@@ -15,8 +15,7 @@ class InvsetingApi(private val client: OkHttpClient) {
             .get()
             .build()
 
-        val result = client.newCall(request).await()
-        return result
+        return client.newCall(request).await()
     }
 
     suspend fun getRecentPriceHistory(id: Int): Response {
@@ -26,7 +25,6 @@ class InvsetingApi(private val client: OkHttpClient) {
             .get()
             .build()
 
-        val result = client.newCall(request).await()
-        return result
+        return client.newCall(request).await()
     }
 }
