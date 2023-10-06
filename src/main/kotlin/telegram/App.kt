@@ -6,52 +6,65 @@ import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import services.RequestService
-import java.util.*
 
 class App(private val bot_token: String) {
+    private lateinit var botJob: Job
+    private lateinit var telegramBot: Bot
+    private lateinit var model: BotModel
+    private lateinit var mainScope: CoroutineScope
 
-    fun run() = runBlocking {
-        coroutineScope {
-            initBot()
-        }
-        coroutineScope {
+    suspend fun run() = coroutineScope {
+        mainScope = this
+        model = BotModel(mainScope)
+        initBot(mainScope)
+
+        launch {
             val t1 = "SBER"
-            val t1Price = async(Dispatchers.IO) { RequestService.get().getLastPrice(t1) }
+            val t1Job = async(Dispatchers.IO) { RequestService.get().getLastPrice(t1) }
 
-            val t2 = "GAZP"
-            val t2Price = async(Dispatchers.IO) { RequestService.get().getLastPrice(t2) }
-            println("$t1 price = ${t1Price.await()}")
-            println("$t2 price = ${t2Price.await()}")
+            val t2 = "USD/RUB"
+            val t2Job = async(Dispatchers.IO) { RequestService.get().getLastPrice(t2) }
+            val p1 = t1Job.await()
+            val p2 = t2Job.await()
+            println("$t1 price = ${p1.price}")
+            println("$t2 price = ${p2.price}")
         }
-        val date = Date(1696330380000)
-        println(date)
     }
 
-    private fun initBot() {
-        val telegramBot: Bot = bot {
+    private suspend fun initBot(scope: CoroutineScope) {
+        telegramBot = bot {
             token = bot_token
             dispatch {
                 command("start") {
-                    println("$message\n")
-                    val result = bot.sendMessage(chatId = ChatId.fromId(message.chat.id), text = "Hi there!")
-                    result.fold({
-                        println(it)
-                        // do something here with the response
-                    }, {
-                        // do something with the error
-                    })
+                    model.dispatchStartMessage(message.chat.id)
+                    update.consume()
                 }
-                //echo
+
+                command("stop") {
+                    bot.sendMessage(chatId = ChatId.fromId(message.chat.id), text = "Stopping bot")
+                    onStop()
+                    update.consume()
+                }
+
                 text {
-                    bot.sendMessage(chatId = ChatId.fromId(message.chat.id), text = text)
+                    model.handleTextInput(message.chat.id, text)
                 }
             }
         }
         telegramBot.startPolling()
+        botJob = scope.launch {
+            model.outMessage.collect { event ->
+                event.getValue()?.let { message ->
+                    telegramBot.sendMessage(chatId = ChatId.fromId(message.id), text = message.text)
+                }
+            }
+        }
+    }
+
+    private fun onStop() {
+        telegramBot.stopPolling()
+        mainScope.cancel()
     }
 }

@@ -1,5 +1,6 @@
 package services
 
+import api.investing.InvestingSecurity
 import api.investing.InvsetingApi
 import api.investing.SearchResponse
 import kotlinx.serialization.json.Json
@@ -13,39 +14,32 @@ import java.util.*
 class RequestService private constructor() {
     private val format = Json { ignoreUnknownKeys = true }
     private val invsetingApi = InvsetingApi(client)
-    private val idCache = mutableMapOf<String, Int>()
+    private val idCache = mutableMapOf<String, InvestingSecurity>()
 
-    suspend fun getInvestingTickerId(ticker: String): Int {
-        if (idCache.containsKey(ticker))
-            return idCache[ticker]!!
-
-        val response = invsetingApi.performSearch(ticker)
-        if (response.code == 200 && response.body != null) {
-            val body = response.body!!.string()
-//                println(body)
-            val obj = format.decodeFromString<SearchResponse>(body)
-
-            for (quote in obj.quotes) {
-                if (quote.symbol == ticker) {
-                    idCache[ticker] = quote.id
-                    return quote.id
-                }
+    suspend fun getInvestingTicker(ticker: String): InvestingSecurity {
+        val normalizedTicker = ticker.uppercase(Locale.getDefault())
+        if (idCache.containsKey(normalizedTicker))
+            return idCache[normalizedTicker]!!
+        val response = performSearch(normalizedTicker)
+        for (quote in response.quotes) {
+            if (quote.symbol == normalizedTicker) {
+                idCache[normalizedTicker] = quote
+                return quote
             }
         }
-        return 0
-
+        return InvestingSecurity(id = -1, description = String(), symbol = String())
     }
 
-    suspend fun getLastPrice(ticker: String): Double {
-        val id = getInvestingTickerId(ticker)
+    suspend fun getLastPrice(ticker: String): Price {
+        val security = getInvestingTicker(ticker)
 
-        if (id < 1)
-            return 0.0
+        if (security.id < 1)
+            return Price()
 
-        val response = invsetingApi.getRecentPriceHistory(id)
+        val response = invsetingApi.getRecentPriceHistory(security.id)
 
         if (response.code != 200)
-            return 0.0
+            return Price()
 
         val body = response.body!!.string()
         val root = format.parseToJsonElement(body)
@@ -61,8 +55,18 @@ class RequestService private constructor() {
 //            [2] - LOW
 //            [3] - HIGH
 //            [4] - TO
-        val result = format.decodeFromJsonElement<Double>(last.jsonArray[4])
-        return result
+        val price = format.decodeFromJsonElement<Double>(last.jsonArray[4])
+        return Price(date, price)
+    }
+
+    private suspend fun performSearch(ticker: String): SearchResponse {
+        val response = invsetingApi.performSearch(ticker)
+        if (response.code == 200 && response.body != null) {
+            val body = response.body!!.string()
+//                println(body)
+            return format.decodeFromString<SearchResponse>(body)
+        }
+        return SearchResponse(quotes = emptyList())
     }
 
     companion object {
