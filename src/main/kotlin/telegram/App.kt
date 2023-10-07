@@ -28,8 +28,12 @@ class App(private val bot_token: String) {
             val t2Job = async(Dispatchers.IO) { RequestService.get().getLastPrice(t2) }
             val p1 = t1Job.await()
             val p2 = t2Job.await()
-            println("$t1 price = ${p1.price}")
-            println("$t2 price = ${p2.price}")
+            if (p1 is Resource.Success) {
+                println("$t1 price = ${p1.data!!.price}")
+            }
+            if (p2 is Resource.Success) {
+                println("$t1 price = ${p2.data!!.price}")
+            }
         }
     }
 

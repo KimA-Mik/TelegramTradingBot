@@ -1,5 +1,6 @@
 package services
 
+import Resource
 import api.investing.InvestingSecurity
 import api.investing.InvsetingApi
 import api.investing.SearchResponse
@@ -16,47 +17,59 @@ class RequestService private constructor() {
     private val invsetingApi = InvsetingApi(client)
     private val idCache = mutableMapOf<String, InvestingSecurity>()
 
-    suspend fun getInvestingTicker(ticker: String): InvestingSecurity {
-        val normalizedTicker = ticker.uppercase(Locale.getDefault())
-        if (idCache.containsKey(normalizedTicker))
-            return idCache[normalizedTicker]!!
-        val response = performSearch(normalizedTicker)
-        for (quote in response.quotes) {
-            if (quote.symbol == normalizedTicker) {
-                idCache[normalizedTicker] = quote
-                return quote
+    suspend fun getInvestingTicker(ticker: String): Resource<InvestingSecurity> {
+        try {
+            val normalizedTicker = ticker.trim().uppercase(Locale.getDefault())
+            if (idCache.containsKey(normalizedTicker))
+                return Resource.Success(idCache[normalizedTicker]!!)
+            val response = performSearch(normalizedTicker)
+            for (quote in response.quotes) {
+                if (quote.symbol == normalizedTicker) {
+                    idCache[normalizedTicker] = quote
+                    return Resource.Success(quote)
+                }
             }
+            return Resource.Error("Not found")
+        } catch (e: Exception) {
+            println(e.message)
+            return Resource.Error("Investing ticker $ticker was not found")
         }
-        return InvestingSecurity(id = -1, description = String(), symbol = String())
+
     }
 
-    suspend fun getLastPrice(ticker: String): Price {
-        val security = getInvestingTicker(ticker)
+    suspend fun getLastPrice(ticker: String): Resource<Price> {
+        try {
+            val securityResource = getInvestingTicker(ticker)
+            if (securityResource is Resource.Error) {
+                return Resource.Error(securityResource.message)
+            }
+            val security = securityResource.data!!
 
-        if (security.id < 1)
-            return Price()
+            val response = invsetingApi.getRecentPriceHistory(security.id)
 
-        val response = invsetingApi.getRecentPriceHistory(security.id)
+            if (response.code != 200)
+                return Resource.Error("Server error")
 
-        if (response.code != 200)
-            return Price()
-
-        val body = response.body!!.string()
-        val root = format.parseToJsonElement(body)
-        val data = root.jsonObject["data"]!!
+            val body = response.body!!.string()
+            val root = format.parseToJsonElement(body)
+            val data = root.jsonObject["data"]!!
 
 //            for (line in data.jsonArray) {
 //                println(line)
 //            }
 
-        val last = data.jsonArray.last()
-        val date = Date(format.decodeFromJsonElement<Long>(last.jsonArray[0]))
+            val last = data.jsonArray.last()
+            val date = Date(format.decodeFromJsonElement<Long>(last.jsonArray[0]))
 //            [1] - FROM
 //            [2] - LOW
 //            [3] - HIGH
 //            [4] - TO
-        val price = format.decodeFromJsonElement<Double>(last.jsonArray[4])
-        return Price(date, price)
+            val price = format.decodeFromJsonElement<Double>(last.jsonArray[4])
+            return Resource.Success(Price(date, price))
+        } catch (e: Exception) {
+            println(e.message)
+            return Resource.Error("Was not able to get last price for $ticker")
+        }
     }
 
     private suspend fun performSearch(ticker: String): SearchResponse {
