@@ -1,5 +1,6 @@
 import kotlinx.coroutines.runBlocking
 import telegram.App
+import java.util.Locale
 
 
 fun main(): Unit = runBlocking {
@@ -9,6 +10,7 @@ fun main(): Unit = runBlocking {
         return@runBlocking
     }
 
+    Locale.setDefault(Locale("ru", "RU"))
     val app = App(token)
     app.run()
 }

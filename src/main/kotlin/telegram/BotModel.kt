@@ -8,10 +8,12 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import services.RequestService
+import java.text.SimpleDateFormat
 
 
 class BotModel(private val scope: CoroutineScope) {
     private val service = RequestService.get()
+    private val dateFormatter = SimpleDateFormat("dd.MM, EEE HH:mm")
 
     private val _outMessage = MutableSharedFlow<Message>()
     val outMessage = _outMessage.asSharedFlow()
@@ -27,14 +29,14 @@ class BotModel(private val scope: CoroutineScope) {
         val securityResponse = securityJob.await()
         val priceResponse = priceJob.await()
         val outText = if (securityResponse is Resource.Error) {
-            "[ERROR] ${securityResponse.message}"
+            "[ОШИБКА] ${securityResponse.message}"
         } else {
             val security = securityResponse.data!!
             if (priceResponse is Resource.Success) {
                 val price = priceResponse.data!!
-                "${security.symbol} - ${security.description}\n${price.date} - ${price.price}"
+                "${security.symbol} - ${security.description}\n${dateFormatter.format(price.date)} - ${price.price}"
             } else {
-                "${security.symbol} - ${security.description}\nPrice not found"
+                "${security.symbol} - ${security.description}\nЦена не найдена"
             }
         }
         val message = Message(id, outText)

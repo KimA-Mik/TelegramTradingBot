@@ -12,6 +12,7 @@ class InvsetingApi(private val client: OkHttpClient) {
         val requestUrl = "$URL/search/v2/search?q=$query"
         val request = Request.Builder()
             .url(requestUrl)
+            .header("Domain-Id", "ru")
             .get()
             .build()
 
@@ -22,6 +23,7 @@ class InvsetingApi(private val client: OkHttpClient) {
         val requestUrl = "$URL/financialdata/$id/historical/chart/?interval=PT1M&pointscount=60"
         val request = Request.Builder()
             .url(requestUrl)
+            .header("Domain-Id", "ru")
             .get()
             .build()
 

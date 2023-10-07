@@ -9,6 +9,7 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import okhttp3.OkHttpClient
+import okhttp3.Protocol
 import java.util.*
 
 
@@ -29,10 +30,10 @@ class RequestService private constructor() {
                     return Resource.Success(quote)
                 }
             }
-            return Resource.Error("Not found")
+            return Resource.Error("Тикер $ticker не найден")
         } catch (e: Exception) {
             println(e.message)
-            return Resource.Error("Investing ticker $ticker was not found")
+            return Resource.Error("Тикер $ticker не найден")
         }
 
     }
@@ -48,7 +49,7 @@ class RequestService private constructor() {
             val response = invsetingApi.getRecentPriceHistory(security.id)
 
             if (response.code != 200)
-                return Resource.Error("Server error")
+                return Resource.Error("Проблемы с сервером")
 
             val body = response.body!!.string()
             val root = format.parseToJsonElement(body)
@@ -68,7 +69,7 @@ class RequestService private constructor() {
             return Resource.Success(Price(date, price))
         } catch (e: Exception) {
             println(e.message)
-            return Resource.Error("Was not able to get last price for $ticker")
+            return Resource.Error("Не удалось получить цену для $ticker")
         }
     }
 
@@ -83,14 +84,17 @@ class RequestService private constructor() {
     }
 
     companion object {
-        private val client = OkHttpClient()
+        private val client = OkHttpClient.Builder().protocols(
+            listOf(Protocol.HTTP_1_1)
+        ).build()
         private var instance: RequestService? = null
 //        private val JSON = "application/json".toMediaType()
 //        private val HTML = "text/html; charset=utf-8".toMediaType()
 
         fun get(): RequestService {
-            if (instance == null)
+            if (instance == null) {
                 instance = RequestService()
+            }
             return instance!!
         }
     }
