@@ -1,25 +1,24 @@
 package telegram
 
-import Event
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import services.RequestService
 
 class BotModel(private val scope: CoroutineScope) {
     private val service = RequestService.get()
 
-    private val _outMessage = MutableStateFlow(Event<Message>(null))
-    val outMessage = _outMessage.asStateFlow()
-    fun dispatchStartMessage(sender: Long) {
+    private val _outMessage = MutableSharedFlow<Message>()
+    val outMessage = _outMessage.asSharedFlow()
+    fun dispatchStartMessage(sender: Long) = scope.launch {
         val message = Message(id = sender, text = "Hi there")
-        _outMessage.value = Event(message)
+        _outMessage.emit(message)
     }
 
-    suspend fun handleTextInput(id: Long, text: String) = coroutineScope {
+    suspend fun handleTextInput(id: Long, text: String) = scope.launch {
         val securityJob = async(Dispatchers.IO) { service.getInvestingTicker(text) }
         val priceJob = async(Dispatchers.IO) { service.getLastPrice(text) }
 
@@ -31,6 +30,6 @@ class BotModel(private val scope: CoroutineScope) {
             "${security.symbol} - ${security.description}\n${price.date} - ${price.price}"
         }
         val message = Message(id, outText)
-        _outMessage.value = Event(message)
+        _outMessage.emit(message)
     }
 }

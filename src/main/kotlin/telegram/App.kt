@@ -55,10 +55,8 @@ class App(private val bot_token: String) {
         }
         telegramBot.startPolling()
         botJob = scope.launch {
-            model.outMessage.collect { event ->
-                event.getValue()?.let { message ->
-                    telegramBot.sendMessage(chatId = ChatId.fromId(message.id), text = message.text)
-                }
+            model.outMessage.collect { message ->
+                telegramBot.sendMessage(chatId = ChatId.fromId(message.id), text = message.text)
             }
         }
     }
