@@ -1,45 +1,41 @@
 package telegram
 
 import Resource
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import services.RequestService
-import java.text.SimpleDateFormat
 
 
-class BotModel(private val scope: CoroutineScope) {
-    private val service = RequestService.get()
-    private val dateFormatter = SimpleDateFormat("dd.MM, EEE HH:mm")
+class BotModel() : KoinComponent {
+    private val service: RequestService by inject()
 
     private val _outMessage = MutableSharedFlow<Message>()
     val outMessage = _outMessage.asSharedFlow()
-    fun dispatchStartMessage(sender: Long) = scope.launch {
+    suspend fun dispatchStartMessage(sender: Long) {
         val message = Message(id = sender, text = "Hi there")
         _outMessage.emit(message)
     }
 
-    suspend fun handleTextInput(id: Long, text: String) = scope.launch {
-        val securityJob = async(Dispatchers.IO) { service.getInvestingTicker(text) }
-        val priceJob = async(Dispatchers.IO) { service.getLastPrice(text) }
+    suspend fun handleTextInput(id: Long, text: String) {
 
-        val securityResponse = securityJob.await()
-        val priceResponse = priceJob.await()
-        val outText = if (securityResponse is Resource.Error) {
-            "[ОШИБКА] ${securityResponse.message}"
-        } else {
-            val security = securityResponse.data!!
-            if (priceResponse is Resource.Success) {
-                val price = priceResponse.data!!
-                "${security.symbol} - ${security.description}\n${dateFormatter.format(price.date)} - ${price.price}"
+        withContext(Dispatchers.IO) {
+            val resource = async { service.getMarketData(text) }
+            val result = resource.await()
+
+            val outText = if (result is Resource.Success) {
+                val securityInfo = result.data!!
+                "${securityInfo.security.shortName} (${securityInfo.security.secId}) - ${securityInfo.marketData.last}₽"
             } else {
-                "${security.symbol} - ${security.description}\nЦена не найдена"
+                result.message!!
             }
+
+            val message = Message(id, outText)
+            _outMessage.emit(message)
         }
-        val message = Message(id, outText)
-        _outMessage.emit(message)
     }
 }

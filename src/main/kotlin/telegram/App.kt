@@ -7,9 +7,8 @@ import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
 import kotlinx.coroutines.*
-import services.RequestService
 
-class App(private val bot_token: String) {
+class App(private val botToken: String) {
     private lateinit var botJob: Job
     private lateinit var telegramBot: Bot
     private lateinit var model: BotModel
@@ -17,29 +16,14 @@ class App(private val bot_token: String) {
 
     suspend fun run() = coroutineScope {
         mainScope = this
-        model = BotModel(mainScope)
+        model = BotModel()
         initBot(mainScope)
-
-        launch {
-            val t1 = "SBER"
-            val t1Job = async(Dispatchers.IO) { RequestService.get().getLastPrice(t1) }
-
-            val t2 = "USD/RUB"
-            val t2Job = async(Dispatchers.IO) { RequestService.get().getLastPrice(t2) }
-            val p1 = t1Job.await()
-            val p2 = t2Job.await()
-            if (p1 is Resource.Success) {
-                println("$t1 price = ${p1.data!!.price}")
-            }
-            if (p2 is Resource.Success) {
-                println("$t1 price = ${p2.data!!.price}")
-            }
-        }
     }
 
     private suspend fun initBot(scope: CoroutineScope) {
+        println("Starting bot")
         telegramBot = bot {
-            token = bot_token
+            token = botToken
             dispatch {
                 command("start") {
                     model.dispatchStartMessage(message.chat.id)
@@ -68,5 +52,6 @@ class App(private val bot_token: String) {
     private fun onStop() {
         telegramBot.stopPolling()
         mainScope.cancel()
+        botJob.cancel()
     }
 }
