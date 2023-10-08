@@ -4,6 +4,7 @@ import java.util.Locale
 
 
 fun main(): Unit = runBlocking {
+    println("Investing api")
     val token = System.getenv("TRADE_BOT")
     if (token == null) {
         println("[ERROR]Provide telegram bot token via 'TRADE_BOT' environment variable")
