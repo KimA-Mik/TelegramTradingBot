@@ -24,12 +24,15 @@ class BotModel() : KoinComponent {
     suspend fun handleTextInput(id: Long, text: String) {
 
         withContext(Dispatchers.IO) {
-            val resource = async { service.getMarketData(text) }
+            val resource = async { service.getSecurityMetadata(text) }
             val result = resource.await()
 
             val outText = if (result is Resource.Success) {
-                val securityInfo = result.data!!
-                "${securityInfo.security.shortName} (${securityInfo.security.secId}) - ${securityInfo.marketData.last}₽"
+                val metadata = result.data!!
+                val emitter = metadata.description.find { it.name == "EMITTER_ID" }!!
+                val name = metadata.description.find { it.name == "NAME" }!!
+                val secId = metadata.description.find { it.name == "SECID" }!!
+                "${name.value} (${secId.value}) - emitter ${emitter.value}"
             } else {
                 result.message!!
             }

@@ -6,6 +6,8 @@ import api.moex.data.history.HistoryEntry
 import api.moex.data.history.HistoryResponse
 import api.moex.data.security.SecurityInfo
 import api.moex.data.security.SecurityResponse
+import api.moex.data.securityMetadata.SecurityMetadata
+import api.moex.data.securityMetadata.SecurityMetadataResponse
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -57,6 +59,31 @@ class MoexApi : KoinComponent {
         } catch (e: Exception) {
             println(e.localizedMessage)
             Resource.Error("При поиске последней цены для $securityId произошла чудовищная ошибка")
+        }
+    }
+
+    suspend fun getSecurityMetadata(securityId: String): Resource<SecurityMetadata> {
+        return try {
+            val requestUrl =
+                "$URL/securities/$securityId.json?$DEF_AGRS"
+            val response = client.get(requestUrl)
+            val result: Array<SecurityMetadataResponse> = response.body()
+
+            val data = result[1]
+            val description = data.description
+            val boards = data.boards
+            if (description?.isNotEmpty() == true && boards?.isNotEmpty() == true) {
+                Resource.Success(
+                    SecurityMetadata(
+                        description, boards
+                    )
+                )
+            } else {
+                Resource.Error("Методата для $securityId не найдена")
+            }
+        } catch (e: Exception) {
+            println(e.localizedMessage)
+            Resource.Error("При поиске метадаты для $securityId произошла чудовищная ошибка")
         }
     }
 }

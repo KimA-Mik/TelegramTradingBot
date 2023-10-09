@@ -4,6 +4,7 @@ import Resource
 import api.moex.MoexApi
 import api.moex.data.history.HistoryEntry
 import api.moex.data.security.SecurityInfo
+import api.moex.data.securityMetadata.SecurityMetadata
 
 
 class RequestServiceImpl : RequestService {
@@ -20,4 +21,6 @@ class RequestServiceImpl : RequestService {
     override suspend fun getPriceHistory(securityId: String): Resource<List<HistoryEntry>> =
         moexApi.getPriceHistory(securityId)
 
+    override suspend fun getSecurityMetadata(securityId: String): Resource<SecurityMetadata> =
+        moexApi.getSecurityMetadata(securityId)
 }

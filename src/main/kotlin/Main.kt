@@ -1,7 +1,7 @@
 import api.moex.data.history.HistoryHolder
 import api.moex.data.history.HistoryResponse
-import api.moex.data.security.DataHolder
 import api.moex.data.security.SecurityResponse
+import api.moex.data.securityMetadata.SecurityMetadataResponse
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -54,7 +54,12 @@ fun main(): Unit = runBlocking {
 
                     polymorphic(SecurityResponse::class) {
                         subclass(api.moex.data.security.CharsetInfoHolder::class)
-                        subclass(DataHolder::class)
+                        subclass(api.moex.data.security.DataHolder::class)
+                    }
+
+                    polymorphic(SecurityMetadataResponse::class) {
+                        subclass(api.moex.data.securityMetadata.CharsetInfoHolder::class)
+                        subclass(api.moex.data.securityMetadata.DataHolder::class)
                     }
                 }
             })
