@@ -26,7 +26,7 @@ data class MarketDataEntry(
     @SerialName("WAPTOPREVWAPRICEPRCNT") val wapToPrevWaPricePercent: Double,
     @SerialName("WAPTOPREVWAPRICE") val wapToPrevWaPrice: Double,
     @SerialName("CLOSEPRICE") val closePrice: Double?,
-    @SerialName("MARKETPRICETODAY") val marketPriceToday: Double,
+    @SerialName("MARKETPRICETODAY") val marketPriceToday: Double?,
     @SerialName("MARKETPRICE") val marketPrice: Double,
     @SerialName("LASTTOPREVPRICE") val lastToPrevPrice: Double,
     @SerialName("NUMTRADES") val numTrades: Int,
@@ -36,7 +36,7 @@ data class MarketDataEntry(
     @SerialName("ETFSETTLEPRICE") val etfSettlePrice: Double?,
     @SerialName("TRADINGSTATUS") val tradingStatus: String,
     @SerialName("UPDATETIME") val updateTime: String, // time "23:50:07"
-    @SerialName("LCLOSEPRICE") val lClosePrice: Double,
+    @SerialName("LCLOSEPRICE") val lClosePrice: Double?,
     @SerialName("LCURRENTPRICE") val lCurrentPrice: Double,
     @SerialName("MARKETPRICE2") val marketPrice2: Double?,
     @SerialName("CHANGE") val change: Double,
@@ -45,7 +45,7 @@ data class MarketDataEntry(
     @SerialName("OPENPERIODPRICE") val openPeriodPrice: Double?,
     @SerialName("SEQNUM") val seqNum: Long,
     @SerialName("SYSTIME") val sysTime: String, //DateTime "2023-10-08 00:05:00"
-    @SerialName("CLOSINGAUCTIONPRICE") val closingAuctionPrice: Double,
+    @SerialName("CLOSINGAUCTIONPRICE") val closingAuctionPrice: Double?,
     @SerialName("CLOSINGAUCTIONVOLUME") val closingAuctionVolume: Double?,
     @SerialName("ISSUECAPITALIZATION") val issueCapitalization: Double,
     @SerialName("ISSUECAPITALIZATION_UPDATETIME") val issueCapitalizationUpdateTime: String, //Time "23:49:58"
