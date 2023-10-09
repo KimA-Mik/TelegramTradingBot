@@ -28,7 +28,7 @@ data class MarketDataEntry(
     @SerialName("CLOSEPRICE") val closePrice: Double? = null,
     @SerialName("MARKETPRICETODAY") val marketPriceToday: Double? = null,
     @SerialName("MARKETPRICE") val marketPrice: Double? = null, //futures
-    @SerialName("LASTTOPREVPRICE") val lastToPrevPrice: Double,
+    @SerialName("LASTTOPREVPRICE") val lastToPrevPrice: Double? = null,
     @SerialName("NUMTRADES") val numTrades: Int,
     @SerialName("VOLTODAY") val volToday: Long,
     @SerialName("VALTODAY") val valToday: Long,
