@@ -33,7 +33,7 @@ class MoexApi : KoinComponent {
 
             Resource.Success(history[1].history)
         } catch (e: Exception) {
-            println(e.localizedMessage)
+            println(e.message)
             Resource.Error("При поиске истории цен для $securityId произошла чудовищная ошибка")
         }
     }
@@ -65,7 +65,7 @@ class MoexApi : KoinComponent {
                 Resource.Error("Последняя цена для $securityId не найдена")
             }
         } catch (e: Exception) {
-            println(e.localizedMessage)
+            println(e.message)
             Resource.Error("При поиске последней цены для $securityId произошла чудовищная ошибка")
         }
     }
@@ -91,7 +91,7 @@ class MoexApi : KoinComponent {
                 Resource.Error("Методата для $securityId не найдена")
             }
         } catch (e: Exception) {
-            println(e.localizedMessage)
+            println(e.message)
             Resource.Error("При поиске метадаты для $securityId произошла чудовищная ошибка")
         }
     }
@@ -112,7 +112,7 @@ class MoexApi : KoinComponent {
                 Resource.Error("Не удалост получить иформацию о бумагах эмитента $emitterId")
             }
         } catch (e: Exception) {
-            println(e.localizedMessage)
+            println(e.message)
             Resource.Error("При получении информации о бумагах эмитента $emitterId произошла чудовищная ошибка")
         }
     }
