@@ -1,7 +1,8 @@
 package api.moex
 
-
 import Resource
+import api.moex.data.emitter.securities.EmitterSecurity
+import api.moex.data.emitter.securities.EmitterSecurityResponse
 import api.moex.data.history.HistoryEntry
 import api.moex.data.history.HistoryResponse
 import api.moex.data.security.SecurityInfo
@@ -37,10 +38,17 @@ class MoexApi : KoinComponent {
         }
     }
 
-    suspend fun getMarketData(securityId: String): Resource<SecurityInfo> {
+    //example sec: https://iss.moex.com/iss/engines/stock/markets/shares/boards/TQBR/securities/SBER.json?iss.meta=off&iss.json=extended
+    //example futures: https://iss.moex.com/iss/engines/futures/markets/forts/boards/RFUD/securities/SRZ3.json?iss.meta=off&iss.json=extended
+    suspend fun getMarketData(
+        securityId: String,
+        engine: String = "stock",
+        market: String = "shares",
+        board: String = "TQBR"
+    ): Resource<SecurityInfo> {
         return try {
             val requestUrl =
-                "$URL/engines/stock/markets/shares/boards/TQBR/securities/$securityId.json?$DEF_AGRS"
+                "$URL/engines/$engine/markets/$market/boards/$board/securities/$securityId.json?$DEF_AGRS"
             val response = client.get(requestUrl)
             val result: Array<SecurityResponse> = response.body()
 
@@ -62,6 +70,7 @@ class MoexApi : KoinComponent {
         }
     }
 
+    //example: https://iss.moex.com/iss/securities/GAZP.jsonp?iss.meta=off&iss.json=extended&lang=ru&shortname=1
     suspend fun getSecurityMetadata(securityId: String): Resource<SecurityMetadata> {
         return try {
             val requestUrl =
@@ -84,6 +93,27 @@ class MoexApi : KoinComponent {
         } catch (e: Exception) {
             println(e.localizedMessage)
             Resource.Error("При поиске метадаты для $securityId произошла чудовищная ошибка")
+        }
+    }
+
+    //example: https://iss.moex.com/iss/emitters/1243/securities.jsonp?iss.meta=off&iss.json=extended&lang=ru
+    suspend fun getEmitterSecurities(emitterId: Int): Resource<List<EmitterSecurity>> {
+        return try {
+            val requestUrl =
+                "$URL/emitters/$emitterId/securities.json?$DEF_AGRS&lang=ru"
+            val response = client.get(requestUrl)
+            val result: Array<EmitterSecurityResponse> = response.body()
+            val data = result[1]
+            val securities = data.securities
+
+            if (securities?.isNotEmpty() == true) {
+                Resource.Success(securities)
+            } else {
+                Resource.Error("Не удалост получить иформацию о бумагах эмитента $emitterId")
+            }
+        } catch (e: Exception) {
+            println(e.localizedMessage)
+            Resource.Error("При получении информации о бумагах эмитента $emitterId произошла чудовищная ошибка")
         }
     }
 }

@@ -1,3 +1,4 @@
+import api.moex.data.emitter.securities.EmitterSecurityResponse
 import api.moex.data.history.HistoryHolder
 import api.moex.data.history.HistoryResponse
 import api.moex.data.security.SecurityResponse
@@ -37,7 +38,7 @@ fun main(): Unit = runBlocking {
         }
 
         install(Logging) {
-            level = LogLevel.ALL
+            level = LogLevel.NONE
         }
         install(ContentNegotiation) {
             json(Json {
@@ -60,6 +61,11 @@ fun main(): Unit = runBlocking {
                     polymorphic(SecurityMetadataResponse::class) {
                         subclass(api.moex.data.securityMetadata.CharsetInfoHolder::class)
                         subclass(api.moex.data.securityMetadata.DataHolder::class)
+                    }
+
+                    polymorphic(EmitterSecurityResponse::class) {
+                        subclass(api.moex.data.emitter.securities.CharsetInfoHolder::class)
+                        subclass(api.moex.data.emitter.securities.DataHolder::class)
                     }
                 }
             })
