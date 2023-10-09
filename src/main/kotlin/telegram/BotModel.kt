@@ -88,9 +88,15 @@ class BotModel() : KoinComponent {
         val commonSecurity = commonShareResource.data!!
         val futuresSecurity = futuresResource.data!!
 
-        val maxValue = max(futuresSecurity.marketData.last, commonSecurity.marketData.last * 100)
-        val minValue = min(futuresSecurity.marketData.last, commonSecurity.marketData.last * 100)
-        val diff = (maxValue - minValue) / minValue * 100
+        val d = futuresSecurity.marketData.last / commonSecurity.marketData.last
+        val factor = when (d.toInt()) {
+            in 5..15 -> 10.0
+            in 50..150 -> 100.0
+            else -> 1.0
+        }
+        val maxValue = max(futuresSecurity.marketData.last, commonSecurity.marketData.last * factor)
+        val minValue = min(futuresSecurity.marketData.last, commonSecurity.marketData.last * factor)
+        val diff = (maxValue - minValue) / minValue * 100.0
 
         return@withContext "Акция (${commonSecurity.security.secId}): ${commonSecurity.security.shortName} - ${commonSecurity.marketData.last}₽\n" +
                 "Фьючерс (${futuresSecurity.security.secId}): ${futuresSecurity.security.shortName} - ${futuresSecurity.marketData.last}₽\n" +
