@@ -7,12 +7,14 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import services.RequestService
 import java.text.SimpleDateFormat
 
 
-class BotModel(private val scope: CoroutineScope) {
-    private val service = RequestService.get()
+class BotModel(private val scope: CoroutineScope) : KoinComponent {
+    private val service: RequestService by inject()
     private val dateFormatter = SimpleDateFormat("dd.MM, EEE HH:mm")
 
     private val _outMessage = MutableSharedFlow<Message>()

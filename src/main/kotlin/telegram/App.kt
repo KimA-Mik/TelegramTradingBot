@@ -7,9 +7,12 @@ import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
 import kotlinx.coroutines.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import services.RequestService
 
-class App(private val bot_token: String) {
+class App(private val bot_token: String) : KoinComponent {
+    private val service: RequestService by inject()
     private lateinit var botJob: Job
     private lateinit var telegramBot: Bot
     private lateinit var model: BotModel
@@ -17,22 +20,27 @@ class App(private val bot_token: String) {
 
     suspend fun run() = coroutineScope {
         mainScope = this
-        model = BotModel(mainScope)
-        initBot(mainScope)
+//        model = BotModel(mainScope)
+//        initBot(mainScope)
 
         launch {
             val t1 = "SBER"
-            val t1Job = async(Dispatchers.IO) { RequestService.get().getLastPrice(t1) }
+            val t1Job = async(Dispatchers.IO) { service.getLastPrice(t1) }
 
             val t2 = "USD/RUB"
-            val t2Job = async(Dispatchers.IO) { RequestService.get().getLastPrice(t2) }
+            val t2Job = async(Dispatchers.IO) { service.getLastPrice(t2) }
             val p1 = t1Job.await()
             val p2 = t2Job.await()
             if (p1 is Resource.Success) {
                 println("$t1 price = ${p1.data!!.price}")
             }
             if (p2 is Resource.Success) {
-                println("$t1 price = ${p2.data!!.price}")
+                println("$t2 price = ${p2.data!!.price}")
+            }
+
+            val result = service.getInvestingTicker("SBER")
+            if (result is Resource.Success) {
+                println(result.data)
             }
         }
     }

@@ -9,14 +9,21 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import okhttp3.OkHttpClient
-import okhttp3.Protocol
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import util.Logger
 import java.util.*
 
 
-class RequestService private constructor() {
+class RequestService : KoinComponent {
+    private val client: OkHttpClient by inject()
+//        private val JSON = "application/json".toMediaType()
+//        private val HTML = "text/html; charset=utf-8".toMediaType()
+
     private val format = Json { ignoreUnknownKeys = true }
     private val invsetingApi = InvsetingApi(client)
     private val idCache = mutableMapOf<String, InvestingSecurity>()
+    private val logger: Logger by inject()
 
     suspend fun getInvestingTicker(ticker: String): Resource<InvestingSecurity> {
         try {
@@ -32,7 +39,7 @@ class RequestService private constructor() {
             }
             return Resource.Error("Тикер $ticker не найден")
         } catch (e: Exception) {
-            println(e.message)
+            e.message?.let { logger.logError(it) }
             return Resource.Error("Тикер $ticker не найден")
         }
 
@@ -68,7 +75,7 @@ class RequestService private constructor() {
             val price = format.decodeFromJsonElement<Double>(last.jsonArray[4])
             return Resource.Success(Price(date, price))
         } catch (e: Exception) {
-            println(e.message)
+            e.message?.let { logger.logError(it) }
             return Resource.Error("Не удалось получить цену для $ticker")
         }
     }
@@ -81,21 +88,5 @@ class RequestService private constructor() {
             return format.decodeFromString<SearchResponse>(body)
         }
         return SearchResponse(quotes = emptyList())
-    }
-
-    companion object {
-        private val client = OkHttpClient.Builder().protocols(
-            listOf(Protocol.HTTP_1_1)
-        ).build()
-        private var instance: RequestService? = null
-//        private val JSON = "application/json".toMediaType()
-//        private val HTML = "text/html; charset=utf-8".toMediaType()
-
-        fun get(): RequestService {
-            if (instance == null) {
-                instance = RequestService()
-            }
-            return instance!!
-        }
     }
 }
