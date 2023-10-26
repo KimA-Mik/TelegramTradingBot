@@ -1,4 +1,4 @@
-package util
+package util.logger
 
 interface Logger {
     fun logMessage(message: String)

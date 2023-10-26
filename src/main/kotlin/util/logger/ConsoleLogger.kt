@@ -1,4 +1,4 @@
-package util
+package util.logger
 
 class ConsoleLogger : Logger {
     override fun logMessage(message: String) {

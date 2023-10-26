@@ -23,6 +23,8 @@ class App(private val bot_token: String) : KoinComponent {
 //        model = BotModel(mainScope)
 //        initBot(mainScope)
 
+
+        //TODO: Remove launch bloch
         launch {
             val t1 = "SBER"
             val t1Job = async(Dispatchers.IO) { service.getLastPrice(t1) }
@@ -38,9 +40,18 @@ class App(private val bot_token: String) : KoinComponent {
                 println("$t2 price = ${p2.data!!.price}")
             }
 
-            val result = service.getInvestingTicker("SBER")
+            val result = service.getInvestingTickerFutures("SBER")
             if (result is Resource.Success) {
                 println(result.data)
+            }
+
+            val price = result.data?.let { service.getLastPrice(it.symbol) }
+            if (price is Resource.Success) {
+                println("$t2 price = ${price.data!!.price}")
+            } else {
+                if (price != null) {
+                    println(price.message)
+                }
             }
         }
     }

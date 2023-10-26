@@ -1,21 +1,20 @@
-import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.Protocol
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import services.RequestService
 import telegram.App
-import util.ConsoleLogger
-import util.Logger
-import java.util.Locale
+import util.logger.ConsoleLogger
+import util.logger.Logger
+import java.util.*
 
 
-fun main(): Unit = runBlocking {
+suspend fun main() {
     println("Investing api")
     val token = System.getenv("TRADE_BOT")
     if (token == null) {
         println("[ERROR]Provide telegram bot token via 'TRADE_BOT' environment variable")
-        return@runBlocking
+        return
     }
 
     Locale.setDefault(Locale("ru", "RU"))

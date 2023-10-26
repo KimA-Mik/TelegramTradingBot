@@ -11,7 +11,7 @@ import kotlinx.serialization.json.jsonObject
 import okhttp3.OkHttpClient
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import util.Logger
+import util.logger.Logger
 import java.util.*
 
 
@@ -77,6 +77,38 @@ class RequestService : KoinComponent {
         } catch (e: Exception) {
             e.message?.let { logger.logError(it) }
             return Resource.Error("Не удалось получить цену для $ticker")
+        }
+    }
+
+    suspend fun getInvestingTickerFutures(ticker: String): Resource<InvestingSecurity> {
+        try {
+            val normalizedTicker = ticker.trim().uppercase(Locale.getDefault())
+
+            val response = performSearch(normalizedTicker)
+            for (quote in response.quotes) {
+                if (quote.description.contains("Фьючерс", true)) {
+                    idCache[quote.symbol.uppercase()] = quote
+                    return Resource.Success(quote)
+                }
+            }
+
+            return Resource.Error("Фьючерс $ticker не найден")
+        } catch (e: Exception) {
+            e.message?.let { logger.logError(it) }
+            return Resource.Error("Фьючерс $ticker не найден")
+        }
+
+    }
+
+    suspend fun getFuturesLastPrice(ticker: String): Resource<Price> {
+        return try {
+            val futures = getInvestingTickerFutures(ticker)
+            val response = futures.data?.let { invsetingApi.getFuturesPriceHistory(it.id) }
+
+            Resource.Error("123")
+        } catch (e: Exception) {
+            e.message?.let { logger.logError(it) }
+            Resource.Error("Цена Фьючерса $ticker не найден")
         }
     }
 
