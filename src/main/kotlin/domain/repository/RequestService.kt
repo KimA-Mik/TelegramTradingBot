@@ -1,4 +1,4 @@
-package domain.futures.repository
+package domain.repository
 
 import Resource
 import data.moex.data.emitter.securities.EmitterSecurity

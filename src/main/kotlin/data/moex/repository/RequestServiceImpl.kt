@@ -6,7 +6,7 @@ import data.moex.data.emitter.securities.EmitterSecurity
 import data.moex.data.history.HistoryEntry
 import data.moex.data.security.SecurityInfo
 import data.moex.data.securityMetadata.SecurityMetadata
-import domain.futures.repository.RequestService
+import domain.repository.RequestService
 
 
 class RequestServiceImpl(private val moexApi: MoexApi) : RequestService {

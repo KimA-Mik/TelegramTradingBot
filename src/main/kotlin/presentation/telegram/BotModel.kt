@@ -4,7 +4,7 @@ import Resource
 import data.moex.data.emitter.securities.EmitterSecuritiesTypes
 import data.moex.data.securityMetadata.SecurityMetadata
 import data.moex.data.securityMetadata.SecurityMetadataTypes
-import domain.futures.repository.RequestService
+import domain.repository.RequestService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
