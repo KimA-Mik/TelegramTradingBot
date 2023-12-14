@@ -6,9 +6,12 @@ import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
+import domain.securities.useCase.FindSecurityUseCase
 import kotlinx.coroutines.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class App(private val botToken: String) {
+class App(private val botToken: String) : KoinComponent {
     private lateinit var botJob: Job
     private lateinit var telegramBot: Bot
     private lateinit var model: BotModel
@@ -16,7 +19,8 @@ class App(private val botToken: String) {
 
     suspend fun run() = coroutineScope {
         mainScope = this
-        model = BotModel()
+        val findSecurity: FindSecurityUseCase by inject()
+        model = BotModel(findSecurity)
         initBot(mainScope)
     }
 

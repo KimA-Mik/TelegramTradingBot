@@ -1,12 +1,12 @@
 package domain.securities.useCase
 
 import Resource
-import domain.repository.RequestService
+import domain.repository.MoexRepository
 import domain.securities.model.Security
-import kotlinx.coroutines.flow.flow
 
-class FindSecurityUseCase(private val requestService: RequestService) {
-    suspend operator fun invoke(secName: String) = flow<Resource<Security>> {
-        emit(Resource.Error(""))
+class FindSecurityUseCase(private val moexRepository: MoexRepository) {
+    suspend operator fun invoke(secName: String): Resource<Security> {
+        println("Looking for ${secName}")
+        return moexRepository.getSecurity(secName)
     }
 }

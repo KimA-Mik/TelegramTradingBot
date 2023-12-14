@@ -1,23 +1,18 @@
 package presentation.telegram
 
 import Resource
-import data.moex.data.emitter.securities.EmitterSecuritiesTypes
-import data.moex.data.securityMetadata.SecurityMetadata
-import data.moex.data.securityMetadata.SecurityMetadataTypes
-import domain.repository.RequestService
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import domain.securities.useCase.FindSecurityUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import kotlin.math.max
 import kotlin.math.min
 
 
-class BotModel : KoinComponent {
-    private val service: RequestService by inject()
+class BotModel(
+    private val findSecurity: FindSecurityUseCase
+) : KoinComponent {
+//    private val service: MoexRepository by inject()
 
     private val _outMessage = MutableSharedFlow<Message>()
     val outMessage = _outMessage.asSharedFlow()
@@ -30,98 +25,63 @@ class BotModel : KoinComponent {
         val tickers = text.split(' ')
         for (ticker in tickers) {
             val outText = getSecurityDescription(ticker.trim().uppercase())
-
             val message = Message(id, outText)
             _outMessage.emit(message)
         }
     }
 
-    private suspend fun getSecurityDescription(securityId: String): String = withContext(Dispatchers.IO) {
-        //TODO: Abstract out operations to service
-        val metadata = service.getSecurityMetadata(securityId)
-        if (metadata is Resource.Error) {
-            return@withContext "${metadata.message}"
+    private suspend fun getSecurityDescription(securityId: String): String {
+        val result = findSecurity(securityId)
+        if (result is Resource.Error) {
+            return result.message!!
         }
 
-        val emitterId =
-            metadata.data?.description?.find { it.name == SecurityMetadataTypes.EMITTER_ID.type }?.value?.toInt()
-                ?: return@withContext getFuturesStrFromMetadata(metadata.data)
-
-        val emitterSecuritiesResource = service.getEmitterSecurities(emitterId)
-        if (emitterSecuritiesResource is Resource.Error) {
-            return@withContext "${emitterSecuritiesResource.message}"
+        val security = result.data!!
+        var answer = "[${security.time}]\nАкция (${security.secId}): ${security.shortName} - ${security.price}₽\n"
+        if (security.futures.isEmpty()) {
+            return answer + "Фьючерсы не найдены"
         }
 
-        val emitterSecurities = emitterSecuritiesResource.data
-        val commonShare = emitterSecurities?.find { it.type == EmitterSecuritiesTypes.COMMON_SHARE.type }
-            ?: return@withContext "Не удалось найти акцию"
-
-        val futures = emitterSecurities.find { it.type == EmitterSecuritiesTypes.FUTURES.type }
-            ?: return@withContext "Не удалось найти фьючерс"
-
-        val commonShareJob = async(Dispatchers.IO) {
-            service.getMarketData(
-                commonShare.secId,
-                commonShare.engine,
-                commonShare.market,
-                commonShare.primaryBoardId
-            )
+        for (future in security.futures) {
+            val d = future.price / security.price
+            val factor = future.lotSize?.toDouble() ?: when (d.toInt()) {
+                in 5..15 -> 10.0
+                in 50..150 -> 100.0
+                in 500..1500 -> 1000.0
+                in 5000..15000 -> 10000.0
+                else -> 1.0
+            }
+            val maxValue = max(future.price, security.price * factor)
+            val minValue = min(future.price, security.price * factor)
+            val diff = (maxValue - minValue) / minValue * 100.0
+            answer += "[${future.time}]\nФьючерс (${future.secId}): ${future.shortName} - ${future.price}₽\nРазница: %.2f".format(
+                diff
+            ) + '%'
+            if (diff > 5)
+                answer += '❗'
+            answer += '\n'
         }
-        val futuresJob = async(Dispatchers.IO) {
-            service.getMarketData(
-                futures.secId,
-                futures.engine,
-                futures.market,
-                futures.primaryBoardId
-            )
-        }
-
-        val commonShareResource = commonShareJob.await()
-        val futuresResource = futuresJob.await()
-
-        if (commonShareResource is Resource.Error) {
-            return@withContext commonShareResource.message!!
-        }
-        if (futuresResource is Resource.Error) {
-            return@withContext futuresResource.message!!
-        }
-
-        val commonSecurity = commonShareResource.data!!
-        val futuresSecurity = futuresResource.data!!
-
-        val d = futuresSecurity.marketData.last / commonSecurity.marketData.last
-        val factor = futuresSecurity.security.lotSize?.toDouble() ?: when (d.toInt()) {
-            in 5..15 -> 10.0
-            in 50..150 -> 100.0
-            else -> 1.0
-        }
-        val maxValue = max(futuresSecurity.marketData.last, commonSecurity.marketData.last * factor)
-        val minValue = min(futuresSecurity.marketData.last, commonSecurity.marketData.last * factor)
-        val diff = (maxValue - minValue) / minValue * 100.0
-
-        return@withContext "Акция (${commonSecurity.security.secId}): ${commonSecurity.security.shortName} - ${commonSecurity.marketData.last}₽\n" +
-                "Фьючерс (${futuresSecurity.security.secId}): ${futuresSecurity.security.shortName} - ${futuresSecurity.marketData.last}₽\n" +
-                "Разница: %.2f".format(diff) + "%"
+        return answer
     }
 
-    private suspend fun getFuturesStrFromMetadata(data: SecurityMetadata?): String {
-        if (data == null)
-            return "Не удалост найти метаданные"
-
-        data.description.find { it.value == SecurityMetadataTypes.FUTURES.type }
-            ?: return "Не удалост найти метаданные"
-
-        var result = String()
-        for (board in data.boards) {
-            val marketDataResource = service.getMarketData(board.secId, board.engine, board.market, board.boardId)
-            if (marketDataResource is Resource.Error)
-                continue
-
-            val security = marketDataResource.data?.security!!
-            val marketData = marketDataResource.data.marketData
-            result += "Фьючерс: ${security.shortName} - %.2f₽\n".format(marketData.last)
-        }
-
-        return result.ifEmpty { "Не удалост найти Фьючерс" }
-    }
+//    private suspend fun getFuturesStrFromMetadata(data: SecurityMetadata?): String {
+//        if (data == null)
+//            return "Не удалост найти метаданные"
+//
+//        data.description.find { it.value == SecurityMetadataTypes.FUTURES.type }
+//            ?: return "Не удалост найти метаданные"
+//
+//        var result = String()
+//        for (board in data.boards) {
+//            val marketDataResource = service.getMarketData(board.secId, board.engine, board.market, board.boardId)
+//            if (marketDataResource is Resource.Error)
+//                continue
+//
+//            val security = marketDataResource.data?.security!!
+//            val marketData = marketDataResource.data.marketData
+//            result += "Фьючерс: ${security.shortName} - %.2f₽\n".format(marketData.last)
+//        }
+//
+//        return result.ifEmpty { "Не удалост найти Фьючерс" }
+//    }
 }

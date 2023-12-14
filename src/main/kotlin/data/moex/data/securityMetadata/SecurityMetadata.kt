@@ -23,3 +23,9 @@ data class SecurityMetadata(
 //"name": "TYPE", "title": "Тип бумаги"
 //"name": "GROUPNAME", "title": "Типа инструмента"
 //"name": "EMITTER_ID", "title": "Код эмитента"
+
+//fun SecurityMetadata.toSecurity(): Security {
+//    return Security(
+//
+//    )
+//}

@@ -1,7 +1,6 @@
 import di.dataModule
 import di.domainModule
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.koin.core.context.startKoin
 import presentation.telegram.App
 import java.util.*
@@ -21,7 +20,7 @@ fun main() {
             domainModule()
         )
     }
-    GlobalScope.launch {
+    runBlocking {
         val app = App(token)
         app.run()
     }

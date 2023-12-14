@@ -1,9 +1,13 @@
 package di
 
-import data.moex.repository.RequestServiceImpl
-import domain.repository.RequestService
+import data.moex.repository.MoexRepositoryImpl
+import domain.repository.MoexRepository
+import domain.securities.useCase.FindSecurityUseCase
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 fun domainModule() = module {
-    single<RequestService> { RequestServiceImpl(get()) }
+    single<MoexRepository> { MoexRepositoryImpl(get()) }
+
+    singleOf(::FindSecurityUseCase)
 }

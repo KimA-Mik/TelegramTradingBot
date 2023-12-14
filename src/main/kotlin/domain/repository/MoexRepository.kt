@@ -5,9 +5,10 @@ import data.moex.data.emitter.securities.EmitterSecurity
 import data.moex.data.history.HistoryEntry
 import data.moex.data.security.SecurityInfo
 import data.moex.data.securityMetadata.SecurityMetadata
+import domain.securities.model.Security
 
 
-interface RequestService {
+interface MoexRepository {
     suspend fun getLastPrice(securityId: String): Double
 
     suspend fun getMarketData(
@@ -23,4 +24,5 @@ interface RequestService {
 
     suspend fun getEmitterSecurities(emitterId: Int): Resource<List<EmitterSecurity>>
 
+    suspend fun getSecurity(secId: String): Resource<Security>
 }
