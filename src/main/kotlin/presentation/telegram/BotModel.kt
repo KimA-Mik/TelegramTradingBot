@@ -49,6 +49,7 @@ class BotModel(
                 in 50..150 -> 100.0
                 in 500..1500 -> 1000.0
                 in 5000..15000 -> 10000.0
+                in 50000..150000 -> 100000.0
                 else -> 1.0
             }
             val maxValue = max(future.price, security.price * factor)
