@@ -45,21 +45,24 @@ class BotModel(
         for (future in security.futures) {
             val d = future.price / security.price
             val factor = future.lotSize?.toDouble() ?: when (d.toInt()) {
-                in 5..15 -> 10.0
-                in 50..150 -> 100.0
+                in 5..50 -> 10.0
+                in 50..500 -> 100.0
                 in 500..1500 -> 1000.0
-                in 5000..15000 -> 10000.0
+                in 1500..5000 -> 2000.0
+                in 5000..50000 -> 10000.0
                 in 50000..150000 -> 100000.0
                 else -> 1.0
             }
             val maxValue = max(future.price, security.price * factor)
             val minValue = min(future.price, security.price * factor)
             val diff = (maxValue - minValue) / minValue * 100.0
-            answer += "[${future.time}]\nФьючерс (${future.secId}): ${future.shortName} - ${future.price}₽\nРазница: %.2f".format(
-                diff
-            ) + '%'
-            if (diff > 5)
-                answer += '❗'
+            answer += "[${future.time}]\nФьючерс (${future.secId}): ${future.shortName} - ${future.price}₽\n"
+            if (future.price != 0.0) {
+                answer += "Разница: %.2f".format(diff) + '%'
+                if (diff > 5) {
+                    answer += '❗'
+                }
+            }
             answer += '\n'
         }
         return answer

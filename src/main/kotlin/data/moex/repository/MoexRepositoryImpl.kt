@@ -48,7 +48,7 @@ class MoexRepositoryImpl(private val moexApi: MoexApi) : MoexRepository {
 
         val emitterId =
             metadata.data?.description?.find { it.name == SecurityMetadataTypes.EMITTER_ID.type }?.value?.toInt()
-                ?: return@coroutineScope Resource.Error("Эмитент не найден")
+                ?: return@coroutineScope Resource.Error("Эмитент для $secId не найден")
 //                ?: return Resource.Error(getFuturesStrFromMetadata(metadata.data))
 
         val emitterSecuritiesResource = moexApi.getEmitterSecurities(emitterId)
@@ -58,7 +58,7 @@ class MoexRepositoryImpl(private val moexApi: MoexApi) : MoexRepository {
 
         val emitterSecurities = emitterSecuritiesResource.data
         val commonShare = emitterSecurities?.find { it.type == EmitterSecuritiesTypes.COMMON_SHARE.type }
-            ?: return@coroutineScope Resource.Error("Не удалось найти акцию")
+            ?: return@coroutineScope Resource.Error("Не удалось найти акцию $secId")
 
         val commonShareJob = async(Dispatchers.IO) {
             moexApi.getMarketData(
@@ -93,6 +93,7 @@ class MoexRepositoryImpl(private val moexApi: MoexApi) : MoexRepository {
 
         val resFutures = futures
             .awaitAll()
+            .asSequence()
             .filterIsInstance<Resource.Success<SecurityInfo>>()
             .map { result ->
                 result.data!!
@@ -106,6 +107,7 @@ class MoexRepositoryImpl(private val moexApi: MoexApi) : MoexRepository {
                     time = securityInfo.marketData.time
                 )
             }
+            .toList()
 
         return@coroutineScope Resource.Success(
             Security(
