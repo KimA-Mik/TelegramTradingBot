@@ -19,6 +19,7 @@ import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
+import ru.tinkoff.piapi.core.InvestApi
 
 fun dataModule() = module {
     single {
@@ -66,4 +67,14 @@ fun dataModule() = module {
         }
     }
     singleOf(::MoexApi)
+
+    single {
+        val tinkoffToken = System.getenv("TINKOFF_TOKEN")
+        if (tinkoffToken == null) {
+            println("Please provide Tinkoff readonly token via TINKOFF_TOKEN environment variable")
+            throw Exception()
+        }
+
+        return@single InvestApi.create(tinkoffToken)
+    }
 }

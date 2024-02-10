@@ -8,9 +8,9 @@ import data.moex.data.history.HistoryEntry
 import data.moex.data.security.SecurityInfo
 import data.moex.data.securityMetadata.SecurityMetadata
 import data.moex.data.securityMetadata.SecurityMetadataTypes
-import domain.repository.MoexRepository
-import domain.securities.model.Futures
-import domain.securities.model.Security
+import domain.moex.repository.MoexRepository
+import domain.moex.securities.model.Futures
+import domain.moex.securities.model.Security
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

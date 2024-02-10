@@ -1,4 +1,4 @@
-package domain.securities.model
+package domain.moex.securities.model
 
 data class Security(
     val secId: String = String(),

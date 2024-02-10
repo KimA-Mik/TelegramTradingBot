@@ -1,7 +1,7 @@
 package presentation.telegram
 
 import Resource
-import domain.securities.useCase.FindSecurityUseCase
+import domain.moex.securities.useCase.FindSecurityUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import org.koin.core.component.KoinComponent

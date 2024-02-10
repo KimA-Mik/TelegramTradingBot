@@ -1,6 +1,6 @@
 plugins {
-    kotlin("jvm") version "1.9.21"
-    kotlin("plugin.serialization") version "1.9.21"
+    kotlin("jvm") version "1.9.22"
+    kotlin("plugin.serialization") version "1.9.22"
     application
 }
 
@@ -31,7 +31,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
     implementation("org.slf4j:slf4j-simple:2.0.9")
 
-    val koinVersion = "3.5.0"
+    implementation("ru.tinkoff.piapi:java-sdk-core:1.5")
+
+    val koinVersion = "3.5.3"
     implementation("io.insert-koin:koin-core:$koinVersion")
 }
 

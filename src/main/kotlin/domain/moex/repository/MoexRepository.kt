@@ -1,11 +1,11 @@
-package domain.repository
+package domain.moex.repository
 
 import Resource
 import data.moex.data.emitter.securities.EmitterSecurity
 import data.moex.data.history.HistoryEntry
 import data.moex.data.security.SecurityInfo
 import data.moex.data.securityMetadata.SecurityMetadata
-import domain.securities.model.Security
+import domain.moex.securities.model.Security
 
 
 interface MoexRepository {

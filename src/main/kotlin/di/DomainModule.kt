@@ -1,13 +1,16 @@
 package di
 
 import data.moex.repository.MoexRepositoryImpl
-import domain.repository.MoexRepository
-import domain.securities.useCase.FindSecurityUseCase
+import data.tinkoff.repository.TinkoffRepositoryImpl
+import domain.moex.repository.MoexRepository
+import domain.moex.securities.useCase.FindSecurityUseCase
+import domain.tinkoff.repository.TinkoffRepository
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 fun domainModule() = module {
     single<MoexRepository> { MoexRepositoryImpl(get()) }
+    single<TinkoffRepository> { TinkoffRepositoryImpl(get()) }
 
     singleOf(::FindSecurityUseCase)
 }
