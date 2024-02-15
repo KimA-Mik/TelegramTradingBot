@@ -4,9 +4,10 @@ import Resource
 import data.tinkoff.mappers.toTinkoffFuture
 import data.tinkoff.mappers.toTinkoffPrice
 import data.tinkoff.mappers.toTinkoffSecurity
+import domain.tinkoff.model.SecurityType
 import domain.tinkoff.model.TinkoffFuture
 import domain.tinkoff.model.TinkoffPrice
-import domain.tinkoff.model.TinkoffSecurity
+import domain.tinkoff.model.TinkoffShare
 import domain.tinkoff.repository.TinkoffRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -20,7 +21,7 @@ class TinkoffRepositoryImpl(private val api: InvestApi) : TinkoffRepository {
     private val tradableFutures: List<Future> = api.instrumentsService.tradableFuturesSync
 
 
-    override fun getSecurity(secId: String): Resource<TinkoffSecurity> {
+    override fun getSecurity(secId: String): Resource<TinkoffShare> {
         val res = tradableShares.find { it.ticker.equals(secId.trim(), ignoreCase = true) }
 
         return if (res == null) {
@@ -30,7 +31,7 @@ class TinkoffRepositoryImpl(private val api: InvestApi) : TinkoffRepository {
         }
     }
 
-    override fun getSecurityFutures(security: TinkoffSecurity): Resource<List<TinkoffFuture>> {
+    override fun getSecurityFutures(security: TinkoffShare): Resource<List<TinkoffFuture>> {
         val futures = tradableFutures
             .filter { it.basicAsset == security.ticker }
             .map { it.toTinkoffFuture() }
@@ -42,7 +43,7 @@ class TinkoffRepositoryImpl(private val api: InvestApi) : TinkoffRepository {
         }
     }
 
-    override suspend fun getSecuritiesPrice(securities: List<TinkoffSecurity>): Resource<List<TinkoffPrice>> {
+    override suspend fun getSecuritiesPrice(securities: List<TinkoffShare>): Resource<List<TinkoffPrice>> {
         val uids = securities.map { it.uid }
         val tinkoffPrices = getUidsLastPrices(uids)
 
@@ -62,6 +63,10 @@ class TinkoffRepositoryImpl(private val api: InvestApi) : TinkoffRepository {
         } else {
             Resource.Success(tinkoffPrices)
         }
+    }
+
+    override fun findSecurity(ticker: String): SecurityType {
+        TODO("Not yet implemented")
     }
 
     private suspend fun getUidsLastPrices(uids: List<String>): List<TinkoffPrice> {
