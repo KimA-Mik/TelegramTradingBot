@@ -66,7 +66,13 @@ class TinkoffRepositoryImpl(private val api: InvestApi) : TinkoffRepository {
     }
 
     override fun findSecurity(ticker: String): SecurityType {
-        TODO("Not yet implemented")
+        if (tradableShares.find { it.ticker == ticker } != null) {
+            return SecurityType.SHARE
+        }
+        if (tradableFutures.find { it.ticker == ticker } != null) {
+            return SecurityType.FUTURE
+        }
+        return SecurityType.NONE
     }
 
     private suspend fun getUidsLastPrices(uids: List<String>): List<TinkoffPrice> {

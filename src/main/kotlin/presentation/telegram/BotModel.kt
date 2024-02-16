@@ -2,6 +2,8 @@ package presentation.telegram
 
 import Resource
 import domain.moex.securities.useCase.FindSecurityUseCase
+import domain.tinkoff.model.SecurityType
+import domain.tinkoff.repository.TinkoffRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import org.koin.core.component.KoinComponent
@@ -10,9 +12,9 @@ import kotlin.math.min
 
 
 class BotModel(
-    private val findSecurity: FindSecurityUseCase
+    private val findSecurity: FindSecurityUseCase,
+    private val tinkoffRepository: TinkoffRepository
 ) : KoinComponent {
-//    private val service: MoexRepository by inject()
 
     private val _outMessage = MutableSharedFlow<Message>()
     val outMessage = _outMessage.asSharedFlow()
@@ -24,13 +26,49 @@ class BotModel(
     suspend fun handleTextInput(id: Long, text: String) {
         val tickers = text.split(' ')
         for (ticker in tickers) {
-            val outText = getSecurityDescription(ticker.trim().uppercase())
+//            val outText = getSecurityDescriptionMoex(ticker.trim().uppercase())
+            val outText = getSecurityDescriptionTinkoff(ticker.trim().uppercase())
             val message = Message(id, outText)
             _outMessage.emit(message)
         }
     }
 
-    private suspend fun getSecurityDescription(securityId: String): String {
+    private fun getSecurityDescriptionTinkoff(ticker: String): String {
+        val securityType = tinkoffRepository.findSecurity(ticker)
+
+        return when (securityType) {
+            SecurityType.SHARE -> getShareDescription(ticker)
+            SecurityType.FUTURE -> getFutureDescription(ticker)
+            SecurityType.NONE -> "$ticker не найден"
+        }
+    }
+
+    private fun getShareDescription(ticker: String): String {
+        var result = String()
+        val shareResource = tinkoffRepository.getSecurity(ticker)
+        if (shareResource is Resource.Error) {
+            return "Не получилось найти $ticker из-за ошибки: ${shareResource.message}"
+        }
+        val share = shareResource.data!!
+        result += "$ticker - ${share.name}"
+        val futuresRes = tinkoffRepository.getSecurityFutures(share)
+        if (futuresRes is Resource.Error) {
+            result += "\nФьючерсы не найдены"
+            return result
+        }
+
+        val futures = futuresRes.data!!
+        futures.forEach {
+            result += "\n${it.ticker} (${it.lot}) - ${it.name}"
+        }
+        return result
+    }
+
+    private fun getFutureDescription(ticker: String): String {
+        return "$ticker это фьючерс"
+    }
+
+    private suspend fun getSecurityDescriptionMoex(securityId: String): String {
         val result = findSecurity(securityId)
         if (result is Resource.Error) {
             return result.message!!
