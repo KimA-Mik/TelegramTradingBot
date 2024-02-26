@@ -4,6 +4,7 @@ import com.github.kotlintelegrambot.Bot
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.command
+import com.github.kotlintelegrambot.dispatcher.telegramError
 import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
 import domain.moex.securities.useCase.FindSecurityUseCase
@@ -11,6 +12,7 @@ import domain.tinkoff.repository.TinkoffRepository
 import kotlinx.coroutines.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import presentation.telegram.mappers.toInlineKeyboardMarkup
 
 //TODO: factor out KoinComponent
 class App(private val botToken: String) : KoinComponent {
@@ -40,18 +42,23 @@ class App(private val botToken: String) : KoinComponent {
                 command("stop") {
                     bot.sendMessage(chatId = ChatId.fromId(message.chat.id), text = "Stopping bot")
                     onStop()
-                    update.consume()
+//                    update.consume()
                 }
 
                 text {
                     model.handleTextInput(message.chat.id, text)
+                }
+
+                telegramError {
+                    println(error.getErrorMessage())
                 }
             }
         }
         telegramBot.startPolling()
         botJob = scope.launch {
             model.outMessage.collect { message ->
-                telegramBot.sendMessage(chatId = ChatId.fromId(message.id), text = message.text)
+                val markup = message.buttonsMarkup?.toInlineKeyboardMarkup()
+                telegramBot.sendMessage(chatId = ChatId.fromId(message.id), text = message.text, replyMarkup = markup)
             }
         }
     }
