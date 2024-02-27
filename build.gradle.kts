@@ -35,6 +35,14 @@ dependencies {
 
     val koinVersion = "3.5.3"
     implementation("io.insert-koin:koin-core:$koinVersion")
+
+    val exposedVersion: String by project
+    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
+
+    implementation("org.xerial:sqlite-jdbc:3.45.1.0")
 }
 
 tasks.test {
