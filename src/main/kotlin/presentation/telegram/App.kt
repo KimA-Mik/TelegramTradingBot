@@ -8,6 +8,7 @@ import com.github.kotlintelegrambot.dispatcher.telegramError
 import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
 import com.github.kotlintelegrambot.entities.KeyboardReplyMarkup
+import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.KeyboardButton
 import kotlinx.coroutines.*
@@ -53,26 +54,59 @@ class App(
         telegramBot.startPolling()
         botJob = scope.launch {
             model.outMessage.collect { screen ->
-                val text = when (screen) {
-                    is BotScreen.Greeting -> "Добро пожаловать в торговый бот."
-                }
-
-                val replayMarkup: ReplyMarkup? = when (screen) {
-                    is BotScreen.Greeting -> KeyboardReplyMarkup(
-                        listOf(
-                            listOf(KeyboardButton("Поиск"), KeyboardButton("Моё")),
-                            listOf(KeyboardButton("Назад"))
-                        ),
-                        resizeKeyboard = true
-                    )
-
-                    else -> null
-                }
-
-
-                telegramBot.sendMessage(chatId = ChatId.fromId(screen.id), text = text, replyMarkup = replayMarkup)
+                telegramBot.sendMessage(
+                    chatId = ChatId.fromId(screen.id),
+                    text = screenText(screen),
+                    replyMarkup = screenReplayMarkup(screen),
+                    parseMode = screenParseMode(screen)
+                )
             }
         }
+    }
+
+    private fun screenText(screen: BotScreen): String = when (screen) {
+        is BotScreen.Greeting -> "Добро пожаловать в торговый бот."
+        is BotScreen.Error -> "Произошла ошибка: ${screen.message}"
+        is BotScreen.Root -> "*Супер бот:*\n• ${BotTextCommands.MySecurities.text}\n• ${BotTextCommands.SearchSecurities.text}"
+        is BotScreen.MySecurities -> "TODO(MySecurities)"
+        is BotScreen.SearchSecurities -> "TODO(SearchSecurities)"
+    }
+
+
+    private fun screenReplayMarkup(screen: BotScreen): ReplyMarkup? = when (screen) {
+        is BotScreen.Root -> KeyboardReplyMarkup(
+            listOf(
+                listOf(
+                    KeyboardButton(BotTextCommands.SearchSecurities.text),
+                    KeyboardButton(BotTextCommands.MySecurities.text)
+                ),
+//                listOf(KeyboardButton("Назад"))
+            ),
+            resizeKeyboard = true
+        )
+
+        is BotScreen.Error -> KeyboardReplyMarkup(
+            KeyboardButton(BotTextCommands.Root.text),
+            resizeKeyboard = true
+        )
+
+        is BotScreen.MySecurities -> KeyboardReplyMarkup(
+            KeyboardButton(BotTextCommands.Root.text),
+            resizeKeyboard = true
+        )
+
+        is BotScreen.SearchSecurities -> KeyboardReplyMarkup(
+            KeyboardButton(BotTextCommands.Root.text),
+            resizeKeyboard = true
+        )
+
+
+        else -> null
+    }
+
+    private fun screenParseMode(screen: BotScreen): ParseMode? = when (screen) {
+        is BotScreen.Root -> ParseMode.MARKDOWN_V2
+        else -> null
     }
 
     private fun onStop() {

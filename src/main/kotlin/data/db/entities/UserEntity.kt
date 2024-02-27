@@ -12,9 +12,9 @@ object Users : LongIdTable() {
     val path = varchar("path", 200)
 }
 
-class User(id: EntityID<Long>) : LongEntity(id) {
-    companion object : LongEntityClass<User>(Users)
+class UserEntity(id: EntityID<Long>) : LongEntity(id) {
+    companion object : LongEntityClass<UserEntity>(Users)
 
-    val registered by Users.registered
-    val path by Users.path
+    var registered by Users.registered
+    var path by Users.path
 }

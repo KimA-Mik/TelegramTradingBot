@@ -1,5 +1,6 @@
 package di
 
+import data.db.DatabaseConnector
 import data.moex.MoexApi
 import data.moex.data.emitter.securities.EmitterSecurityResponse
 import data.moex.data.history.CharsetInfoHolder
@@ -77,4 +78,6 @@ fun dataModule() = module {
 
         return@single InvestApi.create(tinkoffToken)
     }
+
+    singleOf(::DatabaseConnector)
 }

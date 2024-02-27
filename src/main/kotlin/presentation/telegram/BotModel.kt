@@ -4,6 +4,8 @@ import Resource
 import domain.moex.securities.useCase.FindSecurityUseCase
 import domain.tinkoff.model.SecurityType
 import domain.tinkoff.repository.TinkoffRepository
+import domain.useCase.NavigateUserUseCase
+import domain.useCase.RegisterUserUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlin.math.max
@@ -12,23 +14,53 @@ import kotlin.math.min
 
 class BotModel(
     private val findSecurity: FindSecurityUseCase,
-    private val tinkoffRepository: TinkoffRepository
+    private val tinkoffRepository: TinkoffRepository,
+    private val registerUser: RegisterUserUseCase,
+    private val navigateUser: NavigateUserUseCase
 ) {
 
     private val _outMessage = MutableSharedFlow<BotScreen>()
     val outMessage = _outMessage.asSharedFlow()
     suspend fun dispatchStartMessage(sender: Long) {
-
-        val message = BotScreen.Greeting(id = sender)
-        _outMessage.emit(message)
+        val registered = when (val result = registerUser(sender)) {
+            is Resource.Success -> BotScreen.Greeting(id = sender)
+            is Resource.Error -> BotScreen.Error(id = sender, message = result.message ?: UNKNOWN_ERROR)
+        }
+        _outMessage.emit(registered)
+        _outMessage.emit(BotScreen.Root(id = sender))
     }
 
     suspend fun handleTextInput(id: Long, text: String) {
-        val tickers = text.split(' ')
-        for (ticker in tickers) {
-            val outText = getSecurityDescriptionTinkoff(ticker.trim().uppercase())
-//            _outMessage.emit(message)
+        val screen = when (text) {
+            BotTextCommands.Root.text -> {
+                popBack(id)
+            }
+
+            BotTextCommands.MySecurities.text -> {
+                navigate(id, BotTextCommands.MySecurities.name)
+            }
+
+            BotTextCommands.SearchSecurities.text -> {
+                navigate(id, BotTextCommands.SearchSecurities.name)
+
+            }
+
+            BotTextCommands.Pop.text -> {
+                popBack(id)
+            }
+
+            else -> {
+                BotScreen.Error(id, "Я пока не знаю что с этим делать")
+            }
         }
+
+        _outMessage.emit(screen)
+
+//        val tickers = text.split(' ')
+//        for (ticker in tickers) {
+//            val outText = getSecurityDescriptionTinkoff(ticker.trim().uppercase())
+//            _outMessage.emit(message)
+//        }
     }
 
     private fun getSecurityDescriptionTinkoff(ticker: String): String {
@@ -104,6 +136,35 @@ class BotModel(
         return answer
     }
 
+    private suspend fun navigate(id: Long, direction: String): BotScreen {
+        val res = navigateUser(id, direction)
+        return dispatchNavResult(id, res)
+    }
+
+    private suspend fun popBack(id: Long): BotScreen {
+        val res = navigateUser(id = id, pop = true)
+        return dispatchNavResult(id, res)
+    }
+
+    private fun dispatchNavResult(id: Long, navResult: NavigateUserUseCase.NavResult): BotScreen {
+        return when (navResult) {
+            is NavigateUserUseCase.NavResult.Success -> pathToScreen(navResult.user.id, navResult.user.path)
+            NavigateUserUseCase.NavResult.NoUser -> BotScreen.Error(id, "Пользователь не найден")
+            is NavigateUserUseCase.NavResult.Unreachable -> BotScreen.Error(id, "Место недостижимо")
+        }
+    }
+
+    private fun pathToScreen(id: Long, path: String): BotScreen {
+        if (path.isBlank()) return BotScreen.Root(id)
+        val actualScreen = path.split('/').last()
+        return when (actualScreen) {
+            BotTextCommands.MySecurities.name -> BotScreen.MySecurities(id)
+            BotTextCommands.SearchSecurities.name -> BotScreen.SearchSecurities(id)
+            else -> BotScreen.Error(id, "Где я?")
+        }
+    }
+
+
 //    private suspend fun getFuturesStrFromMetadata(data: SecurityMetadata?): String {
 //        if (data == null)
 //            return "Не удалост найти метаданные"
@@ -124,4 +185,8 @@ class BotModel(
 //
 //        return result.ifEmpty { "Не удалост найти Фьючерс" }
 //    }
+
+    companion object {
+        private const val UNKNOWN_ERROR = "Неизвестная ошибка"
+    }
 }

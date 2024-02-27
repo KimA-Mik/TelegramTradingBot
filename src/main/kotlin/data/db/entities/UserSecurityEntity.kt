@@ -11,10 +11,10 @@ object UserSecurities : LongIdTable() {
     val security = reference("security", Securities)
 }
 
-class UserSecurity(id: EntityID<Long>) : LongEntity(id) {
-    companion object : LongEntityClass<UserSecurity>(UserSecurities)
+class UserSecurityEntity(id: EntityID<Long>) : LongEntity(id) {
+    companion object : LongEntityClass<UserSecurityEntity>(UserSecurities)
 
-    val percent by UserSecurities.percent
-    val user by User referencedOn UserSecurities.user
-    val security by Security referencedOn UserSecurities.security
+    var percent by UserSecurities.percent
+    var userEntity by UserEntity referencedOn UserSecurities.user
+    var securityEntity by SecurityEntity referencedOn UserSecurities.security
 }

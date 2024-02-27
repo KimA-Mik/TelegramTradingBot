@@ -12,11 +12,11 @@ object Securities : LongIdTable() {
     val lot = integer("lot")
 }
 
-class Security(id: EntityID<Long>) : LongEntity(id) {
-    companion object : LongEntityClass<Security>(Securities)
+class SecurityEntity(id: EntityID<Long>) : LongEntity(id) {
+    companion object : LongEntityClass<SecurityEntity>(Securities)
 
-    val uid by Securities.uid
-    val ticker by Securities.ticker
-    val name by Securities.name
-    val lot by Securities.lot
+    var uid by Securities.uid
+    var ticker by Securities.ticker
+    var name by Securities.name
+    var lot by Securities.lot
 }

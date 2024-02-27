@@ -1,19 +1,45 @@
 package data.db.repository
 
-import domain.database.repository.DatabaseRepository
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.transactions.TransactionManager
-import java.sql.Connection
+import data.db.DatabaseConnector
+import data.db.entities.Securities
+import data.db.entities.UserEntity
+import data.db.entities.UserSecurities
+import data.db.entities.Users
+import data.db.mappers.toUser
+import domain.local.model.User
+import domain.local.repository.DatabaseRepository
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.transactions.transaction
 
-class DatabaseRepositoryImpl : DatabaseRepository {
+class DatabaseRepositoryImpl(
+    private val database: DatabaseConnector
+) : DatabaseRepository {
     init {
-        Database.connect("jdbc:sqlite:data.db", "org.sqlite.JDBC")
-        TransactionManager.manager.defaultIsolationLevel =
-            Connection.TRANSACTION_SERIALIZABLE
-
+        transaction {
+            SchemaUtils.create(Securities, Users, UserSecurities)
+        }
     }
 
-    override suspend fun crateUser(id: Long): Boolean {
-        return false
+    override suspend fun registerUser(id: Long) {
+        database.transaction {
+            UserEntity.new(id) {
+                path = String()
+            }
+        }
     }
+
+    override suspend fun findUser(id: Long): User? {
+        return database.transaction {
+            UserEntity.findById(id)
+        }?.toUser()
+    }
+
+    override suspend fun updateUser(user: User): User? {
+        return database.transaction {
+            UserEntity.findByIdAndUpdate(user.id) {
+                it.path = user.path
+            }
+        }?.toUser()
+    }
+
 }
