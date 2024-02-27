@@ -6,7 +6,6 @@ import domain.tinkoff.model.SecurityType
 import domain.tinkoff.repository.TinkoffRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import org.koin.core.component.KoinComponent
 import kotlin.math.max
 import kotlin.math.min
 
@@ -14,7 +13,7 @@ import kotlin.math.min
 class BotModel(
     private val findSecurity: FindSecurityUseCase,
     private val tinkoffRepository: TinkoffRepository
-) : KoinComponent {
+) {
 
     private val _outMessage = MutableSharedFlow<BotScreen>()
     val outMessage = _outMessage.asSharedFlow()

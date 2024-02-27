@@ -10,24 +10,18 @@ import com.github.kotlintelegrambot.entities.ChatId
 import com.github.kotlintelegrambot.entities.KeyboardReplyMarkup
 import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.KeyboardButton
-import domain.moex.securities.useCase.FindSecurityUseCase
-import domain.tinkoff.repository.TinkoffRepository
 import kotlinx.coroutines.*
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
-//TODO: factor out KoinComponent
-class App(private val botToken: String) : KoinComponent {
+class App(
+    private val botToken: String,
+    private val model: BotModel
+) {
     private lateinit var botJob: Job
     private lateinit var telegramBot: Bot
-    private lateinit var model: BotModel
     private lateinit var mainScope: CoroutineScope
 
     suspend fun run() = coroutineScope {
         mainScope = this
-        val findSecurity: FindSecurityUseCase by inject()
-        val tinkoffRepository: TinkoffRepository by inject()
-        model = BotModel(findSecurity, tinkoffRepository)
         initBot(mainScope)
     }
 

@@ -1,11 +1,14 @@
 import di.dataModule
 import di.domainModule
-import kotlinx.coroutines.runBlocking
 import org.koin.core.context.startKoin
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.module
+import org.koin.java.KoinJavaComponent.get
 import presentation.telegram.App
+import presentation.telegram.BotModel
 import java.util.*
 
-fun main() {
+suspend fun main() {
     val token = System.getenv("TRADE_BOT")
     if (token == null) {
         println("[ERROR]Provide presentation.telegram bot token via 'TRADE_BOT' environment variable")
@@ -16,12 +19,14 @@ fun main() {
 
     startKoin {
         modules(
+            module {
+                singleOf(::BotModel)
+            },
             dataModule(),
             domainModule()
         )
     }
-    runBlocking {
-        val app = App(token)
-        app.run()
-    }
+
+    val app = App(token, get(BotModel::class.java))
+    app.run()
 }
