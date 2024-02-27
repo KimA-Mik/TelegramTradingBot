@@ -7,12 +7,14 @@ import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.telegramError
 import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
+import com.github.kotlintelegrambot.entities.KeyboardReplyMarkup
+import com.github.kotlintelegrambot.entities.ReplyMarkup
+import com.github.kotlintelegrambot.entities.keyboard.KeyboardButton
 import domain.moex.securities.useCase.FindSecurityUseCase
 import domain.tinkoff.repository.TinkoffRepository
 import kotlinx.coroutines.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import presentation.telegram.mappers.toInlineKeyboardMarkup
 
 //TODO: factor out KoinComponent
 class App(private val botToken: String) : KoinComponent {
@@ -56,9 +58,25 @@ class App(private val botToken: String) : KoinComponent {
         }
         telegramBot.startPolling()
         botJob = scope.launch {
-            model.outMessage.collect { message ->
-                val markup = message.buttonsMarkup?.toInlineKeyboardMarkup()
-                telegramBot.sendMessage(chatId = ChatId.fromId(message.id), text = message.text, replyMarkup = markup)
+            model.outMessage.collect { screen ->
+                val text = when (screen) {
+                    is BotScreen.Greeting -> "Добро пожаловать в торговый бот."
+                }
+
+                val replayMarkup: ReplyMarkup? = when (screen) {
+                    is BotScreen.Greeting -> KeyboardReplyMarkup(
+                        listOf(
+                            listOf(KeyboardButton("Поиск"), KeyboardButton("Моё")),
+                            listOf(KeyboardButton("Назад"))
+                        ),
+                        resizeKeyboard = true
+                    )
+
+                    else -> null
+                }
+
+
+                telegramBot.sendMessage(chatId = ChatId.fromId(screen.id), text = text, replyMarkup = replayMarkup)
             }
         }
     }

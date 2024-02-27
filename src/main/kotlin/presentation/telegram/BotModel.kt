@@ -7,10 +7,7 @@ import domain.tinkoff.repository.TinkoffRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import org.koin.core.component.KoinComponent
-import presentation.telegram.model.ButtonRow
-import presentation.telegram.model.ButtonsMarkup
 import presentation.telegram.model.Message
-import presentation.telegram.model.TelegramButton
 import kotlin.math.max
 import kotlin.math.min
 
@@ -20,22 +17,11 @@ class BotModel(
     private val tinkoffRepository: TinkoffRepository
 ) : KoinComponent {
 
-    private val _outMessage = MutableSharedFlow<Message>()
+    private val _outMessage = MutableSharedFlow<BotScreen>()
     val outMessage = _outMessage.asSharedFlow()
     suspend fun dispatchStartMessage(sender: Long) {
 
-        val markup = ButtonsMarkup(
-            listOf(
-                ButtonRow(
-                    listOf(
-                        TelegramButton("Hello", "hello"),
-                        TelegramButton("Bye", "bye")
-                    )
-                )
-            )
-        )
-
-        val message = Message(id = sender, text = "Hi there", buttonsMarkup = markup)
+        val message = BotScreen.Greeting(id = sender)
         _outMessage.emit(message)
     }
 
@@ -45,7 +31,7 @@ class BotModel(
 //            val outText = getSecurityDescriptionMoex(ticker.trim().uppercase())
             val outText = getSecurityDescriptionTinkoff(ticker.trim().uppercase())
             val message = Message(id, outText)
-            _outMessage.emit(message)
+//            _outMessage.emit(message)
         }
     }
 
