@@ -7,7 +7,6 @@ import domain.tinkoff.repository.TinkoffRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import org.koin.core.component.KoinComponent
-import presentation.telegram.model.Message
 import kotlin.math.max
 import kotlin.math.min
 
@@ -28,9 +27,7 @@ class BotModel(
     suspend fun handleTextInput(id: Long, text: String) {
         val tickers = text.split(' ')
         for (ticker in tickers) {
-//            val outText = getSecurityDescriptionMoex(ticker.trim().uppercase())
             val outText = getSecurityDescriptionTinkoff(ticker.trim().uppercase())
-            val message = Message(id, outText)
 //            _outMessage.emit(message)
         }
     }
