@@ -28,7 +28,7 @@ class MoexApi(private val client: HttpClient) {
                 Resource.Error<List<HistoryEntry>>("$securityId не найден")
             }
 
-            Resource.Success(history[1].history)
+            Resource.Success(history[1].history!!)
         } catch (e: Exception) {
             println(e.message)
             Resource.Error("При поиске истории цен для $securityId произошла чудовищная ошибка")

@@ -1,6 +1,6 @@
-package domain.local.repository
+package domain.user.repository
 
-import domain.local.model.User
+import domain.user.model.User
 
 interface DatabaseRepository {
     suspend fun registerUser(id: Long)

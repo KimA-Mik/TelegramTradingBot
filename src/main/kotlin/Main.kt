@@ -1,8 +1,7 @@
 import di.dataModule
 import di.domainModule
+import di.presentationModule
 import org.koin.core.context.startKoin
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.module
 import org.koin.java.KoinJavaComponent.get
 import presentation.telegram.App
 import presentation.telegram.BotModel
@@ -19,11 +18,9 @@ suspend fun main() {
 
     startKoin {
         modules(
-            module {
-                singleOf(::BotModel)
-            },
-            dataModule(),
-            domainModule()
+            presentationModule,
+            dataModule,
+            domainModule
         )
     }
 

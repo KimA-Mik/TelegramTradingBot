@@ -22,7 +22,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import ru.tinkoff.piapi.core.InvestApi
 
-fun dataModule() = module {
+val dataModule = module {
     single {
         HttpClient(OkHttp) {
             engine {

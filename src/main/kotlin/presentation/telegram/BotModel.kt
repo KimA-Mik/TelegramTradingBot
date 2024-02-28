@@ -1,27 +1,27 @@
 package presentation.telegram
 
 import Resource
-import domain.local.model.User
+import domain.common.PATH_SEPARATOR
 import domain.moex.securities.useCase.FindSecurityUseCase
-import domain.navigation.useCase.NavigateUserUseCase
-import domain.navigation.useCase.PopUserUseCase
-import domain.navigation.useCase.RegisterUserUseCase
-import domain.navigation.useCase.UserToRootUseCase
 import domain.tinkoff.model.SecurityType
 import domain.tinkoff.repository.TinkoffRepository
+import domain.user.navigation.useCase.RegisterUserUseCase
+import domain.user.navigation.useCase.UserToRootUseCase
+import domain.user.useCase.FindUserUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import presentation.telegram.textModels.RootTextModel
 import kotlin.math.max
 import kotlin.math.min
 
 
 class BotModel(
+    private val rootTextModel: RootTextModel,
     private val findSecurity: FindSecurityUseCase,
     private val tinkoffRepository: TinkoffRepository,
     private val registerUser: RegisterUserUseCase,
-    private val navigateUser: NavigateUserUseCase,
-    private val popUser: PopUserUseCase,
-    private val userToRoot: UserToRootUseCase,
+    private val findUser: FindUserUseCase,
+    private val userToRoot: UserToRootUseCase
 ) {
 
     private val _outMessage = MutableSharedFlow<BotScreen>()
@@ -36,36 +36,24 @@ class BotModel(
     }
 
     suspend fun handleTextInput(id: Long, text: String) {
-        val screen = when (text) {
-            BotTextCommands.Root.text -> {
-                popBack(id)
-            }
-
-            BotTextCommands.MySecurities.text -> {
-                navigate(id, BotTextCommands.MySecurities.name)
-            }
-
-            BotTextCommands.SearchSecurities.text -> {
-                navigate(id, BotTextCommands.SearchSecurities.name)
-
-            }
-
-            BotTextCommands.Pop.text -> {
-                popBack(id)
-            }
-
-            else -> {
-                BotScreen.Error(id, "Я пока не знаю что с этим делать")
-            }
+        val userResource = findUser(id)
+        val user = if (userResource is Resource.Success) {
+            userResource.data!!
+        } else {
+            val screen = BotScreen.Error(id, userResource.message ?: UNKNOWN_ERROR)
+            _outMessage.emit(screen)
+            return
         }
 
-        _outMessage.emit(screen)
+        if (text == BotTextCommands.Root.text) {
+            userToRoot(user)
+            _outMessage.emit(BotScreen.Root(user.id))
+            return
+        }
 
-//        val tickers = text.split(' ')
-//        for (ticker in tickers) {
-//            val outText = getSecurityDescriptionTinkoff(ticker.trim().uppercase())
-//            _outMessage.emit(message)
-//        }
+        val path = user.path.split(PATH_SEPARATOR)
+        val screen = rootTextModel.executeCommand(user, path, text)
+        _outMessage.emit(screen)
     }
 
     private fun getSecurityDescriptionTinkoff(ticker: String): String {
@@ -139,23 +127,6 @@ class BotModel(
             answer += '\n'
         }
         return answer
-    }
-
-    private suspend fun navigate(id: Long, direction: String): BotScreen {
-        val res = navigateUser(id, direction)
-        return dispatchNavResult(id, res)
-    }
-
-    private suspend fun popBack(id: Long): BotScreen {
-        val res = popUser(id = id)
-        return dispatchNavResult(id, res)
-    }
-
-    private fun dispatchNavResult(id: Long, navResult: Resource<User>): BotScreen {
-        return when (navResult) {
-            is Resource.Success -> pathToScreen(navResult.data!!.id, navResult.data.path)
-            is Resource.Error -> BotScreen.Error(id, navResult.message ?: UNKNOWN_ERROR)
-        }
     }
 
     private fun pathToScreen(id: Long, path: String): BotScreen {

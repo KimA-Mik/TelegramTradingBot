@@ -1,7 +1,7 @@
-package domain.navigation.useCase
+package domain.user.navigation.useCase
 
 import Resource
-import domain.local.repository.DatabaseRepository
+import domain.user.repository.DatabaseRepository
 
 class RegisterUserUseCase(private val repository: DatabaseRepository) {
     suspend operator fun invoke(id: Long): Resource<Unit> {

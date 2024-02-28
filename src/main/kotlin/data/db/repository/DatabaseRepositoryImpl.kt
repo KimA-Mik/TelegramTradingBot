@@ -6,8 +6,8 @@ import data.db.entities.UserEntity
 import data.db.entities.UserSecurities
 import data.db.entities.Users
 import data.db.mappers.toUser
-import domain.local.model.User
-import domain.local.repository.DatabaseRepository
+import domain.user.model.User
+import domain.user.repository.DatabaseRepository
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
