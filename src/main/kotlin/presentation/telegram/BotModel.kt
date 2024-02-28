@@ -1,11 +1,14 @@
 package presentation.telegram
 
 import Resource
+import domain.local.model.User
 import domain.moex.securities.useCase.FindSecurityUseCase
+import domain.navigation.useCase.NavigateUserUseCase
+import domain.navigation.useCase.PopUserUseCase
+import domain.navigation.useCase.RegisterUserUseCase
+import domain.navigation.useCase.UserToRootUseCase
 import domain.tinkoff.model.SecurityType
 import domain.tinkoff.repository.TinkoffRepository
-import domain.useCase.NavigateUserUseCase
-import domain.useCase.RegisterUserUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlin.math.max
@@ -16,7 +19,9 @@ class BotModel(
     private val findSecurity: FindSecurityUseCase,
     private val tinkoffRepository: TinkoffRepository,
     private val registerUser: RegisterUserUseCase,
-    private val navigateUser: NavigateUserUseCase
+    private val navigateUser: NavigateUserUseCase,
+    private val popUser: PopUserUseCase,
+    private val userToRoot: UserToRootUseCase,
 ) {
 
     private val _outMessage = MutableSharedFlow<BotScreen>()
@@ -142,15 +147,14 @@ class BotModel(
     }
 
     private suspend fun popBack(id: Long): BotScreen {
-        val res = navigateUser(id = id, pop = true)
+        val res = popUser(id = id)
         return dispatchNavResult(id, res)
     }
 
-    private fun dispatchNavResult(id: Long, navResult: NavigateUserUseCase.NavResult): BotScreen {
+    private fun dispatchNavResult(id: Long, navResult: Resource<User>): BotScreen {
         return when (navResult) {
-            is NavigateUserUseCase.NavResult.Success -> pathToScreen(navResult.user.id, navResult.user.path)
-            NavigateUserUseCase.NavResult.NoUser -> BotScreen.Error(id, "Пользователь не найден")
-            is NavigateUserUseCase.NavResult.Unreachable -> BotScreen.Error(id, "Место недостижимо")
+            is Resource.Success -> pathToScreen(navResult.data!!.id, navResult.data.path)
+            is Resource.Error -> BotScreen.Error(id, navResult.message ?: UNKNOWN_ERROR)
         }
     }
 

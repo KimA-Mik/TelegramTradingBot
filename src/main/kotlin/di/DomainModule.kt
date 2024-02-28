@@ -6,9 +6,11 @@ import data.tinkoff.repository.TinkoffRepositoryImpl
 import domain.local.repository.DatabaseRepository
 import domain.moex.repository.MoexRepository
 import domain.moex.securities.useCase.FindSecurityUseCase
+import domain.navigation.useCase.NavigateUserUseCase
+import domain.navigation.useCase.PopUserUseCase
+import domain.navigation.useCase.RegisterUserUseCase
+import domain.navigation.useCase.UserToRootUseCase
 import domain.tinkoff.repository.TinkoffRepository
-import domain.useCase.NavigateUserUseCase
-import domain.useCase.RegisterUserUseCase
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -20,6 +22,8 @@ fun domainModule() = module {
 
     singleOf(::RegisterUserUseCase)
     singleOf(::NavigateUserUseCase)
+    singleOf(::UserToRootUseCase)
+    singleOf(::PopUserUseCase)
 
     singleOf(::FindSecurityUseCase)
 }

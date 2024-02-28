@@ -1,4 +1,4 @@
-package domain.useCase
+package domain.navigation.useCase
 
 import Resource
 import domain.local.repository.DatabaseRepository
