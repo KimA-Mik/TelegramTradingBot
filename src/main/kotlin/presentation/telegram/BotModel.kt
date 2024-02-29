@@ -42,7 +42,10 @@ class BotModel(
         val user = if (userResource is Resource.Success) {
             userResource.data!!
         } else {
-            val screen = BotScreen.Error(id, userResource.message ?: UNKNOWN_ERROR)
+            val screen = BotScreen.Error(
+                id,
+                "Похоже мне стерли память и я вас не помню, напишите команду /start, чтобы я вас записал."
+            )
             _outMessage.emit(screen)
             return
         }
