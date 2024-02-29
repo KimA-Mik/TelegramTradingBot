@@ -3,13 +3,12 @@ package presentation.telegram
 import com.github.kotlintelegrambot.Bot
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
+import com.github.kotlintelegrambot.dispatcher.callbackQuery
 import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.telegramError
 import com.github.kotlintelegrambot.dispatcher.text
-import com.github.kotlintelegrambot.entities.ChatId
-import com.github.kotlintelegrambot.entities.KeyboardReplyMarkup
-import com.github.kotlintelegrambot.entities.ParseMode
-import com.github.kotlintelegrambot.entities.ReplyMarkup
+import com.github.kotlintelegrambot.entities.*
+import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import com.github.kotlintelegrambot.entities.keyboard.KeyboardButton
 import domain.tinkoff.model.TinkoffPrice
 import kotlinx.coroutines.*
@@ -48,6 +47,13 @@ class App(
                     model.handleTextInput(message.chat.id, text)
                 }
 
+                callbackQuery(
+                    callbackData = "followSecurity",
+                    callbackAnswerText = "Я так пока не умею.",
+                    callbackAnswerShowAlert = true,
+                ) {
+                }
+
                 telegramError {
                     println(error.getErrorMessage())
                 }
@@ -70,7 +76,7 @@ class App(
         is BotScreen.Greeting -> "Добро пожаловать в торговый бот."
         is BotScreen.Error -> "Произошла ошибка: ${screen.message}"
         is BotScreen.Root -> "*Супер бот:*\n• ${BotTextCommands.MySecurities.text}\n• ${BotTextCommands.SearchSecurities.text}"
-        is BotScreen.MySecurities -> "TODO(MySecurities)"
+        is BotScreen.MySecurities -> "Пока тут не на что смотреть"
         is BotScreen.SearchSecurities -> "Введите тикер ценной бумаги"
         is BotScreen.SecuritySearchResult -> getSearchResultText(screen.result)
         is BotScreen.SecurityNotFound -> "Акция ${screen.name} не найдена"
@@ -102,6 +108,12 @@ class App(
         is BotScreen.SearchSecurities -> KeyboardReplyMarkup(
             KeyboardButton(BotTextCommands.Root.text),
             resizeKeyboard = true
+        )
+
+        is BotScreen.SecuritySearchResult -> InlineKeyboardMarkup.create(
+            listOf(
+                InlineKeyboardButton.CallbackData("Отслеживать", "followSecurity")
+            )
         )
 
 
