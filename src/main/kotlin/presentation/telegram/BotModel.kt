@@ -5,6 +5,7 @@ import domain.common.PATH_SEPARATOR
 import domain.moex.securities.useCase.FindSecurityUseCase
 import domain.tinkoff.model.SecurityType
 import domain.tinkoff.repository.TinkoffRepository
+import domain.user.navigation.useCase.PopUserUseCase
 import domain.user.navigation.useCase.RegisterUserUseCase
 import domain.user.navigation.useCase.UserToRootUseCase
 import domain.user.useCase.FindUserUseCase
@@ -21,7 +22,8 @@ class BotModel(
     private val tinkoffRepository: TinkoffRepository,
     private val registerUser: RegisterUserUseCase,
     private val findUser: FindUserUseCase,
-    private val userToRoot: UserToRootUseCase
+    private val userToRoot: UserToRootUseCase,
+    private val popUser: PopUserUseCase
 ) {
 
     private val _outMessage = MutableSharedFlow<BotScreen>()
@@ -45,14 +47,24 @@ class BotModel(
             return
         }
 
-        if (text == BotTextCommands.Root.text) {
-            userToRoot(user)
-            _outMessage.emit(BotScreen.Root(user.id))
-            return
+        var path = user.path.split(PATH_SEPARATOR)
+        val screen = when (text) {
+            BotTextCommands.Root.text -> {
+                userToRoot(user)
+                BotScreen.Root(user.id)
+            }
+
+            BotTextCommands.Pop.text -> {
+                if (path.size > 1) {
+                    popUser(user)
+                    path = path.dropLast(1)
+                }
+                rootTextModel.executeCommand(user, path, String())
+            }
+
+            else -> rootTextModel.executeCommand(user, path, text)
         }
 
-        val path = user.path.split(PATH_SEPARATOR)
-        val screen = rootTextModel.executeCommand(user, path, text)
         _outMessage.emit(screen)
     }
 

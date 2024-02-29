@@ -1,4 +1,4 @@
-package presentation.telegram.textModels
+package presentation.telegram.textModels.common
 
 import domain.user.model.User
 import presentation.telegram.BotScreen

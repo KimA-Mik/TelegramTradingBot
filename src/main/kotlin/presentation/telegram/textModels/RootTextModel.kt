@@ -4,6 +4,9 @@ import domain.user.model.User
 import domain.user.navigation.useCase.NavigateUserUseCase
 import presentation.telegram.BotScreen
 import presentation.telegram.BotTextCommands
+import presentation.telegram.textModels.common.TextModel
+import presentation.telegram.textModels.common.UNKNOWN_COMMAND
+import presentation.telegram.textModels.common.UNKNOWN_PATH
 
 class RootTextModel(
     mySecuritiesTextModel: MySecuritiesTextModel,
@@ -15,15 +18,18 @@ class RootTextModel(
         BotTextCommands.SearchSecurities.name to searchSecuritiesTextModel
     )
 
-    private val commands = mapOf(
+    private val navigationCommands = mapOf(
         BotTextCommands.MySecurities.text to mySecuritiesTextModel,
         BotTextCommands.SearchSecurities.text to searchSecuritiesTextModel
-
     )
 
     override suspend fun executeCommand(user: User, path: List<String>, command: String): BotScreen {
+        if (command.isBlank()) {
+            return BotScreen.Root(user.id)
+        }
+
         return if (path.size == 1) {
-            executeCommand(user, command, path)
+            command(user, command)
         } else {
             passExecution(user, path, command)
         }
@@ -47,20 +53,16 @@ class RootTextModel(
         }
     }
 
-    private suspend fun executeCommand(
-        user: User,
-        command: String,
-        path: List<String>
-    ): BotScreen {
-        return if (commands.containsKey(command)) {
-            navigateUser(user, command)
-            commands[command]!!.executeCommand(
-                user = user,
-                path = path.drop(1),
-                command = command
-            )
-        } else {
-            BotScreen.Error(user.id, UNKNOWN_COMMAND)
+    private suspend fun command(user: User, command: String): BotScreen {
+        navigationCommands[command]?.let {
+            return navigateCommand(user, command, it)
         }
+
+        return BotScreen.Error(user.id, UNKNOWN_COMMAND)
+    }
+
+    private suspend fun navigateCommand(user: User, destination: String, model: TextModel): BotScreen {
+        navigateUser(user, destination)
+        return model.executeCommand(user, emptyList(), String())
     }
 }
