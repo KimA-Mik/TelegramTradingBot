@@ -11,7 +11,9 @@ import com.github.kotlintelegrambot.entities.KeyboardReplyMarkup
 import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.KeyboardButton
+import domain.tinkoff.model.TinkoffPrice
 import kotlinx.coroutines.*
+import presentation.telegram.model.SecuritySearchResultData
 
 class App(
     private val botToken: String,
@@ -69,7 +71,9 @@ class App(
         is BotScreen.Error -> "Произошла ошибка: ${screen.message}"
         is BotScreen.Root -> "*Супер бот:*\n• ${BotTextCommands.MySecurities.text}\n• ${BotTextCommands.SearchSecurities.text}"
         is BotScreen.MySecurities -> "TODO(MySecurities)"
-        is BotScreen.SearchSecurities -> "TODO(SearchSecurities)"
+        is BotScreen.SearchSecurities -> "Введите тикер ценной бумаги"
+        is BotScreen.SecuritySearchResult -> getSearchResultText(screen.result)
+        is BotScreen.SecurityNotFound -> "Акция ${screen.name} не найдена"
     }
 
 
@@ -109,9 +113,24 @@ class App(
         else -> null
     }
 
+    private fun getSearchResultText(searchResult: SecuritySearchResultData): String {
+        var result =
+            "Акция ${searchResult.security.share.ticker} - ${searchResult.security.share.name}: ${searchResult.sharePrice.price}$ROUBLE"
+        searchResult.security.futures.forEachIndexed { index, future ->
+            val price = searchResult.futuresPrices.getOrElse(index) { TinkoffPrice() }
+            result += "\nФьючерс ${future.ticker} - ${future.name}: ${price.price}$ROUBLE"
+        }
+
+        return result
+    }
+
     private fun onStop() {
         telegramBot.stopPolling()
         mainScope.cancel()
         botJob.cancel()
+    }
+
+    companion object {
+        const val ROUBLE = '₽'
     }
 }

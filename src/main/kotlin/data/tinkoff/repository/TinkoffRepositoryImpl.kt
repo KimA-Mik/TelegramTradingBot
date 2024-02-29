@@ -4,48 +4,39 @@ import Resource
 import data.tinkoff.mappers.toTinkoffFuture
 import data.tinkoff.mappers.toTinkoffPrice
 import data.tinkoff.mappers.toTinkoffSecurity
+import data.tinkoff.service.TinkoffInvestService
 import domain.tinkoff.model.SecurityType
 import domain.tinkoff.model.TinkoffFuture
 import domain.tinkoff.model.TinkoffPrice
 import domain.tinkoff.model.TinkoffShare
 import domain.tinkoff.repository.TinkoffRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import ru.tinkoff.piapi.contract.v1.Future
 import ru.tinkoff.piapi.contract.v1.LastPrice
-import ru.tinkoff.piapi.contract.v1.Share
-import ru.tinkoff.piapi.core.InvestApi
 
-class TinkoffRepositoryImpl(private val api: InvestApi) : TinkoffRepository {
-    private val tradableShares: List<Share> = api.instrumentsService.tradableSharesSync
-    private val tradableFutures: List<Future> = api.instrumentsService.tradableFuturesSync
-
+class TinkoffRepositoryImpl(private val service: TinkoffInvestService) : TinkoffRepository {
 
     override fun getSecurity(secId: String): Resource<TinkoffShare> {
-        val res = tradableShares.find { it.ticker.equals(secId.trim(), ignoreCase = true) }
-
-        return if (res == null) {
-            Resource.Error("Security not found")
-        } else {
-            Resource.Success(res.toTinkoffSecurity())
-        }
+        val result = service.findShare(ticker = secId) ?: return Resource.Error("Акция не найдена")
+        return Resource.Success(result.toTinkoffSecurity())
     }
 
     override fun getSecurityFutures(security: TinkoffShare): Resource<List<TinkoffFuture>> {
-        val futures = tradableFutures
-            .filter { it.basicAsset == security.ticker }
-            .map { it.toTinkoffFuture() }
+        val futures = service.getFuturesForShare(security.ticker)
 
         return if (futures.isEmpty()) {
             Resource.Error("Futures not found")
         } else {
-            Resource.Success(futures)
+            Resource.Success(futures.map(Future::toTinkoffFuture))
         }
     }
 
-    override suspend fun getSecuritiesPrice(securities: List<TinkoffShare>): Resource<List<TinkoffPrice>> {
+    override suspend fun getSharesPrice(securities: List<TinkoffShare>): Resource<List<TinkoffPrice>> {
+        if (securities.isEmpty()) {
+            return Resource.Success(emptyList())
+        }
+
         val uids = securities.map { it.uid }
-        val tinkoffPrices = getUidsLastPrices(uids)
+        val tinkoffPrices = service.getUidsLastPrices(uids).map(LastPrice::toTinkoffPrice)
 
         return if (tinkoffPrices.isEmpty()) {
             Resource.Error("")
@@ -56,7 +47,7 @@ class TinkoffRepositoryImpl(private val api: InvestApi) : TinkoffRepository {
 
     override suspend fun getFuturesPrices(futures: List<TinkoffFuture>): Resource<List<TinkoffPrice>> {
         val uids = futures.map { it.uid }
-        val tinkoffPrices = getUidsLastPrices(uids)
+        val tinkoffPrices = service.getUidsLastPrices(uids).map(LastPrice::toTinkoffPrice)
 
         return if (tinkoffPrices.isEmpty()) {
             Resource.Error("")
@@ -66,19 +57,14 @@ class TinkoffRepositoryImpl(private val api: InvestApi) : TinkoffRepository {
     }
 
     override fun findSecurity(ticker: String): SecurityType {
-        if (tradableShares.find { it.ticker == ticker } != null) {
+        service.findShare(ticker)?.let {
             return SecurityType.SHARE
         }
-        if (tradableFutures.find { it.ticker == ticker } != null) {
+
+        service.findFuture(ticker)?.let {
             return SecurityType.FUTURE
         }
-        return SecurityType.NONE
-    }
 
-    private suspend fun getUidsLastPrices(uids: List<String>): List<TinkoffPrice> {
-        val prices = withContext(Dispatchers.IO) {
-            api.marketDataService.getLastPricesSync(uids)
-        }
-        return prices.map(LastPrice::toTinkoffPrice)
+        return SecurityType.NONE
     }
 }

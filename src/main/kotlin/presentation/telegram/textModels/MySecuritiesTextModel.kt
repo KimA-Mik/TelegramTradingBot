@@ -16,7 +16,7 @@ class MySecuritiesTextModel : TextModel {
             return BotScreen.MySecurities(user.id)
         }
 
-        return if (path.size == 1) {
+        return if (path.isEmpty()) {
             command(user, command)
         } else {
             passExecution(user, path, command)

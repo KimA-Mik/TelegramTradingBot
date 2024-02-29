@@ -28,7 +28,7 @@ class RootTextModel(
             return BotScreen.Root(user.id)
         }
 
-        return if (path.size == 1) {
+        return if (path.isEmpty()) {
             command(user, command)
         } else {
             passExecution(user, path, command)
@@ -61,7 +61,12 @@ class RootTextModel(
         return BotScreen.Error(user.id, UNKNOWN_COMMAND)
     }
 
-    private suspend fun navigateCommand(user: User, destination: String, model: TextModel): BotScreen {
+    private suspend fun navigateCommand(user: User, command: String, model: TextModel): BotScreen {
+        val destination = BotTextCommands.entries.find { it.text == command }?.name ?: return BotScreen.Error(
+            user.id,
+            UNKNOWN_COMMAND
+        )
+
         navigateUser(user, destination)
         return model.executeCommand(user, emptyList(), String())
     }

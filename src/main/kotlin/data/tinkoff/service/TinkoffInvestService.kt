@@ -3,6 +3,7 @@ package data.tinkoff.service
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import ru.tinkoff.piapi.contract.v1.Future
+import ru.tinkoff.piapi.contract.v1.LastPrice
 import ru.tinkoff.piapi.contract.v1.Share
 import ru.tinkoff.piapi.core.InvestApi
 
@@ -10,17 +11,30 @@ class TinkoffInvestService(private val api: InvestApi) {
     private val tradableShares = MutableStateFlow(emptyList<Share>())
     private val tradableFutures = MutableStateFlow(emptyList<Future>())
 
-    suspend fun initialize() = coroutineScope {
+    suspend fun launchUpdating() = coroutineScope {
         launch { updateShares() }
         launch { updateFutures() }
     }
 
     fun findShare(ticker: String): Share? {
-        return tradableShares.value.find { it.ticker == ticker }
+        return tradableShares.value.find { it.ticker.equals(ticker, true) }
     }
 
     fun findFuture(ticker: String): Future? {
-        return tradableFutures.value.find { it.ticker == ticker }
+        return tradableFutures.value.find { it.ticker.equals(ticker, true) }
+    }
+
+    fun getFuturesForShare(ticker: String): List<Future> {
+        val futures = tradableFutures.value
+            .filter { it.basicAsset.equals(ticker, true) }
+
+        return futures
+    }
+
+    suspend fun getUidsLastPrices(uids: List<String>): List<LastPrice> {
+        return withContext(Dispatchers.IO) {
+            api.marketDataService.getLastPricesSync(uids)
+        }
     }
 
     private suspend fun updateShares() = coroutineScope {

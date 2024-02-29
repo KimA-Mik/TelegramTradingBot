@@ -47,7 +47,7 @@ class BotModel(
             return
         }
 
-        var path = user.path.split(PATH_SEPARATOR)
+        var path = user.path.split(PATH_SEPARATOR).drop(1)
         val screen = when (text) {
             BotTextCommands.Root.text -> {
                 userToRoot(user)
@@ -55,7 +55,7 @@ class BotModel(
             }
 
             BotTextCommands.Pop.text -> {
-                if (path.size > 1) {
+                if (path.isNotEmpty()) {
                     popUser(user)
                     path = path.dropLast(1)
                 }
