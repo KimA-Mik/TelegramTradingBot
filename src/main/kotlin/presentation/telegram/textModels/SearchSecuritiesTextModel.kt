@@ -1,17 +1,13 @@
 package presentation.telegram.textModels
 
-import domain.tinkoff.model.TinkoffFuture
-import domain.tinkoff.model.TinkoffPrice
-import domain.tinkoff.model.TinkoffSecurity
-import domain.tinkoff.repository.TinkoffRepository
+import domain.tinkoff.useCase.GetFullSecurityUseCase
 import domain.user.model.User
-import presentation.telegram.BotScreen
-import presentation.telegram.model.SecuritySearchResultData
+import presentation.telegram.screens.*
 import presentation.telegram.textModels.common.TextModel
 import presentation.telegram.textModels.common.UNKNOWN_PATH
 
 class SearchSecuritiesTextModel(
-    private val tinkoffRepository: TinkoffRepository
+    private val getFullSecurityUseCase: GetFullSecurityUseCase
 ) : TextModel {
     private val textModels = mapOf<String, TextModel>()
 
@@ -19,7 +15,7 @@ class SearchSecuritiesTextModel(
 
     override suspend fun executeCommand(user: User, path: List<String>, command: String): BotScreen {
         if (command.isBlank()) {
-            return BotScreen.SearchSecurities(user.id)
+            return SearchSecurities(user.id)
         }
 
         return if (path.isEmpty()) {
@@ -43,7 +39,7 @@ class SearchSecuritiesTextModel(
                 command = command
             )
         } else {
-            BotScreen.Error(user.id, UNKNOWN_PATH)
+            Error(user.id, UNKNOWN_PATH)
         }
     }
 
@@ -55,59 +51,16 @@ class SearchSecuritiesTextModel(
         return customCommand(user, command)
     }
 
-    //TODO: Factor out search
     private suspend fun customCommand(user: User, command: String): BotScreen {
-        val shareResource = tinkoffRepository.getSecurity(command)
-        if (shareResource.data == null) {
-            return BotScreen.SecurityNotFound(user.id, command)
+        return when (val result = getFullSecurityUseCase(command)) {
+            GetFullSecurityUseCase.GetSecurityResult.SecurityNotFound -> SecurityNotFound(user.id, command)
+            is GetFullSecurityUseCase.GetSecurityResult.Success -> SecuritySearchResult(user.id, null, result.result)
         }
-
-        val share = shareResource.data
-        val futuresResource = tinkoffRepository.getSecurityFutures(share)
-        var futures = futuresResource.data ?: emptyList<TinkoffFuture>()
-        futures = futures.sortedWith { o1, o2 ->
-            //TODO: 2029 > 2030 if we simply check the last digit
-            val years = try {
-                val year1 = o1.ticker.last().code
-                val year2 = o2.ticker.last().code
-                year1 - year2
-            } catch (e: NoSuchElementException) {
-                0
-            }
-            if (years == -9) return@sortedWith 1
-            if (years != 0) return@sortedWith years
-
-            val result = try {
-                val month1 = o1.ticker.last { it.isLetter() }.code
-                val month2 = o2.ticker.last { it.isLetter() }.code
-                month1 - month2
-            } catch (e: NoSuchElementException) {
-                0
-            }
-            return@sortedWith result
-        }
-
-        println(futures.map { it.ticker })
-
-        val sharesPrices = tinkoffRepository.getSharesPrice(listOf(share))
-        val sharePrice = sharesPrices.data?.getOrNull(0) ?: TinkoffPrice()
-
-        val futuresPrices = tinkoffRepository.getFuturesPrices(futures).data ?: emptyList()
-
-        val data = SecuritySearchResultData(
-            security = TinkoffSecurity(
-                share = share,
-                futures = futures
-            ),
-            sharePrice = sharePrice,
-            futuresPrices = futuresPrices
-        )
-        return BotScreen.SecuritySearchResult(user.id, data)
     }
 
     private suspend fun navigateCommand(user: User, destination: String, model: TextModel): BotScreen {
 //        navigateUser(user, destination)
 //        return model.executeCommand(user, emptyList(), String())
-        return BotScreen.Error(user.id, UNKNOWN_PATH)
+        return Error(user.id, UNKNOWN_PATH)
     }
 }

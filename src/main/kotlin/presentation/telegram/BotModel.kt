@@ -11,6 +11,10 @@ import domain.user.navigation.useCase.UserToRootUseCase
 import domain.user.useCase.FindUserUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import presentation.telegram.screens.BotScreen
+import presentation.telegram.screens.Error
+import presentation.telegram.screens.Greeting
+import presentation.telegram.screens.Root
 import presentation.telegram.textModels.RootTextModel
 import kotlin.math.max
 import kotlin.math.min
@@ -30,11 +34,11 @@ class BotModel(
     val outMessage = _outMessage.asSharedFlow()
     suspend fun dispatchStartMessage(sender: Long) {
         val registered = when (val result = registerUser(sender)) {
-            is Resource.Success -> BotScreen.Greeting(id = sender)
-            is Resource.Error -> BotScreen.Error(id = sender, message = result.message ?: UNKNOWN_ERROR)
+            is Resource.Success -> Greeting(id = sender)
+            is Resource.Error -> Error(id = sender, message = result.message ?: UNKNOWN_ERROR)
         }
         _outMessage.emit(registered)
-        _outMessage.emit(BotScreen.Root(id = sender))
+        _outMessage.emit(Root(id = sender))
     }
 
     suspend fun handleTextInput(id: Long, text: String) {
@@ -42,7 +46,7 @@ class BotModel(
         val user = if (userResource is Resource.Success) {
             userResource.data!!
         } else {
-            val screen = BotScreen.Error(
+            val screen = Error(
                 id,
                 "Похоже мне стерли память и я вас не помню, напишите команду /start, чтобы я вас записал."
             )
@@ -54,7 +58,7 @@ class BotModel(
         val screen = when (text) {
             BotTextCommands.Root.text -> {
                 userToRoot(user)
-                BotScreen.Root(user.id)
+                Root(user.id)
             }
 
             BotTextCommands.Pop.text -> {
@@ -142,16 +146,6 @@ class BotModel(
             answer += '\n'
         }
         return answer
-    }
-
-    private fun pathToScreen(id: Long, path: String): BotScreen {
-        if (path.isBlank()) return BotScreen.Root(id)
-        val actualScreen = path.split('/').last()
-        return when (actualScreen) {
-            BotTextCommands.MySecurities.name -> BotScreen.MySecurities(id)
-            BotTextCommands.SearchSecurities.name -> BotScreen.SearchSecurities(id)
-            else -> BotScreen.Error(id, "Где я?")
-        }
     }
 
 
