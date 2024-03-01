@@ -1,5 +1,6 @@
 package presentation.telegram.textModels
 
+import domain.tinkoff.model.TinkoffFuture
 import domain.tinkoff.model.TinkoffPrice
 import domain.tinkoff.model.TinkoffSecurity
 import domain.tinkoff.repository.TinkoffRepository
@@ -63,7 +64,30 @@ class SearchSecuritiesTextModel(
 
         val share = shareResource.data
         val futuresResource = tinkoffRepository.getSecurityFutures(share)
-        val futures = futuresResource.data ?: emptyList()
+        var futures = futuresResource.data ?: emptyList<TinkoffFuture>()
+        futures = futures.sortedWith { o1, o2 ->
+            //TODO: 2029 > 2030 if we simply check the last digit
+            val years = try {
+                val year1 = o1.ticker.last().code
+                val year2 = o2.ticker.last().code
+                year1 - year2
+            } catch (e: NoSuchElementException) {
+                0
+            }
+            if (years == -9) return@sortedWith 1
+            if (years != 0) return@sortedWith years
+
+            val result = try {
+                val month1 = o1.ticker.last { it.isLetter() }.code
+                val month2 = o2.ticker.last { it.isLetter() }.code
+                month1 - month2
+            } catch (e: NoSuchElementException) {
+                0
+            }
+            return@sortedWith result
+        }
+
+        println(futures.map { it.ticker })
 
         val sharesPrices = tinkoffRepository.getSharesPrice(listOf(share))
         val sharePrice = sharesPrices.data?.getOrNull(0) ?: TinkoffPrice()
