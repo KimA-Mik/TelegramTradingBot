@@ -11,7 +11,6 @@ class SecuritySearchResult(id: Long, messageId: Long?, val result: FullTinkoffSe
     sealed interface State {
         data class SearchResult(val result: FullTinkoffSecurity) : State
         data class FollowUpdate(
-            val messageId: Long,
             val messageText: String,
             val followed: Boolean
         ) : State

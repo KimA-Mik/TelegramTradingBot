@@ -3,14 +3,12 @@ package presentation.telegram
 import Resource
 import domain.common.PATH_SEPARATOR
 import domain.moex.securities.useCase.FindSecurityUseCase
-import domain.tinkoff.model.SecurityType
-import domain.tinkoff.repository.TinkoffRepository
 import domain.user.navigation.useCase.PopUserUseCase
 import domain.user.navigation.useCase.RegisterUserUseCase
 import domain.user.navigation.useCase.UserToRootUseCase
 import domain.user.useCase.FindUserUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.merge
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.Error
 import presentation.telegram.screens.Greeting
@@ -22,23 +20,23 @@ import kotlin.math.min
 
 class BotModel(
     private val rootTextModel: RootTextModel,
+    private val callbackModel: CallbackModel,
     private val findSecurity: FindSecurityUseCase,
-    private val tinkoffRepository: TinkoffRepository,
     private val registerUser: RegisterUserUseCase,
     private val findUser: FindUserUseCase,
     private val userToRoot: UserToRootUseCase,
     private val popUser: PopUserUseCase
 ) {
 
-    private val _outMessage = MutableSharedFlow<BotScreen>()
-    val outMessage = _outMessage.asSharedFlow()
+    private val _outMessages = MutableSharedFlow<BotScreen>()
+    val outMessages = merge(_outMessages, callbackModel.outFlow)
     suspend fun dispatchStartMessage(sender: Long) {
         val registered = when (val result = registerUser(sender)) {
             is Resource.Success -> Greeting(id = sender)
             is Resource.Error -> Error(id = sender, message = result.message ?: UNKNOWN_ERROR)
         }
-        _outMessage.emit(registered)
-        _outMessage.emit(Root(id = sender))
+        _outMessages.emit(registered)
+        _outMessages.emit(Root(id = sender))
     }
 
     suspend fun handleTextInput(id: Long, text: String) {
@@ -50,7 +48,7 @@ class BotModel(
                 id,
                 "Похоже мне стерли память и я вас не помню, напишите команду /start, чтобы я вас записал."
             )
-            _outMessage.emit(screen)
+            _outMessages.emit(screen)
             return
         }
 
@@ -72,42 +70,11 @@ class BotModel(
             else -> rootTextModel.executeCommand(user, path, text)
         }
 
-        _outMessage.emit(screen)
+        _outMessages.emit(screen)
     }
 
-    private fun getSecurityDescriptionTinkoff(ticker: String): String {
-        val securityType = tinkoffRepository.findSecurity(ticker)
-
-        return when (securityType) {
-            SecurityType.SHARE -> getShareDescription(ticker)
-            SecurityType.FUTURE -> getFutureDescription(ticker)
-            SecurityType.NONE -> "$ticker не найден"
-        }
-    }
-
-    private fun getShareDescription(ticker: String): String {
-        var result = String()
-        val shareResource = tinkoffRepository.getSecurity(ticker)
-        if (shareResource is Resource.Error) {
-            return "Не получилось найти $ticker из-за ошибки: ${shareResource.message}"
-        }
-        val share = shareResource.data!!
-        result += "$ticker - ${share.name}"
-        val futuresRes = tinkoffRepository.getSecurityFutures(share)
-        if (futuresRes is Resource.Error) {
-            result += "\nФьючерсы не найдены"
-            return result
-        }
-
-        val futures = futuresRes.data!!
-        futures.forEach {
-            result += "\n${it.ticker} (${it.lot}) - ${it.name}"
-        }
-        return result
-    }
-
-    private fun getFutureDescription(ticker: String): String {
-        return "$ticker это фьючерс"
+    suspend fun handleFollowSecurity(userId: Long, messageId: Long, ticker: String, oldMessage: String) {
+        callbackModel.handleFollowSecurity(userId, messageId, ticker, oldMessage)
     }
 
     private suspend fun getSecurityDescriptionMoex(securityId: String): String {

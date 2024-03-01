@@ -8,7 +8,7 @@ import org.jetbrains.exposed.dao.id.LongIdTable
 object UserSecurities : LongIdTable() {
     val percent = double("percent")
     val user = reference("user", Users)
-    val security = reference("security", Securities)
+    val security = reference("security", Shares)
 }
 
 class UserSecurityEntity(id: EntityID<Long>) : LongEntity(id) {
@@ -16,5 +16,5 @@ class UserSecurityEntity(id: EntityID<Long>) : LongEntity(id) {
 
     var percent by UserSecurities.percent
     var userEntity by UserEntity referencedOn UserSecurities.user
-    var securityEntity by SecurityEntity referencedOn UserSecurities.security
+    var shareEntity by ShareEntity referencedOn UserSecurities.security
 }

@@ -59,7 +59,7 @@ class App(
         }
         telegramBot.startPolling()
         botJob = scope.launch {
-            model.outMessage.collect { screen ->
+            model.outMessages.collect { screen ->
                 screen.messageId?.let {
                     telegramBot.editMessageText(
                         chatId = ChatId.fromId(screen.id),

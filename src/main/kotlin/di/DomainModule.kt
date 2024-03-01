@@ -7,6 +7,7 @@ import domain.moex.repository.MoexRepository
 import domain.moex.securities.useCase.FindSecurityUseCase
 import domain.tinkoff.repository.TinkoffRepository
 import domain.tinkoff.useCase.GetFullSecurityUseCase
+import domain.tinkoff.useCase.GetTinkoffShareUseCase
 import domain.user.navigation.useCase.NavigateUserUseCase
 import domain.user.navigation.useCase.PopUserUseCase
 import domain.user.navigation.useCase.RegisterUserUseCase
@@ -23,6 +24,7 @@ val domainModule = module {
     singleOf(::DatabaseRepositoryImpl) bind DatabaseRepository::class
 
     singleOf(::GetFullSecurityUseCase)
+    singleOf(::GetTinkoffShareUseCase)
 
     singleOf(::FindUserUseCase)
 

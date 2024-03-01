@@ -1,0 +1,3 @@
+package domain.user.useCase
+
+class SubscribeUserToShareUseCase
