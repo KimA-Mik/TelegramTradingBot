@@ -12,6 +12,6 @@ class UnsubscribeUserToShareUseCase(
         val shareResource = tinkoff.getSecurity(ticker)
         if (shareResource.data == null) return Resource.Error("")
         val share = shareResource.data
-
+        return Resource.Error("")
     }
 }

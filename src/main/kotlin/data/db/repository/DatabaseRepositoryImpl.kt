@@ -1,13 +1,14 @@
 package data.db.repository
 
 import data.db.DatabaseConnector
-import data.db.entities.*
-import data.db.mappers.toUser
+import data.db.entities.Shares
+import data.db.entities.UserShares
+import data.db.entities.Users
 import domain.tinkoff.model.TinkoffShare
 import domain.user.model.User
 import domain.user.repository.DatabaseRepository
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class DatabaseRepositoryImpl(
@@ -15,52 +16,95 @@ class DatabaseRepositoryImpl(
 ) : DatabaseRepository {
     init {
         transaction {
-            SchemaUtils.create(Shares, Users, UserSecurities)
+            SchemaUtils.create(Shares, Users, UserShares)
         }
     }
 
     override suspend fun registerUser(id: Long) {
         database.transaction {
-            UserEntity.new(id) {
-                path = String()
+            Users.insert {
+                it[this.id] = id
+                it[path] = String()
             }
         }
     }
 
     override suspend fun findUser(id: Long): User? {
-        return database.transaction {
-            UserEntity.findById(id)
-        }?.toUser()
-    }
-
-    override suspend fun updateUser(user: User): User? {
-        return database.transaction {
-            UserEntity.findByIdAndUpdate(user.id) {
-                it.path = user.path
+        return Users
+            .selectAll()
+            .where { Users.id eq id }
+            .map {
+                User(
+                    id = it[Users.id],
+                    registered = it[Users.registered],
+                    path = it[Users.path]
+                )
             }
-        }?.toUser()
+            .firstOrNull()
     }
 
-    override suspend fun subscribeUserToShare(userId: Long, share: TinkoffShare) {
+    override suspend fun updateUser(user: User): User {
+        Users.update({ Users.id eq user.id }) {
+            it[id] = user.id
+            it[registered] = user.registered
+            it[path] = user.path
+        }
+
+        return user
+    }
+
+    override suspend fun subscribeUserToShare(userId: Long, share: TinkoffShare): Boolean {
         return database.transaction {
-            val shareQuery = ShareEntity.find { Shares.ticker eq share.ticker }
-            val actualShare = if (shareQuery.count() == 1L) {
-                shareQuery.single()
+            val sharesList = Shares
+                .select(Shares.id)
+                .where { Shares.ticker eq share.ticker }
+                .map { it[Shares.id].value }
+                .toList()
+
+            val shareId = if (sharesList.isNotEmpty()) {
+                sharesList.first()
             } else {
-                ShareEntity.new {
-                    this.name = share.name
-                    this.lot = share.lot
-                    this.uid = share.uid
-                }
+                Shares.insertAndGetId {
+                    it[name] = share.name
+                    it[ticker] = share.ticker
+                    it[lot] = share.lot
+                    it[uid] = share.uid
+                }.value
             }
-            val existed =
-                UserSecurityEntity.find { (UserSecurities.user eq userId) and (UserSecurities.security eq actualShare.id) }
 
-            if (existed.count() > 0) return@transaction
-            UserSecurityEntity.new {
-                transaction { }
+            val existedLinks = UserShares
+                .selectAll()
+                .where { UserShares.userId eq userId }
+                .andWhere { UserShares.shareId eq shareId }
+                .toList()
+
+            if (existedLinks.isNotEmpty()) return@transaction false
+
+            UserShares.insert {
+                it[UserShares.userId] = userId
+                it[UserShares.shareId] = shareId
             }
+
+            true
         }
     }
 
+    override suspend fun unsubscribeUserToShare(userId: Long, ticker: String): Boolean {
+        return database.transaction {
+            val sharesList = Shares
+                .select(Shares.id)
+                .where { Shares.ticker eq ticker }
+                .map { it[Shares.id].value }
+                .toList()
+
+            if (sharesList.isEmpty()) return@transaction false
+
+            val shareId = sharesList.first()
+            val deleted = UserShares.deleteWhere {
+                (UserShares.shareId eq shareId) and (UserShares.userId eq userId)
+            }
+
+            return@transaction deleted > 0
+        }
+    }
 }
