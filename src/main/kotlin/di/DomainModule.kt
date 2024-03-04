@@ -14,6 +14,9 @@ import domain.user.navigation.useCase.RegisterUserUseCase
 import domain.user.navigation.useCase.UserToRootUseCase
 import domain.user.repository.DatabaseRepository
 import domain.user.useCase.FindUserUseCase
+import domain.user.useCase.IsUserSubscribedUseCase
+import domain.user.useCase.SubscribeUserToShareUseCase
+import domain.user.useCase.UnsubscribeUserFromShareUseCase
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -27,6 +30,9 @@ val domainModule = module {
     singleOf(::GetTinkoffShareUseCase)
 
     singleOf(::FindUserUseCase)
+    singleOf(::SubscribeUserToShareUseCase)
+    singleOf(::UnsubscribeUserFromShareUseCase)
+    singleOf(::IsUserSubscribedUseCase)
 
     singleOf(::RegisterUserUseCase)
     singleOf(::NavigateUserUseCase)

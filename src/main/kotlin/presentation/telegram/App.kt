@@ -9,6 +9,7 @@ import com.github.kotlintelegrambot.dispatcher.telegramError
 import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
 import kotlinx.coroutines.*
+import presentation.telegram.callbackButtons.CallbackButton
 
 class App(
     private val botToken: String,
@@ -44,12 +45,28 @@ class App(
                 }
 
                 callbackQuery(
-                    callbackData = "followSecurity",
+                    callbackData = CallbackButton.Subscribe.callbackData,
                 ) {
                     if (callbackQuery.message == null) return@callbackQuery
-//                    bot.processUpdate()
-                    println(callbackQuery)
-                    println(update)
+
+                    model.handleCallbackButton(
+                        callbackData = CallbackButton.Subscribe.callbackData,
+                        userId = callbackQuery.message?.chat?.id ?: 0,
+                        messageId = callbackQuery.message?.messageId ?: 0,
+                        messageText = callbackQuery.message?.text.orEmpty()
+                    )
+                }
+                callbackQuery(
+                    callbackData = CallbackButton.Unsubscribe.callbackData
+                ) {
+                    if (callbackQuery.message == null) return@callbackQuery
+
+                    model.handleCallbackButton(
+                        callbackData = CallbackButton.Unsubscribe.callbackData,
+                        userId = callbackQuery.message?.chat?.id ?: 0,
+                        messageId = callbackQuery.message?.messageId ?: 0,
+                        messageText = callbackQuery.message?.text.orEmpty()
+                    )
                 }
 
                 telegramError {

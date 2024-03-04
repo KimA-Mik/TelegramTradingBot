@@ -2,7 +2,7 @@ package presentation.telegram.textModels
 
 import domain.user.model.User
 import presentation.telegram.screens.BotScreen
-import presentation.telegram.screens.Error
+import presentation.telegram.screens.ErrorScreen
 import presentation.telegram.screens.MySecurities
 import presentation.telegram.textModels.common.TextModel
 import presentation.telegram.textModels.common.UNKNOWN_COMMAND
@@ -39,21 +39,21 @@ class MySecuritiesTextModel : TextModel {
                 command = command
             )
         } else {
-            Error(user.id, UNKNOWN_PATH)
+            ErrorScreen(user.id, UNKNOWN_PATH)
         }
     }
 
-    private suspend fun command(user: User, command: String): BotScreen {
+    private fun command(user: User, command: String): BotScreen {
         navigationCommands[command]?.let {
             return navigateCommand(user, command, it)
         }
 
-        return Error(user.id, UNKNOWN_COMMAND)
+        return ErrorScreen(user.id, UNKNOWN_COMMAND)
     }
 
-    private suspend fun navigateCommand(user: User, destination: String, model: TextModel): BotScreen {
+    private fun navigateCommand(user: User, destination: String, model: TextModel): BotScreen {
 //        navigateUser(user, destination)
 //        return model.executeCommand(user, emptyList(), String())
-        return Error(user.id, UNKNOWN_PATH)
+        return ErrorScreen(user.id, UNKNOWN_PATH)
     }
 }

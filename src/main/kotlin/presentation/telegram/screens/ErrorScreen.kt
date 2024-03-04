@@ -4,7 +4,7 @@ import com.github.kotlintelegrambot.entities.KeyboardReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.KeyboardButton
 import presentation.telegram.BotTextCommands
 
-class Error(id: Long, message: String) : BotScreen(id) {
+class ErrorScreen(id: Long, message: String) : BotScreen(id) {
     override val text = "Произошла ошибка: $message"
     override val replyMarkup = _replyMarkup
     override val parseMode = null

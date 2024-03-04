@@ -4,7 +4,7 @@ import domain.user.model.User
 import domain.user.navigation.useCase.NavigateUserUseCase
 import presentation.telegram.BotTextCommands
 import presentation.telegram.screens.BotScreen
-import presentation.telegram.screens.Error
+import presentation.telegram.screens.ErrorScreen
 import presentation.telegram.screens.Root
 import presentation.telegram.textModels.common.TextModel
 import presentation.telegram.textModels.common.UNKNOWN_COMMAND
@@ -51,7 +51,7 @@ class RootTextModel(
                 command = command
             )
         } else {
-            Error(user.id, UNKNOWN_PATH)
+            ErrorScreen(user.id, UNKNOWN_PATH)
         }
     }
 
@@ -60,11 +60,11 @@ class RootTextModel(
             return navigateCommand(user, command, it)
         }
 
-        return Error(user.id, UNKNOWN_COMMAND)
+        return ErrorScreen(user.id, UNKNOWN_COMMAND)
     }
 
     private suspend fun navigateCommand(user: User, command: String, model: TextModel): BotScreen {
-        val destination = BotTextCommands.entries.find { it.text == command }?.name ?: return Error(
+        val destination = BotTextCommands.entries.find { it.text == command }?.name ?: return ErrorScreen(
             user.id,
             UNKNOWN_COMMAND
         )

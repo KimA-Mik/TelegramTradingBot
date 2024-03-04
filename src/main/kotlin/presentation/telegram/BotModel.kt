@@ -9,8 +9,11 @@ import domain.user.navigation.useCase.UserToRootUseCase
 import domain.user.useCase.FindUserUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.merge
+import presentation.telegram.callbackButtons.CallbackButton
+import presentation.telegram.callbackButtons.SubscribeButtonHandler
+import presentation.telegram.callbackButtons.UnsubscribeButtonHandler
 import presentation.telegram.screens.BotScreen
-import presentation.telegram.screens.Error
+import presentation.telegram.screens.ErrorScreen
 import presentation.telegram.screens.Greeting
 import presentation.telegram.screens.Root
 import presentation.telegram.textModels.RootTextModel
@@ -19,21 +22,29 @@ import kotlin.math.min
 
 
 class BotModel(
+    subscribeButtonHandler: SubscribeButtonHandler,
+    unsubscribeButtonHandler: UnsubscribeButtonHandler,
     private val rootTextModel: RootTextModel,
     private val callbackModel: CallbackModel,
     private val findSecurity: FindSecurityUseCase,
     private val registerUser: RegisterUserUseCase,
     private val findUser: FindUserUseCase,
     private val userToRoot: UserToRootUseCase,
-    private val popUser: PopUserUseCase
+    private val popUser: PopUserUseCase,
 ) {
 
     private val _outMessages = MutableSharedFlow<BotScreen>()
     val outMessages = merge(_outMessages, callbackModel.outFlow)
+
+    private val buttonHandlers = mapOf(
+        CallbackButton.Subscribe.callbackData to subscribeButtonHandler,
+        CallbackButton.Unsubscribe.callbackData to unsubscribeButtonHandler,
+    )
+
     suspend fun dispatchStartMessage(sender: Long) {
         val registered = when (val result = registerUser(sender)) {
             is Resource.Success -> Greeting(id = sender)
-            is Resource.Error -> Error(id = sender, message = result.message ?: UNKNOWN_ERROR)
+            is Resource.Error -> ErrorScreen(id = sender, message = result.message ?: UNKNOWN_ERROR)
         }
         _outMessages.emit(registered)
         _outMessages.emit(Root(id = sender))
@@ -44,7 +55,7 @@ class BotModel(
         val user = if (userResource is Resource.Success) {
             userResource.data!!
         } else {
-            val screen = Error(
+            val screen = ErrorScreen(
                 id,
                 "Похоже мне стерли память и я вас не помню, напишите команду /start, чтобы я вас записал."
             )
@@ -73,8 +84,13 @@ class BotModel(
         _outMessages.emit(screen)
     }
 
-    suspend fun handleFollowSecurity(userId: Long, messageId: Long, ticker: String, oldMessage: String) {
-        callbackModel.handleFollowSecurity(userId, messageId, ticker, oldMessage)
+    suspend fun handleCallbackButton(callbackData: String, userId: Long, messageId: Long, messageText: String) {
+        if (userId == 0L || messageId == 0L) return
+
+        buttonHandlers[callbackData]?.let { handler ->
+            val screen = handler.execute(userId, messageId, messageText)
+            _outMessages.emit(screen)
+        }
     }
 
     private suspend fun getSecurityDescriptionMoex(securityId: String): String {
