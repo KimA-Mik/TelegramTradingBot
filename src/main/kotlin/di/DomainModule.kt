@@ -3,7 +3,6 @@ package di
 import data.db.repository.DatabaseRepositoryImpl
 import data.moex.repository.MoexRepositoryImpl
 import data.tinkoff.repository.TinkoffRepositoryImpl
-import domain.common.useCase.GetFutureSharePriceUseCase
 import domain.moex.repository.MoexRepository
 import domain.moex.securities.useCase.FindSecurityUseCase
 import domain.tinkoff.repository.TinkoffRepository
@@ -39,8 +38,6 @@ val domainModule = module {
     singleOf(::NavigateUserUseCase)
     singleOf(::UserToRootUseCase)
     singleOf(::PopUserUseCase)
-
-    singleOf(::GetFutureSharePriceUseCase)
 
     singleOf(::FindSecurityUseCase)
 }

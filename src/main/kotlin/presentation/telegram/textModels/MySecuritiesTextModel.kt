@@ -1,12 +1,12 @@
 package presentation.telegram.textModels
 
 import domain.user.model.User
+import presentation.telegram.common.UNKNOWN_COMMAND
+import presentation.telegram.common.UNKNOWN_PATH
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
 import presentation.telegram.screens.MySecurities
 import presentation.telegram.textModels.common.TextModel
-import presentation.telegram.textModels.common.UNKNOWN_COMMAND
-import presentation.telegram.textModels.common.UNKNOWN_PATH
 
 class MySecuritiesTextModel : TextModel {
     private val textModels = mapOf<String, TextModel>()

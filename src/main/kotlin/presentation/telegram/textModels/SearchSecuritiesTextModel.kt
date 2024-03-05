@@ -3,13 +3,13 @@ package presentation.telegram.textModels
 import domain.tinkoff.useCase.GetFullSecurityUseCase
 import domain.user.model.User
 import domain.user.useCase.IsUserSubscribedUseCase
+import presentation.telegram.common.UNKNOWN_PATH
 import presentation.telegram.screens.*
 import presentation.telegram.textModels.common.TextModel
-import presentation.telegram.textModels.common.UNKNOWN_PATH
 
 class SearchSecuritiesTextModel(
     private val getFullSecurityUseCase: GetFullSecurityUseCase,
-    private val isUserSubscribed: IsUserSubscribedUseCase
+    private val isUserSubscribed: IsUserSubscribedUseCase,
 ) : TextModel {
     private val textModels = mapOf<String, TextModel>()
 
