@@ -1,20 +1,12 @@
 package data.db.entities
 
-import org.jetbrains.exposed.dao.LongEntity
-import org.jetbrains.exposed.dao.LongEntityClass
-import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.LongIdTable
+import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.javatime.CurrentDateTime
 import org.jetbrains.exposed.sql.javatime.datetime
 
-object Users : LongIdTable() {
+object Users : Table() {
+    val id = long("id")
     val registered = datetime("registered").defaultExpression(CurrentDateTime)
-    val path = varchar("path", 200)
-}
-
-class UserEntity(id: EntityID<Long>) : LongEntity(id) {
-    companion object : LongEntityClass<UserEntity>(Users)
-
-    var registered by Users.registered
-    var path by Users.path
+    val path = varchar("path", 250)
+    override val primaryKey = PrimaryKey(id)
 }

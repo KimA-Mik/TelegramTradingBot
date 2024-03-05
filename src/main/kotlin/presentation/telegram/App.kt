@@ -43,13 +43,15 @@ class App(
                     model.handleTextInput(message.chat.id, text)
                 }
 
-                callbackQuery(
-                    callbackData = "followSecurity",
-                ) {
-                    if (callbackQuery.message == null) return@callbackQuery
-//                    bot.processUpdate()
-                    println(callbackQuery)
-                    println(update)
+                callbackQuery {
+                    callbackQuery.message?.let {
+                        model.handleCallbackButton(
+                            callbackData = callbackQuery.data,
+                            userId = it.chat.id,
+                            messageId = it.messageId,
+                            messageText = it.text.orEmpty()
+                        )
+                    }
                 }
 
                 telegramError {
@@ -59,15 +61,18 @@ class App(
         }
         telegramBot.startPolling()
         botJob = scope.launch {
-            model.outMessage.collect { screen ->
+            model.outMessages.collect { screen ->
                 screen.messageId?.let {
+                    val chatId = ChatId.fromId(screen.id)
                     telegramBot.editMessageText(
-                        chatId = ChatId.fromId(screen.id),
+                        chatId = chatId,
                         messageId = it,
                         text = screen.text,
-                        replyMarkup = screen.replyMarkup,
-                        parseMode = screen.parseMode
+                        parseMode = screen.parseMode,
+                        replyMarkup = screen.replyMarkup
+
                     )
+
                     return@collect
                 }
 

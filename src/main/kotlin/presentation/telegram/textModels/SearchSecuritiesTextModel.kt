@@ -2,12 +2,14 @@ package presentation.telegram.textModels
 
 import domain.tinkoff.useCase.GetFullSecurityUseCase
 import domain.user.model.User
+import domain.user.useCase.IsUserSubscribedUseCase
 import presentation.telegram.screens.*
 import presentation.telegram.textModels.common.TextModel
 import presentation.telegram.textModels.common.UNKNOWN_PATH
 
 class SearchSecuritiesTextModel(
-    private val getFullSecurityUseCase: GetFullSecurityUseCase
+    private val getFullSecurityUseCase: GetFullSecurityUseCase,
+    private val isUserSubscribed: IsUserSubscribedUseCase
 ) : TextModel {
     private val textModels = mapOf<String, TextModel>()
 
@@ -39,7 +41,7 @@ class SearchSecuritiesTextModel(
                 command = command
             )
         } else {
-            Error(user.id, UNKNOWN_PATH)
+            ErrorScreen(user.id, UNKNOWN_PATH)
         }
     }
 
@@ -54,13 +56,19 @@ class SearchSecuritiesTextModel(
     private suspend fun customCommand(user: User, command: String): BotScreen {
         return when (val result = getFullSecurityUseCase(command)) {
             GetFullSecurityUseCase.GetSecurityResult.SecurityNotFound -> SecurityNotFound(user.id, command)
-            is GetFullSecurityUseCase.GetSecurityResult.Success -> SecuritySearchResult(user.id, null, result.result)
+            is GetFullSecurityUseCase.GetSecurityResult.Success -> SecuritySearchResult(
+                id = user.id, messageId = null,
+                state = SecuritySearchResult.State.SearchResult(
+                    result = result.result,
+                    followed = isUserSubscribed(user.id, command)
+                )
+            )
         }
     }
 
-    private suspend fun navigateCommand(user: User, destination: String, model: TextModel): BotScreen {
+    private fun navigateCommand(user: User, destination: String, model: TextModel): BotScreen {
 //        navigateUser(user, destination)
 //        return model.executeCommand(user, emptyList(), String())
-        return Error(user.id, UNKNOWN_PATH)
+        return ErrorScreen(user.id, UNKNOWN_PATH)
     }
 }

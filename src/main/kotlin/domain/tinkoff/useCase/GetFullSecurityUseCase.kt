@@ -39,11 +39,8 @@ class GetFullSecurityUseCase(private val repository: TinkoffRepository) {
             return@sortedWith result
         }
 
-        println(futures.map { it.ticker })
-
         val sharesPrices = repository.getSharesPrice(listOf(share))
         val sharePrice = sharesPrices.data?.getOrNull(0) ?: TinkoffPrice()
-
         val futuresPrices = repository.getFuturesPrices(futures).data ?: emptyList()
 
         val data = FullTinkoffSecurity(

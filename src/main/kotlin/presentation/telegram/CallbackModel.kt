@@ -15,7 +15,11 @@ class CallbackModel(
     private val _outFlow = MutableSharedFlow<BotScreen>()
     val outFlow = _outFlow.asSharedFlow()
 
-    suspend fun subscribeToSecurity(userId: Long, ticker: String, messageId: Long): BotScreen = coroutineScope {
+    suspend fun handleFollowSecurity(
+        userId: Long,
+        messageId: Long,
+        ticker: String, oldMessage: String
+    ) = coroutineScope {
         val securityJob = async(Dispatchers.IO) { getFullSecurityUseCase(ticker) }
 
 
