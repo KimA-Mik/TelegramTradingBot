@@ -4,21 +4,35 @@ import di.presentationModule
 import kotlinx.coroutines.runBlocking
 import org.koin.core.context.startKoin
 import org.koin.java.KoinJavaComponent.get
-import presentation.telegram.App
 import presentation.telegram.BotModel
+import presentation.telegram.TelegramBot
 import java.util.*
 
 fun main() = runBlocking {
+    var failed = false
 
-    val token = System.getenv("TRADE_BOT")
-    if (token == null) {
-        println("[ERROR]Provide presentation.telegram bot token via 'TRADE_BOT' environment variable")
+    val telegramBotApiToken = System.getenv("TRADE_BOT")
+    if (telegramBotApiToken == null) {
+        println("[ОШИБКА] Для работы программы необходимо предоставить токен для телеграм бота через переменную среды `TRADE_BOT`")
+        failed = true
+    }
+
+    val tinkoffToken = System.getenv("TINKOFF_TOKEN")
+    if (tinkoffToken == null) {
+        println("[ОШИБКА] Для работы программы необходимо предоставить токен для Read-only доступа к Тинькофф-инвестициям через переменную среды `TINKOFF_TOKEN`")
+        failed = true
+    }
+
+    if (failed) {
         return@runBlocking
     }
 
     Locale.setDefault(Locale("ru", "RU"))
 
-    val dataModule = getDataModule(this)
+    val dataModule = getDataModule(
+        tinkoffInvestApiToken = tinkoffToken,
+        scope = this
+    )
     startKoin {
         modules(
             dataModule,
@@ -27,6 +41,6 @@ fun main() = runBlocking {
         )
     }
 
-    val app = App(token, get(BotModel::class.java))
-    app.run()
+    val telegramBot = TelegramBot(telegramBotApiToken, get(BotModel::class.java))
+    telegramBot.run()
 }

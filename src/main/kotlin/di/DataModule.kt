@@ -26,16 +26,15 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import ru.tinkoff.piapi.core.InvestApi
 
-suspend fun getDataModule(scope: CoroutineScope): Module {
-    val tinkoffToken = System.getenv("TINKOFF_TOKEN")
-    if (tinkoffToken == null) {
-        println("Please provide Tinkoff readonly token via TINKOFF_TOKEN environment variable")
-        throw Exception()
-    }
-    val tinkoffInvestService = TinkoffInvestService(InvestApi.create(tinkoffToken))
+suspend fun getDataModule(tinkoffInvestApiToken: String, scope: CoroutineScope): Module {
+    val tinkoffInvestService = TinkoffInvestService(InvestApi.create(tinkoffInvestApiToken))
     scope.launch { tinkoffInvestService.launchUpdating() }
 
     return module {
+        single { tinkoffInvestService }
+        singleOf(::MoexApi)
+        singleOf(::DatabaseConnector)
+
         single {
             HttpClient(OkHttp) {
                 engine {
@@ -80,11 +79,6 @@ suspend fun getDataModule(scope: CoroutineScope): Module {
                 }
             }
         }
-        singleOf(::MoexApi)
-
-        single { tinkoffInvestService }
-
-        singleOf(::DatabaseConnector)
     }
 }
 

@@ -5,7 +5,7 @@ import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import domain.tinkoff.model.FullTinkoffSecurity
 import domain.tinkoff.model.TinkoffPrice
-import presentation.telegram.App
+import presentation.telegram.TelegramBot
 import presentation.telegram.callbackButtons.CallbackButton
 
 class SecuritySearchResult(id: Long, messageId: Long?, val state: State) : BotScreen(id, messageId) {
@@ -34,10 +34,10 @@ class SecuritySearchResult(id: Long, messageId: Long?, val state: State) : BotSc
 
     private fun resultToText(result: FullTinkoffSecurity): String {
         var string =
-            "${result.security.share.ticker} - ${result.security.share.name}: ${result.sharePrice.price}${App.ROUBLE}"
+            "${result.security.share.ticker} - ${result.security.share.name}: ${result.sharePrice.price}${TelegramBot.ROUBLE}"
         result.security.futures.forEachIndexed { index, future ->
             val price = result.futuresPrices.getOrElse(index) { TinkoffPrice() }
-            string += "\nФьючерс ${future.ticker} - ${future.name}: ${price.price}${App.ROUBLE}"
+            string += "\nФьючерс ${future.ticker} - ${future.name}: ${price.price}${TelegramBot.ROUBLE}"
         }
 
         return string

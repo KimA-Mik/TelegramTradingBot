@@ -10,7 +10,7 @@ import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
 import kotlinx.coroutines.*
 
-class App(
+class TelegramBot(
     private val botToken: String,
     private val model: BotModel
 ) {
@@ -86,6 +86,7 @@ class App(
         }
     }
 
+    //FIXME: эта комманда крашит программу и она остается активной но не работающей
     private fun onStop() {
         telegramBot.stopPolling()
         mainScope.cancel()
