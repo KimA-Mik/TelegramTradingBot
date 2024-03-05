@@ -9,7 +9,6 @@ import com.github.kotlintelegrambot.dispatcher.telegramError
 import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
 import kotlinx.coroutines.*
-import presentation.telegram.callbackButtons.CallbackButton
 
 class App(
     private val botToken: String,
@@ -44,29 +43,15 @@ class App(
                     model.handleTextInput(message.chat.id, text)
                 }
 
-                callbackQuery(
-                    callbackData = CallbackButton.Subscribe.callbackData,
-                ) {
-                    if (callbackQuery.message == null) return@callbackQuery
-
-                    model.handleCallbackButton(
-                        callbackData = CallbackButton.Subscribe.callbackData,
-                        userId = callbackQuery.message?.chat?.id ?: 0,
-                        messageId = callbackQuery.message?.messageId ?: 0,
-                        messageText = callbackQuery.message?.text.orEmpty()
-                    )
-                }
-                callbackQuery(
-                    callbackData = CallbackButton.Unsubscribe.callbackData
-                ) {
-                    if (callbackQuery.message == null) return@callbackQuery
-
-                    model.handleCallbackButton(
-                        callbackData = CallbackButton.Unsubscribe.callbackData,
-                        userId = callbackQuery.message?.chat?.id ?: 0,
-                        messageId = callbackQuery.message?.messageId ?: 0,
-                        messageText = callbackQuery.message?.text.orEmpty()
-                    )
+                callbackQuery {
+                    callbackQuery.message?.let {
+                        model.handleCallbackButton(
+                            callbackData = callbackQuery.data,
+                            userId = it.chat.id,
+                            messageId = it.messageId,
+                            messageText = it.text.orEmpty()
+                        )
+                    }
                 }
 
                 telegramError {
@@ -78,13 +63,16 @@ class App(
         botJob = scope.launch {
             model.outMessages.collect { screen ->
                 screen.messageId?.let {
+                    val chatId = ChatId.fromId(screen.id)
                     telegramBot.editMessageText(
-                        chatId = ChatId.fromId(screen.id),
+                        chatId = chatId,
                         messageId = it,
                         text = screen.text,
-                        replyMarkup = screen.replyMarkup,
-                        parseMode = screen.parseMode
+                        parseMode = screen.parseMode,
+                        replyMarkup = screen.replyMarkup
+
                     )
+
                     return@collect
                 }
 

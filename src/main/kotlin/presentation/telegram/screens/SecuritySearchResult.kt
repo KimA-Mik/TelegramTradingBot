@@ -44,14 +44,28 @@ class SecuritySearchResult(id: Long, messageId: Long?, val state: State) : BotSc
     }
 
     private fun calculateReplyMarkup(): ReplyMarkup {
-        val button = when (state.followed) {
-            false -> CallbackButton.Subscribe
-            true -> CallbackButton.Unsubscribe
+        return when (state.followed) {
+            false -> subscribeMarkup
+            true -> unsubscribeMarkup
         }
+    }
 
-        return InlineKeyboardMarkup.create(
+    companion object {
+        private val subscribeMarkup = InlineKeyboardMarkup.create(
             listOf(
-                InlineKeyboardButton.CallbackData(button.text, button.callbackData)
+                InlineKeyboardButton.CallbackData(
+                    CallbackButton.Subscribe.text,
+                    CallbackButton.Subscribe.callbackData
+                )
+            )
+        )
+
+        private val unsubscribeMarkup = InlineKeyboardMarkup.create(
+            listOf(
+                InlineKeyboardButton.CallbackData(
+                    CallbackButton.Unsubscribe.text,
+                    CallbackButton.Unsubscribe.callbackData
+                )
             )
         )
     }
