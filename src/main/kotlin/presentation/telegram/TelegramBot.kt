@@ -86,7 +86,7 @@ class TelegramBot(
         }
     }
 
-    //FIXME: эта комманда крашит программу и она остается активной но не работающей
+    //FIXME: эта команда крашит программу и она остается активной но не работающей
     private fun onStop() {
         telegramBot.stopPolling()
         mainScope.cancel()

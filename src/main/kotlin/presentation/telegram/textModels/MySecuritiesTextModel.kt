@@ -1,6 +1,7 @@
 package presentation.telegram.textModels
 
 import domain.user.model.User
+import domain.user.useCase.GetUserSharesUseCase
 import presentation.telegram.common.UNKNOWN_COMMAND
 import presentation.telegram.common.UNKNOWN_PATH
 import presentation.telegram.screens.BotScreen
@@ -8,13 +9,16 @@ import presentation.telegram.screens.ErrorScreen
 import presentation.telegram.screens.MySecurities
 import presentation.telegram.textModels.common.TextModel
 
-class MySecuritiesTextModel : TextModel {
+class MySecuritiesTextModel(
+    private val getUserShares: GetUserSharesUseCase
+) : TextModel {
     private val textModels = mapOf<String, TextModel>()
 
     private val navigationCommands = mapOf<String, TextModel>()
 
     override suspend fun executeCommand(user: User, path: List<String>, command: String): BotScreen {
         if (command.isBlank()) {
+            println(getUserShares(user.id))
             return MySecurities(user.id)
         }
 

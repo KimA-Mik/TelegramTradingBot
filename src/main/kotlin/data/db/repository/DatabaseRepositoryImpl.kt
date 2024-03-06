@@ -7,6 +7,7 @@ import data.db.entities.Users
 import domain.tinkoff.model.TinkoffShare
 import domain.user.common.DEFAULT_SHARE_PERCENT
 import domain.user.model.User
+import domain.user.model.UserShare
 import domain.user.repository.DatabaseRepository
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -133,6 +134,25 @@ class DatabaseRepositoryImpl(
                 .toList()
 
             return@transaction existedLinks.isNotEmpty()
+        }
+    }
+
+    override suspend fun getUserShares(userId: Long): List<UserShare> {
+        return database.transaction {
+            Shares
+                .join(
+                    UserShares, JoinType.INNER,
+                    onColumn = Shares.id, otherColumn = UserShares.shareId,
+                    additionalConstraint = { UserShares.userId eq userId }
+                )
+                .select(Shares.ticker, Shares.name, UserShares.percent)
+                .map {
+                    UserShare(
+                        ticker = it[Shares.ticker],
+                        name = it[Shares.name],
+                        percent = it[UserShares.percent]
+                    )
+                }
         }
     }
 }

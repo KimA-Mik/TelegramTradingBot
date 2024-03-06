@@ -13,10 +13,7 @@ import domain.user.navigation.useCase.PopUserUseCase
 import domain.user.navigation.useCase.RegisterUserUseCase
 import domain.user.navigation.useCase.UserToRootUseCase
 import domain.user.repository.DatabaseRepository
-import domain.user.useCase.FindUserUseCase
-import domain.user.useCase.IsUserSubscribedUseCase
-import domain.user.useCase.SubscribeUserToShareUseCase
-import domain.user.useCase.UnsubscribeUserFromShareUseCase
+import domain.user.useCase.*
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -38,6 +35,7 @@ val domainModule = module {
     singleOf(::NavigateUserUseCase)
     singleOf(::UserToRootUseCase)
     singleOf(::PopUserUseCase)
+    singleOf(::GetUserSharesUseCase)
 
     singleOf(::FindSecurityUseCase)
 }
