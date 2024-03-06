@@ -55,7 +55,7 @@ class GetFullSecurityUseCase(private val repository: TinkoffRepository) {
     }
 
     sealed interface GetSecurityResult {
-        data class Success(val result: FullTinkoffSecurity) : GetSecurityResult
+        data class Success(val fullSecurity: FullTinkoffSecurity) : GetSecurityResult
         data object SecurityNotFound : GetSecurityResult
     }
 }

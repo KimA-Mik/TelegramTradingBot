@@ -9,9 +9,6 @@ import domain.user.navigation.useCase.UserToRootUseCase
 import domain.user.useCase.FindUserUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.merge
-import presentation.telegram.callbackButtons.CallbackButton
-import presentation.telegram.callbackButtons.SubscribeButtonHandler
-import presentation.telegram.callbackButtons.UnsubscribeButtonHandler
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
 import presentation.telegram.screens.Greeting
@@ -22,10 +19,8 @@ import kotlin.math.min
 
 
 class BotModel(
-    subscribeButtonHandler: SubscribeButtonHandler,
-    unsubscribeButtonHandler: UnsubscribeButtonHandler,
     private val rootTextModel: RootTextModel,
-    private val callbackModel: CallbackModel,
+    private val callbackHandler: CallbackHandler,
     private val findSecurity: FindSecurityUseCase,
     private val registerUser: RegisterUserUseCase,
     private val findUser: FindUserUseCase,
@@ -34,12 +29,7 @@ class BotModel(
 ) {
 
     private val _outMessages = MutableSharedFlow<BotScreen>()
-    val outMessages = merge(_outMessages, callbackModel.outFlow)
-
-    private val buttonHandlers = mapOf(
-        CallbackButton.Subscribe.callbackData to subscribeButtonHandler,
-        CallbackButton.Unsubscribe.callbackData to unsubscribeButtonHandler,
-    )
+    val outMessages = merge(_outMessages, callbackHandler.outFlow)
 
     suspend fun dispatchStartMessage(sender: Long) {
         val registered = when (val result = registerUser(sender)) {
@@ -85,12 +75,7 @@ class BotModel(
     }
 
     suspend fun handleCallbackButton(callbackData: String, userId: Long, messageId: Long, messageText: String) {
-        if (userId == 0L || messageId == 0L) return
-
-        buttonHandlers[callbackData]?.let { handler ->
-            val screen = handler.execute(userId, messageId, messageText)
-            _outMessages.emit(screen)
-        }
+        callbackHandler.handleCallback(callbackData, userId, messageId, messageText)
     }
 
     private suspend fun getSecurityDescriptionMoex(securityId: String): String {

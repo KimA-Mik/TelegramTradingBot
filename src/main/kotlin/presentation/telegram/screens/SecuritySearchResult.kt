@@ -9,11 +9,13 @@ import domain.tinkoff.model.FullTinkoffSecurity
 import domain.tinkoff.model.TinkoffPrice
 import domain.user.common.DEFAULT_SHARE_PERCENT
 import presentation.telegram.TelegramBot
+import presentation.telegram.callbackButtons.CALLBACK_BUTTON_ARGUMENT_SEPARATOR
 import presentation.telegram.callbackButtons.CallbackButton
 import presentation.telegram.common.PERCENT_FMT
 import java.util.*
 
-class SecuritySearchResult(id: Long, messageId: Long?, val state: State) : BotScreen(id, messageId) {
+class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val state: State) :
+    BotScreen(id, messageId) {
     sealed class State(val followed: Boolean) {
         class SearchResult(
             followed: Boolean,
@@ -73,27 +75,18 @@ class SecuritySearchResult(id: Long, messageId: Long?, val state: State) : BotSc
     }
 
     private fun calculateReplyMarkup(): ReplyMarkup {
-        return when (state.followed) {
-            false -> subscribeMarkup
-            true -> unsubscribeMarkup
+        val button = when (state.followed) {
+            false -> CallbackButton.Subscribe
+            true -> CallbackButton.Unsubscribe
         }
-    }
 
-    companion object {
-        private val subscribeMarkup = InlineKeyboardMarkup.create(
+        return InlineKeyboardMarkup.create(
             listOf(
                 InlineKeyboardButton.CallbackData(
-                    CallbackButton.Subscribe.text,
-                    CallbackButton.Subscribe.callbackData
-                )
-            )
-        )
-
-        private val unsubscribeMarkup = InlineKeyboardMarkup.create(
-            listOf(
-                InlineKeyboardButton.CallbackData(
-                    CallbackButton.Unsubscribe.text,
-                    CallbackButton.Unsubscribe.callbackData
+                    button.text,
+                    button.callbackData
+                            + CALLBACK_BUTTON_ARGUMENT_SEPARATOR
+                            + ticker
                 )
             )
         )

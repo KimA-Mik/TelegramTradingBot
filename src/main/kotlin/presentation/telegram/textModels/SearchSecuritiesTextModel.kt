@@ -57,9 +57,9 @@ class SearchSecuritiesTextModel(
         return when (val result = getFullSecurityUseCase(command)) {
             GetFullSecurityUseCase.GetSecurityResult.SecurityNotFound -> SecurityNotFound(user.id, command)
             is GetFullSecurityUseCase.GetSecurityResult.Success -> SecuritySearchResult(
-                id = user.id, messageId = null,
+                id = user.id, messageId = null, ticker = result.fullSecurity.security.share.ticker,
                 state = SecuritySearchResult.State.SearchResult(
-                    result = result.result,
+                    result = result.fullSecurity,
                     followed = isUserSubscribed(user.id, command)
                 )
             )

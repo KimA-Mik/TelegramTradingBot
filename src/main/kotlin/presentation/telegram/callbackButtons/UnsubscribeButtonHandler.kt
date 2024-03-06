@@ -9,15 +9,20 @@ import presentation.telegram.screens.SecuritySearchResult
 class UnsubscribeButtonHandler(
     private val unsubscribeUserToShare: UnsubscribeUserFromShareUseCase
 ) : CallbackButtonHandler {
-    override suspend fun execute(userId: Long, messageId: Long, messageText: String): BotScreen {
-        val ticker = messageText.split(' ').firstOrNull() ?: return ErrorScreen(userId, UNKNOWN_BUTTON_ERROR)
+    override suspend fun execute(
+        userId: Long,
+        messageId: Long,
+        messageText: String,
+        arguments: List<String>
+    ): BotScreen {
+        val ticker = arguments.firstOrNull().orEmpty()
 
         val resource = unsubscribeUserToShare(userId, ticker)
 
         return when (resource) {
             is Resource.Error -> ErrorScreen(userId, UNABLE_TO_UNSUBSCRIBE)
             is Resource.Success -> SecuritySearchResult(
-                id = userId, messageId = messageId,
+                id = userId, messageId = messageId, ticker = ticker,
                 state = SecuritySearchResult.State.FollowUpdate(
                     followed = false,
                     messageText = messageText

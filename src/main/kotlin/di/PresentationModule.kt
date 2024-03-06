@@ -3,7 +3,7 @@ package di
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import presentation.telegram.BotModel
-import presentation.telegram.CallbackModel
+import presentation.telegram.CallbackHandler
 import presentation.telegram.callbackButtons.SubscribeButtonHandler
 import presentation.telegram.callbackButtons.UnsubscribeButtonHandler
 import presentation.telegram.textModels.MySecuritiesTextModel
@@ -13,7 +13,7 @@ import presentation.telegram.textModels.SearchSecuritiesTextModel
 val presentationModule = module {
     singleOf(::BotModel)
 
-    singleOf(::CallbackModel)
+    singleOf(::CallbackHandler)
     singleOf(::RootTextModel)
     singleOf(::MySecuritiesTextModel)
     singleOf(::SearchSecuritiesTextModel)
