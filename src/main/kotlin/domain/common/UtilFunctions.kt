@@ -17,6 +17,7 @@ fun getFutureSharePrice(sharePrice: Double, futurePrice: Double): Double {
 
     val fraction = futurePrice / sharePrice
 
+    if (fraction < 4.5) return futurePrice
     if (fraction < 50.0) return futurePrice / 10.0
     if (fraction < 500.0) return futurePrice / 100.0
     if (fraction < 1500.0) return futurePrice / 1000.0
