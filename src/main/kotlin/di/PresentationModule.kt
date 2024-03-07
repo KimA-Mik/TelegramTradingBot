@@ -4,6 +4,8 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import presentation.telegram.BotModel
 import presentation.telegram.CallbackHandler
+import presentation.telegram.callbackButtons.SecuritiesListBackButtonHandler
+import presentation.telegram.callbackButtons.SecuritiesListForwardButtonHandler
 import presentation.telegram.callbackButtons.SubscribeButtonHandler
 import presentation.telegram.callbackButtons.UnsubscribeButtonHandler
 import presentation.telegram.textModels.MySecuritiesTextModel
@@ -20,4 +22,6 @@ val presentationModule = module {
 
     singleOf(::SubscribeButtonHandler)
     singleOf(::UnsubscribeButtonHandler)
+    singleOf(::SecuritiesListBackButtonHandler)
+    singleOf(::SecuritiesListForwardButtonHandler)
 }

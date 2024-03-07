@@ -8,7 +8,8 @@ import presentation.telegram.common.UNKNOWN_COMMAND
 import presentation.telegram.common.UNKNOWN_PATH
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
-import presentation.telegram.screens.MySecurities
+import presentation.telegram.screens.MySecuritiesList
+import presentation.telegram.screens.MySecuritiesRoot
 import presentation.telegram.textModels.common.TextModel
 
 class MySecuritiesTextModel(
@@ -18,10 +19,21 @@ class MySecuritiesTextModel(
 
     private val navigationCommands = mapOf<String, TextModel>()
 
-    override fun executeCommand(user: User, path: List<String>, command: String) = flow<BotScreen> {
+    override fun executeCommand(user: User, path: List<String>, command: String) = flow {
         if (command.isBlank()) {
-            println(getUserShares(user.id))
-            emit(MySecurities(user.id))
+            emit(MySecuritiesRoot(user.id))
+            val screen = when (val result = getUserShares(user.id, 1)) {
+                GetUserSharesUseCase.GetUserSharesResult.NotFound -> MySecuritiesList(user.id)
+                is GetUserSharesUseCase.GetUserSharesResult.Success -> MySecuritiesList(
+                    id = user.id,
+                    shares = result.shares,
+                    page = result.page,
+                    pageSize = result.pageSize,
+                    totalPages = result.totalPages
+                )
+            }
+
+            emit(screen)
             return@flow
         }
 
@@ -36,7 +48,7 @@ class MySecuritiesTextModel(
         user: User,
         path: List<String>,
         command: String
-    ) = flow<BotScreen> {
+    ) = flow {
         val nextScreen = path.first()
         textModels[nextScreen]?.let {
             emitAll(

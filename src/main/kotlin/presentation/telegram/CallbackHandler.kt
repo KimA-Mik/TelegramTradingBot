@@ -2,19 +2,20 @@ package presentation.telegram
 
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import presentation.telegram.callbackButtons.CALLBACK_BUTTON_ARGUMENT_SEPARATOR
-import presentation.telegram.callbackButtons.CallbackButton
-import presentation.telegram.callbackButtons.SubscribeButtonHandler
-import presentation.telegram.callbackButtons.UnsubscribeButtonHandler
+import presentation.telegram.callbackButtons.*
 import presentation.telegram.screens.BotScreen
 
 class CallbackHandler(
     subscribeButtonHandler: SubscribeButtonHandler,
     unsubscribeButtonHandler: UnsubscribeButtonHandler,
+    securitiesListBackButtonHandler: SecuritiesListBackButtonHandler,
+    securitiesListForwardButtonHandler: SecuritiesListForwardButtonHandler,
 ) {
     private val buttonHandlers = mapOf(
         CallbackButton.Subscribe.callbackData to subscribeButtonHandler,
         CallbackButton.Unsubscribe.callbackData to unsubscribeButtonHandler,
+        CallbackButton.SecuritiesListBack.callbackData to securitiesListBackButtonHandler,
+        CallbackButton.SecuritiesListForward.callbackData to securitiesListForwardButtonHandler
     )
 
     private val _outFlow = MutableSharedFlow<BotScreen>()
