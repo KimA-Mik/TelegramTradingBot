@@ -8,6 +8,8 @@ import domain.user.navigation.useCase.RegisterUserUseCase
 import domain.user.navigation.useCase.UserToRootUseCase
 import domain.user.useCase.FindUserUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.merge
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
@@ -54,10 +56,10 @@ class BotModel(
         }
 
         var path = user.path.split(PATH_SEPARATOR).drop(1)
-        val screen = when (text) {
+        val screens = when (text) {
             BotTextCommands.Root.text -> {
                 userToRoot(user)
-                Root(user.id)
+                flowOf(Root(user.id))
             }
 
             BotTextCommands.Pop.text -> {
@@ -71,7 +73,7 @@ class BotModel(
             else -> rootTextModel.executeCommand(user, path, text)
         }
 
-        _outMessages.emit(screen)
+        _outMessages.emitAll(screens)
     }
 
     suspend fun handleCallbackButton(callbackData: String, userId: Long, messageId: Long, messageText: String) {

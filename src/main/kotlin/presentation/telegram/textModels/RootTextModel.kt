@@ -2,6 +2,8 @@ package presentation.telegram.textModels
 
 import domain.user.model.User
 import domain.user.navigation.useCase.NavigateUserUseCase
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import presentation.telegram.BotTextCommands
 import presentation.telegram.common.UNKNOWN_COMMAND
 import presentation.telegram.common.UNKNOWN_PATH
@@ -25,51 +27,45 @@ class RootTextModel(
         BotTextCommands.SearchSecurities.text to searchSecuritiesTextModel
     )
 
-    override suspend fun executeCommand(user: User, path: List<String>, command: String): BotScreen {
+    override fun executeCommand(user: User, path: List<String>, command: String) = flow<BotScreen> {
         if (command.isBlank()) {
-            return Root(user.id)
+            emit(Root(user.id))
+            return@flow
         }
 
-        return if (path.isEmpty()) {
-            command(user, command)
+        if (path.isEmpty()) {
+            emitAll(command(user, command))
         } else {
-            passExecution(user, path, command)
+            emitAll(passExecution(user, path, command))
         }
     }
 
-    private suspend fun passExecution(
+    private fun passExecution(
         user: User,
         path: List<String>,
         command: String
-    ): BotScreen {
+    ) = flow<BotScreen> {
         val nextScreen = path.first()
 
-        return if (textModels.containsKey(nextScreen)) {
-            return textModels[nextScreen]!!.executeCommand(
-                user = user,
-                path = path.drop(1),
-                command = command
-            )
-        } else {
-            ErrorScreen(user.id, UNKNOWN_PATH)
+        textModels[nextScreen]?.let {
+            emitAll(it.executeCommand(user = user, path = path.drop(1), command = command))
+            return@flow
         }
+        emit(ErrorScreen(user.id, UNKNOWN_PATH))
     }
 
-    private suspend fun command(user: User, command: String): BotScreen {
-        navigationCommands[command]?.let {
-            return navigateCommand(user, command, it)
+    private fun command(user: User, command: String) = flow<BotScreen> {
+        navigationCommands[command]?.let { model ->
+            val destination = BotTextCommands.entries.find { it.text == command }?.name
+            if (destination == null) {
+                emit(ErrorScreen(user.id, UNKNOWN_COMMAND))
+                return@flow
+            }
+
+            navigateUser(user, destination)
+            emitAll(model.executeCommand(user, emptyList(), String()))
+            return@flow
         }
-
-        return ErrorScreen(user.id, UNKNOWN_COMMAND)
-    }
-
-    private suspend fun navigateCommand(user: User, command: String, model: TextModel): BotScreen {
-        val destination = BotTextCommands.entries.find { it.text == command }?.name ?: return ErrorScreen(
-            user.id,
-            UNKNOWN_COMMAND
-        )
-
-        navigateUser(user, destination)
-        return model.executeCommand(user, emptyList(), String())
+        emit(ErrorScreen(user.id, UNKNOWN_COMMAND))
     }
 }
