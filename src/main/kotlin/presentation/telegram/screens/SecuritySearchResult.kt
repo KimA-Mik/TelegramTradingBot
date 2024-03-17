@@ -11,8 +11,7 @@ import domain.user.common.DEFAULT_SHARE_PERCENT
 import presentation.telegram.TelegramBot
 import presentation.telegram.callbackButtons.CALLBACK_BUTTON_ARGUMENT_SEPARATOR
 import presentation.telegram.callbackButtons.CallbackButton
-import presentation.telegram.common.PERCENT_FMT
-import java.util.*
+import presentation.telegram.common.formatAndTrim
 
 class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val state: State) :
     BotScreen(id, messageId) {
@@ -45,7 +44,7 @@ class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val s
         res.append(" - ")
         res.append(result.security.share.name)
         res.append(": ")
-        res.append(result.sharePrice.price)
+        res.append(result.sharePrice.price.formatAndTrim(2))
         res.append(TelegramBot.ROUBLE)
 
 
@@ -58,7 +57,7 @@ class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val s
             res.append(" - ")
             res.append(future.name)
             res.append(": ")
-            res.append(price.price)
+            res.append(price.price.formatAndTrim(2))
             res.append(TelegramBot.ROUBLE)
 
             val futurePrice = getFutureSharePrice(result.sharePrice.price, price.price)
@@ -66,7 +65,7 @@ class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val s
                 val percent = percentBetweenDoubles(result.sharePrice.price, futurePrice)
                 res.append(" (")
                 if (percent >= DEFAULT_SHARE_PERCENT) res.append('❗')
-                res.append(PERCENT_FMT.format(Locale.US, percent))
+                res.append(percent.formatAndTrim(2))
                 res.append("%)")
             }
         }
