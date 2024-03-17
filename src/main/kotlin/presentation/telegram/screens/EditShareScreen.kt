@@ -1,8 +1,10 @@
 package presentation.telegram.screens
 
+import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.ReplyMarkup
+import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
+import presentation.telegram.callbackButtons.CallbackButton
 import presentation.telegram.common.NOT_SUBSCRIBED_TO_SHARE
-import presentation.telegram.common.PERCENT_FMT
 
 class EditShareScreen(
     id: Long,
@@ -16,15 +18,43 @@ class EditShareScreen(
     private fun markupText(): String {
         return when (state) {
             is State.NotSubscribed -> NOT_SUBSCRIBED_TO_SHARE + state.ticker
-            is State.Share -> "${state.ticker} - ${PERCENT_FMT.format(state.percent)}%"
+            is State.Share -> "${state.ticker} - ${state.percent}%"
         }
     }
 
     private fun calculateReplayMarkup(): ReplyMarkup? {
         return when (state) {
+            is State.Share -> getActualMarkup(state)
             is State.NotSubscribed -> null
-            is State.Share -> null
         }
+    }
+
+    private fun getActualMarkup(state: State.Share): ReplyMarkup {
+        InlineKeyboardButton.CallbackData("", "")
+        val rows = listOf(
+            listOf(
+                InlineKeyboardButton.CallbackData(
+                    CallbackButton.SharePercent.getText(-1.0),
+                    CallbackButton.SharePercent.getCallbackData(state.ticker, -1.0)
+                ),
+                InlineKeyboardButton.CallbackData(
+                    CallbackButton.SharePercent.getText(1.0),
+                    CallbackButton.SharePercent.getCallbackData(state.ticker, 1.0)
+                ),
+            ),
+            listOf(
+                InlineKeyboardButton.CallbackData(
+                    CallbackButton.SharePercent.getText(-0.1),
+                    CallbackButton.SharePercent.getCallbackData(state.ticker, -0.1)
+                ),
+                InlineKeyboardButton.CallbackData(
+                    CallbackButton.SharePercent.getText(0.1),
+                    CallbackButton.SharePercent.getCallbackData(state.ticker, 0.1)
+                ),
+            )
+        )
+
+        return InlineKeyboardMarkup.create(rows)
     }
 
     sealed interface State {
