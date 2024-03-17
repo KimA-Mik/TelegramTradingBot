@@ -155,4 +155,29 @@ class DatabaseRepositoryImpl(
                 }
         }
     }
+
+    override suspend fun updateUserSharePercent(userId: Long, userShare: UserShare): Boolean {
+        return database.transaction {
+            val ids = Shares
+                .join(
+                    UserShares, JoinType.INNER,
+                    onColumn = Shares.id, otherColumn = UserShares.shareId,
+                    additionalConstraint = { UserShares.userId eq userId }
+                )
+                .select(UserShares.id)
+                .where { Shares.ticker eq userShare.ticker }
+                .map { it[UserShares.id].value }
+
+            if (ids.size != 1) {
+                return@transaction false
+            }
+
+            val id = ids.first()
+            val updated = UserShares.update({ UserShares.id eq id }) {
+                it[percent] = userShare.percent
+            }
+
+            return@transaction updated > 0
+        }
+    }
 }

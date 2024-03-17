@@ -22,6 +22,7 @@ val domainModule = module {
     singleOf(::GetFullSecurityUseCase)
     singleOf(::GetTinkoffShareUseCase)
 
+    singleOf(::ChangeUserSharePercentUseCase)
     singleOf(::FindUserUseCase)
     singleOf(::GetUserSharesUseCase)
     singleOf(::GetUserShareUseCase)

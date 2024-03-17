@@ -5,6 +5,7 @@ import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import presentation.telegram.callbackButtons.CallbackButton
 import presentation.telegram.common.NOT_SUBSCRIBED_TO_SHARE
+import presentation.telegram.common.formatAndTrim
 
 class EditShareScreen(
     id: Long,
@@ -18,7 +19,9 @@ class EditShareScreen(
     private fun markupText(): String {
         return when (state) {
             is State.NotSubscribed -> NOT_SUBSCRIBED_TO_SHARE + state.ticker
-            is State.Share -> "${state.ticker} - ${state.percent}%"
+            is State.Share -> {
+                "${state.ticker} - ${state.percent.formatAndTrim(2)}%"
+            }
         }
     }
 

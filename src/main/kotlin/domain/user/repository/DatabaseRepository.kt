@@ -12,4 +12,5 @@ interface DatabaseRepository {
     suspend fun unsubscribeUserFromShare(userId: Long, ticker: String): Boolean
     suspend fun isUserSubscribed(userId: Long, ticker: String): Boolean
     suspend fun getUserShares(userId: Long): List<UserShare>
+    suspend fun updateUserSharePercent(userId: Long, userShare: UserShare): Boolean
 }

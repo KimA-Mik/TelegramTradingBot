@@ -11,15 +11,16 @@ import presentation.telegram.textModels.SearchSecuritiesTextModel
 
 val presentationModule = module {
     singleOf(::BotModel)
-
     singleOf(::CallbackHandler)
+
     singleOf(::RootTextModel)
     singleOf(::MySecuritiesTextModel)
     singleOf(::SearchSecuritiesTextModel)
 
     singleOf(::EditShareButtonHandler)
-    singleOf(::SubscribeButtonHandler)
-    singleOf(::UnsubscribeButtonHandler)
     singleOf(::SecuritiesListBackButtonHandler)
     singleOf(::SecuritiesListForwardButtonHandler)
+    singleOf(::SharePercentButtonHandler)
+    singleOf(::SubscribeButtonHandler)
+    singleOf(::UnsubscribeButtonHandler)
 }

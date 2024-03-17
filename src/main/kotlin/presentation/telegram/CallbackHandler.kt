@@ -6,18 +6,20 @@ import presentation.telegram.callbackButtons.*
 import presentation.telegram.screens.BotScreen
 
 class CallbackHandler(
-    subscribeButtonHandler: SubscribeButtonHandler,
-    unsubscribeButtonHandler: UnsubscribeButtonHandler,
+    editShareButtonHandler: EditShareButtonHandler,
     securitiesListBackButtonHandler: SecuritiesListBackButtonHandler,
     securitiesListForwardButtonHandler: SecuritiesListForwardButtonHandler,
-    editShareButtonHandler: EditShareButtonHandler,
+    sharePercentButtonHandler: SharePercentButtonHandler,
+    subscribeButtonHandler: SubscribeButtonHandler,
+    unsubscribeButtonHandler: UnsubscribeButtonHandler,
 ) {
     private val buttonHandlers = mapOf(
-        CallbackButton.Subscribe.callbackData to subscribeButtonHandler,
-        CallbackButton.Unsubscribe.callbackData to unsubscribeButtonHandler,
+        CallbackButton.EditShare.callbackData to editShareButtonHandler,
         CallbackButton.SecuritiesListBack.callbackData to securitiesListBackButtonHandler,
         CallbackButton.SecuritiesListForward.callbackData to securitiesListForwardButtonHandler,
-        CallbackButton.EditShare.callbackData to editShareButtonHandler
+        CallbackButton.SharePercent.callbackData to sharePercentButtonHandler,
+        CallbackButton.Subscribe.callbackData to subscribeButtonHandler,
+        CallbackButton.Unsubscribe.callbackData to unsubscribeButtonHandler,
     )
 
     private val _outFlow = MutableSharedFlow<BotScreen>()

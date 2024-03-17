@@ -1,5 +1,6 @@
 package presentation.telegram.callbackButtons
 
+import presentation.telegram.common.format
 import kotlin.math.abs
 
 sealed class CallbackButton(val text: String, val callbackData: String) {
@@ -22,7 +23,7 @@ sealed class CallbackButton(val text: String, val callbackData: String) {
                     CALLBACK_BUTTON_ARGUMENT_SEPARATOR +
                     ticker +
                     CALLBACK_BUTTON_ARGUMENT_SEPARATOR +
-                    percent
+                    percent.format(2)
         }
     }
 }
