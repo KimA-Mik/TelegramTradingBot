@@ -25,7 +25,7 @@ class MySecuritiesList(
     }
 
     private fun markupText(): String {
-        if (shares.isEmpty()) return "У вас нет отследиваемых акций"
+        if (shares.isEmpty()) return "У вас нет отслеживаемых акций"
 
         var result = "($page/$totalPages)"
 
@@ -40,7 +40,7 @@ class MySecuritiesList(
     private fun calculateReplayMarkup(): ReplyMarkup? {
         if (shares.isEmpty()) return null
 
-        return InlineKeyboardMarkup.create(
+        val buttonsList = mutableListOf(
             listOf(
                 InlineKeyboardButton.CallbackData(
                     CallbackButton.SecuritiesListBack.text,
@@ -54,7 +54,21 @@ class MySecuritiesList(
                             CALLBACK_BUTTON_ARGUMENT_SEPARATOR
                             + page.toString()
                 )
-            ),
+            )
         )
+
+        val sharesRows = shares.map { share ->
+            listOf(
+                InlineKeyboardButton.CallbackData(
+                    CallbackButton.EditShare.text + share.ticker,
+                    CallbackButton.EditShare.callbackData +
+                            CALLBACK_BUTTON_ARGUMENT_SEPARATOR
+                            + share.ticker
+                )
+            )
+        }
+
+        buttonsList.addAll(sharesRows)
+        return InlineKeyboardMarkup.create(buttonsList)
     }
 }

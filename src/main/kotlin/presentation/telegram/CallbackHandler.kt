@@ -10,12 +10,14 @@ class CallbackHandler(
     unsubscribeButtonHandler: UnsubscribeButtonHandler,
     securitiesListBackButtonHandler: SecuritiesListBackButtonHandler,
     securitiesListForwardButtonHandler: SecuritiesListForwardButtonHandler,
+    editShareButtonHandler: EditShareButtonHandler,
 ) {
     private val buttonHandlers = mapOf(
         CallbackButton.Subscribe.callbackData to subscribeButtonHandler,
         CallbackButton.Unsubscribe.callbackData to unsubscribeButtonHandler,
         CallbackButton.SecuritiesListBack.callbackData to securitiesListBackButtonHandler,
-        CallbackButton.SecuritiesListForward.callbackData to securitiesListForwardButtonHandler
+        CallbackButton.SecuritiesListForward.callbackData to securitiesListForwardButtonHandler,
+        CallbackButton.EditShare.callbackData to editShareButtonHandler
     )
 
     private val _outFlow = MutableSharedFlow<BotScreen>()

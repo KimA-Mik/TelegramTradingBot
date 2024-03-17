@@ -23,13 +23,14 @@ val domainModule = module {
     singleOf(::GetTinkoffShareUseCase)
 
     singleOf(::FindUserUseCase)
+    singleOf(::GetUserSharesUseCase)
+    singleOf(::GetUserShareUseCase)
+    singleOf(::IsUserSubscribedUseCase)
     singleOf(::SubscribeUserToShareUseCase)
     singleOf(::UnsubscribeUserFromShareUseCase)
-    singleOf(::IsUserSubscribedUseCase)
 
-    singleOf(::RegisterUserUseCase)
     singleOf(::NavigateUserUseCase)
-    singleOf(::UserToRootUseCase)
     singleOf(::PopUserUseCase)
-    singleOf(::GetUserSharesUseCase)
+    singleOf(::RegisterUserUseCase)
+    singleOf(::UserToRootUseCase)
 }
