@@ -5,6 +5,8 @@ import data.db.entities.Shares
 import data.db.entities.UserShares
 import data.db.entities.Users
 import domain.tinkoff.model.TinkoffShare
+import domain.updateService.model.FollowedShare
+import domain.updateService.model.UserWithFollowedShares
 import domain.user.common.DEFAULT_SHARE_PERCENT
 import domain.user.model.User
 import domain.user.model.UserShare
@@ -179,5 +181,38 @@ class DatabaseRepositoryImpl(
 
             return@transaction updated > 0
         }
+    }
+
+    override suspend fun getUsersWithShares(): List<UserWithFollowedShares> {
+        return database.transaction {
+            Users
+                .join(
+                    UserShares, JoinType.LEFT,
+                    onColumn = Users.id, otherColumn = UserShares.userId
+                )
+                .join(
+                    Shares, JoinType.INNER,
+                    onColumn = UserShares.shareId, otherColumn = Shares.id
+                )
+                .select(Users.id, Shares.id, Shares.uid, Shares.ticker, UserShares.percent)
+                .groupBy { it[Users.id] }
+                .map {
+                    UserWithFollowedShares(
+                        id = it.key,
+                        shares = it.value.map { row ->
+                            row.toFollowedShare()
+                        }
+                    )
+                }
+        }
+    }
+
+    private fun ResultRow.toFollowedShare(): FollowedShare {
+        return FollowedShare(
+            id = this[Shares.id].value,
+            ticker = this[Shares.ticker],
+            uid = this[Shares.ticker],
+            percent = this[UserShares.percent]
+        )
     }
 }
