@@ -24,10 +24,15 @@ class BotModel(
     private val findUser: FindUserUseCase,
     private val userToRoot: UserToRootUseCase,
     private val popUser: PopUserUseCase,
+    private val updateHandler: UpdateHandler,
 ) {
 
     private val _outMessages = MutableSharedFlow<BotScreen>()
-    val outMessages = merge(_outMessages, callbackHandler.outFlow)
+    val outMessages = merge(
+        _outMessages,
+        callbackHandler.outFlow,
+        updateHandler.outScreens
+    )
 
     suspend fun dispatchStartMessage(sender: Long) {
         val registered = when (val result = registerUser(sender)) {
