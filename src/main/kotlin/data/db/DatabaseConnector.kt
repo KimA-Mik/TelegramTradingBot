@@ -2,6 +2,7 @@ package data.db
 
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import java.sql.Connection
@@ -13,7 +14,7 @@ class DatabaseConnector {
         TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
     }
 
-    suspend fun <T> transaction(block: suspend () -> T): T =
+    suspend fun <T> transaction(block: suspend Transaction.() -> T): T =
         newSuspendedTransaction(Dispatchers.IO, db = connection) { block() }
 
 }

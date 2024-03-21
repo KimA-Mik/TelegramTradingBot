@@ -8,6 +8,7 @@ import ru.tinkoff.piapi.contract.v1.Share
 import ru.tinkoff.piapi.core.InvestApi
 
 class TinkoffInvestService(private val api: InvestApi) {
+    //TODO: Use maps for faster search
     private val tradableShares = MutableStateFlow(emptyList<Share>())
     private val tradableFutures = MutableStateFlow(emptyList<Future>())
 

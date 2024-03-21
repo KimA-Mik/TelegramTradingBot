@@ -15,4 +15,5 @@ interface DatabaseRepository {
     suspend fun getUserShares(userId: Long): List<UserShare>
     suspend fun updateUserSharePercent(userId: Long, userShare: UserShare): Boolean
     suspend fun getUsersWithShares(): List<UserWithFollowedShares>
+    suspend fun updateUserSharesNotified(userShares: List<UserShare>)
 }

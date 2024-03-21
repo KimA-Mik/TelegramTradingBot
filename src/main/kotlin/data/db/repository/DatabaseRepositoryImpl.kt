@@ -11,13 +11,18 @@ import domain.user.common.DEFAULT_SHARE_PERCENT
 import domain.user.model.User
 import domain.user.model.UserShare
 import domain.user.repository.DatabaseRepository
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.statements.BatchUpdateStatement
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.slf4j.LoggerFactory
 
 class DatabaseRepositoryImpl(
     private val database: DatabaseConnector
 ) : DatabaseRepository {
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
     init {
         transaction {
             SchemaUtils.create(Shares, Users, UserShares)
@@ -92,6 +97,7 @@ class DatabaseRepositoryImpl(
                 it[UserShares.userId] = userId
                 it[UserShares.shareId] = shareId
                 it[percent] = DEFAULT_SHARE_PERCENT
+                it[notified] = false
             }
 
             true
@@ -150,9 +156,11 @@ class DatabaseRepositoryImpl(
                 .select(Shares.ticker, Shares.name, UserShares.percent)
                 .map {
                     UserShare(
+                        id = it[UserShares.id].value,
                         ticker = it[Shares.ticker],
                         name = it[Shares.name],
-                        percent = it[UserShares.percent]
+                        percent = it[UserShares.percent],
+                        notified = it[UserShares.notified]
                     )
                 }
         }
@@ -204,6 +212,22 @@ class DatabaseRepositoryImpl(
                         }
                     )
                 }
+        }
+    }
+
+    override suspend fun updateUserSharesNotified(userShares: List<UserShare>) {
+        database.transaction {
+            val statement = BatchUpdateStatement(UserShares)
+            userShares.forEach {
+                statement.addBatch(EntityID(id = it.id, UserShares))
+                statement[UserShares.notified] = it.notified
+            }
+
+            try {
+                statement.execute(this)
+            } catch (e: Exception) {
+                logger.info(e.message)
+            }
         }
     }
 
