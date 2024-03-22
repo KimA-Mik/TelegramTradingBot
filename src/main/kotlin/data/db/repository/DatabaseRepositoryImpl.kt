@@ -153,14 +153,13 @@ class DatabaseRepositoryImpl(
                     onColumn = Shares.id, otherColumn = UserShares.shareId,
                     additionalConstraint = { UserShares.userId eq userId }
                 )
-                .select(Shares.ticker, Shares.name, UserShares.percent)
+                .select(UserShares.id, Shares.ticker, Shares.name, UserShares.percent)
                 .map {
                     UserShare(
                         id = it[UserShares.id].value,
                         ticker = it[Shares.ticker],
                         name = it[Shares.name],
                         percent = it[UserShares.percent],
-                        notified = it[UserShares.notified]
                     )
                 }
         }
@@ -202,7 +201,7 @@ class DatabaseRepositoryImpl(
                     Shares, JoinType.INNER,
                     onColumn = UserShares.shareId, otherColumn = Shares.id
                 )
-                .select(Users.id, Shares.id, Shares.uid, Shares.ticker, UserShares.percent)
+                .select(Users.id, Shares.id, Shares.uid, Shares.ticker, UserShares.percent, UserShares.notified)
                 .groupBy { it[Users.id] }
                 .map {
                     UserWithFollowedShares(
@@ -215,7 +214,8 @@ class DatabaseRepositoryImpl(
         }
     }
 
-    override suspend fun updateUserSharesNotified(userShares: List<UserShare>) {
+    override suspend fun updateUserSharesNotified(userShares: List<FollowedShare>) {
+        if (userShares.isEmpty()) return
         database.transaction {
             val statement = BatchUpdateStatement(UserShares)
             userShares.forEach {
@@ -235,8 +235,9 @@ class DatabaseRepositoryImpl(
         return FollowedShare(
             id = this[Shares.id].value,
             ticker = this[Shares.ticker],
-            uid = this[Shares.ticker],
-            percent = this[UserShares.percent]
+            uid = this[Shares.uid],
+            percent = this[UserShares.percent],
+            notified = this[UserShares.notified],
         )
     }
 }

@@ -29,5 +29,6 @@ fun getFutureSharePrice(sharePrice: Double, futurePrice: Double): Double {
 }
 
 fun percentBetweenDoubles(number1: Double, number2: Double): Double {
+    if (number2 == 0.0) return 0.0
     return (number1 - number2) / number2 * 100.0
 }

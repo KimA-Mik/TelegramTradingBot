@@ -5,7 +5,12 @@ import domain.user.repository.DatabaseRepository
 
 class GetUserSharesUseCase(private val repository: DatabaseRepository) {
     suspend operator fun invoke(userId: Long, page: Int): GetUserSharesResult {
-        val shares = repository.getUserShares(userId)
+        val shares = try {
+            repository.getUserShares(userId)
+        } catch (e: Exception) {
+            println(e.message)
+            emptyList<UserShare>()
+        }
         if (shares.isEmpty()) return GetUserSharesResult.NotFound
 
         val totalPages = (shares.size - 1) / PAGE_SIZE + 1

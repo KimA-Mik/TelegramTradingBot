@@ -5,4 +5,5 @@ data class FollowedShare(
     val ticker: String,
     val uid: String,
     val percent: Double,
+    val notified: Boolean
 )
