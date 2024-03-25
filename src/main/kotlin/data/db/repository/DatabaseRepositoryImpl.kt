@@ -204,7 +204,7 @@ class DatabaseRepositoryImpl(
                 )
                 .select(
                     Users.id,
-                    Shares.id,
+                    UserShares.id,
                     Shares.name,
                     Shares.uid,
                     Shares.ticker,
@@ -242,7 +242,7 @@ class DatabaseRepositoryImpl(
 
     private fun ResultRow.toFollowedShare(): UserShare {
         return UserShare(
-            id = this[Shares.id].value,
+            id = this[UserShares.id].value,
             uid = this[Shares.uid],
             ticker = this[Shares.ticker],
             name = this[Shares.name],
