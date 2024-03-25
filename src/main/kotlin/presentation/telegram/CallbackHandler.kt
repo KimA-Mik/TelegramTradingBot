@@ -7,6 +7,7 @@ import presentation.telegram.screens.BotScreen
 
 class CallbackHandler(
     editShareButtonHandler: EditShareButtonHandler,
+    editNotificationButtonHandler: ResetNotificationButtonHandler,
     securitiesListBackButtonHandler: SecuritiesListBackButtonHandler,
     securitiesListForwardButtonHandler: SecuritiesListForwardButtonHandler,
     sharePercentButtonHandler: SharePercentButtonHandler,

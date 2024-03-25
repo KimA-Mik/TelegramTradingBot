@@ -8,9 +8,9 @@ import domain.common.percentBetweenDoubles
 import domain.tinkoff.model.FullTinkoffSecurity
 import domain.tinkoff.model.TinkoffPrice
 import domain.user.common.DEFAULT_SHARE_PERCENT
-import presentation.telegram.TelegramBot
 import presentation.telegram.callbackButtons.CALLBACK_BUTTON_ARGUMENT_SEPARATOR
 import presentation.telegram.callbackButtons.CallbackButton
+import presentation.telegram.common.ROUBLE_SIGN
 import presentation.telegram.common.formatAndTrim
 
 class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val state: State) :
@@ -45,10 +45,10 @@ class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val s
         res.append(result.security.share.name)
         res.append(": ")
         res.append(result.sharePrice.price.formatAndTrim(2))
-        res.append(TelegramBot.ROUBLE)
+        res.append(ROUBLE_SIGN)
 
 
-//        var string = "${result.security.share.ticker} - ${result.security.share.name}: ${result.sharePrice.price}${TelegramBot.ROUBLE}"
+//        var string = "${result.security.share.ticker} - ${result.security.share.name}: ${result.sharePrice.price}${ROUBLE_SIGN}"
         result.security.futures.forEachIndexed { index, future ->
             val price = result.futuresPrices.getOrElse(index) { TinkoffPrice() }
 //            string += "\nФьючерс ${future.ticker} - ${future.name}: ${price.price}${TelegramBot.ROUBLE}"
@@ -58,7 +58,7 @@ class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val s
             res.append(future.name)
             res.append(": ")
             res.append(price.price.formatAndTrim(2))
-            res.append(TelegramBot.ROUBLE)
+            res.append(ROUBLE_SIGN)
 
             val futurePrice = getFutureSharePrice(result.sharePrice.price, price.price)
             if (futurePrice > 0.0) {

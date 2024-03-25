@@ -125,9 +125,9 @@ class UpdateService(
                 if (abs(percent) > share.percent) {
                     futuresToNotify.add(
                         NotifyFuture(
-                            futureTicker = future.ticker,
-                            futureName = future.name,
-                            futurePrice = futurePrice.price,
+                            ticker = future.ticker,
+                            name = future.name,
+                            price = futurePrice.price,
                             actualDifference = percent
                         )
                     )
@@ -162,6 +162,7 @@ class UpdateService(
             val res = tinkoff.getSharesPrice(shares)
             res
         } catch (e: Exception) {
+            logger.info(e.message)
             Resource.Error(e.message)
         }
     }
@@ -170,6 +171,7 @@ class UpdateService(
         return try {
             tinkoff.getFuturesPrices(futuresList)
         } catch (e: Exception) {
+            logger.info(e.message)
             Resource.Error(e.message)
         }
     }

@@ -20,6 +20,7 @@ val presentationModule = module {
     singleOf(::SearchSecuritiesTextModel)
 
     singleOf(::EditShareButtonHandler)
+    singleOf(::ResetNotificationButtonHandler)
     singleOf(::SecuritiesListBackButtonHandler)
     singleOf(::SecuritiesListForwardButtonHandler)
     singleOf(::SharePercentButtonHandler)

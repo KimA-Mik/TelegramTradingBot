@@ -92,8 +92,4 @@ class TelegramBot(
         mainScope.cancel()
         botJob.cancel()
     }
-
-    companion object {
-        const val ROUBLE = '₽'
-    }
 }

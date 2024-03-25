@@ -26,4 +26,13 @@ sealed class CallbackButton(val text: String, val callbackData: String) {
                     percent.format(2)
         }
     }
+    data object ResetNotification : CallbackButton("Сбросить уведомление", "resetNotification") {
+        fun getCallbackData(userId: Long, shareTicker: String): String {
+            return callbackData +
+                    CALLBACK_BUTTON_ARGUMENT_SEPARATOR +
+                    userId +
+                    CALLBACK_BUTTON_ARGUMENT_SEPARATOR +
+                    shareTicker
+        }
+    }
 }
