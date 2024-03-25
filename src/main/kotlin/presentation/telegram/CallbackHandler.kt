@@ -7,7 +7,7 @@ import presentation.telegram.screens.BotScreen
 
 class CallbackHandler(
     editShareButtonHandler: EditShareButtonHandler,
-    editNotificationButtonHandler: ResetNotificationButtonHandler,
+    resetNotificationButtonHandler: ResetNotificationButtonHandler,
     securitiesListBackButtonHandler: SecuritiesListBackButtonHandler,
     securitiesListForwardButtonHandler: SecuritiesListForwardButtonHandler,
     sharePercentButtonHandler: SharePercentButtonHandler,
@@ -16,6 +16,7 @@ class CallbackHandler(
 ) {
     private val buttonHandlers = mapOf(
         CallbackButton.EditShare.callbackData to editShareButtonHandler,
+        CallbackButton.ResetNotification.callbackData to resetNotificationButtonHandler,
         CallbackButton.SecuritiesListBack.callbackData to securitiesListBackButtonHandler,
         CallbackButton.SecuritiesListForward.callbackData to securitiesListForwardButtonHandler,
         CallbackButton.SharePercent.callbackData to sharePercentButtonHandler,

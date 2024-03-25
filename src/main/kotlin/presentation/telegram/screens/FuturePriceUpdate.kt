@@ -20,6 +20,7 @@ class FuturePriceUpdate(
     private fun markupText(): String {
         return when (state) {
             is State.ResetNotify -> state.originalText + "\n[Уведомление сброшено]"
+            is State.UnableResetNotify -> state.originalText + "\n[Сброс не требуется]"
             is State.ShowUpdate -> state.share.toText()
         }
     }
@@ -27,14 +28,16 @@ class FuturePriceUpdate(
     private fun calculateReplayMarkup(): ReplyMarkup {
         return when (state) {
             is State.ResetNotify -> InlineKeyboardMarkup.create(emptyList<InlineKeyboardButton.CallbackData>())
+            is State.UnableResetNotify -> InlineKeyboardMarkup.create(emptyList<InlineKeyboardButton.CallbackData>())
             is State.ShowUpdate -> InlineKeyboardMarkup.create(
                 listOf(
                     InlineKeyboardButton.CallbackData(
                         CallbackButton.ResetNotification.text,
-                        CallbackButton.ResetNotification.getCallbackData(id, state.share.shareTicker)
+                        CallbackButton.ResetNotification.getCallbackData(state.share.shareTicker)
                     )
                 )
             )
+
         }
     }
 
@@ -43,7 +46,11 @@ class FuturePriceUpdate(
         res += "$shareTicker: ${sharePrice.formatAndTrim(2)}$ROUBLE_SIGN"
 
         futures.forEach { future ->
-            res += "\n${future.ticker}: ${future.price.formatAndTrim(2)}$ROUBLE_SIGN (${future.actualDifference}%)"
+            res += "\n${future.ticker}: ${future.price.formatAndTrim(2)}$ROUBLE_SIGN (${
+                future.actualDifference.formatAndTrim(
+                    2
+                )
+            }%)"
         }
 
         return res
@@ -57,5 +64,10 @@ class FuturePriceUpdate(
         data class ResetNotify(
             val originalText: String
         ) : State
+
+        data class UnableResetNotify(
+            val originalText: String
+        ) : State
+
     }
 }

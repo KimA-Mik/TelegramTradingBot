@@ -30,6 +30,7 @@ val domainModule = module {
     singleOf(::GetUserSharesUseCase)
     singleOf(::GetUserShareUseCase)
     singleOf(::IsUserSubscribedUseCase)
+    singleOf(::ResetNotificationUseCase)
     singleOf(::SubscribeUserToShareUseCase)
     singleOf(::UnsubscribeUserFromShareUseCase)
 
