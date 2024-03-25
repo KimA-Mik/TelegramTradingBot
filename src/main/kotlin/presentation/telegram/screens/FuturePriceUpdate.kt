@@ -18,12 +18,10 @@ class FuturePriceUpdate(
     override val parseMode = null
 
     private fun markupText(): String {
-        when (state) {
+        return when (state) {
             is State.ResetNotify -> state.originalText + "\n[Уведомление сброшено]"
             is State.ShowUpdate -> state.share.toText()
         }
-
-        return ""
     }
 
     private fun calculateReplayMarkup(): ReplyMarkup {
