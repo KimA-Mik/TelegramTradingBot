@@ -8,12 +8,12 @@ import domain.tinkoff.model.TinkoffPrice
 import domain.tinkoff.model.TinkoffShare
 import domain.tinkoff.repository.TinkoffRepository
 import domain.tinkoff.util.TinkoffFutureComparator
-import domain.updateService.model.FollowedShare
 import domain.updateService.model.NotifyFuture
 import domain.updateService.model.NotifyShare
 import domain.updateService.model.UserWithFollowedShares
 import domain.updateService.updates.ShareUpdate
 import domain.updateService.updates.Update
+import domain.user.model.UserShare
 import domain.user.repository.DatabaseRepository
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -109,7 +109,7 @@ class UpdateService(
         sharesPrices: Map<String, TinkoffPrice>,
         futuresPrices: Map<String, TinkoffPrice>
     ) = coroutineScope {
-        val handled = mutableListOf<FollowedShare>()
+        val handled = mutableListOf<UserShare>()
         logger.info("User id: ${user.id}")
         user.shares.forEach { share ->
             val sharePrice = sharesPrices[share.uid] ?: return@forEach

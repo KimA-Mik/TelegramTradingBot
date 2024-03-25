@@ -5,7 +5,6 @@ import data.db.entities.Shares
 import data.db.entities.UserShares
 import data.db.entities.Users
 import domain.tinkoff.model.TinkoffShare
-import domain.updateService.model.FollowedShare
 import domain.updateService.model.UserWithFollowedShares
 import domain.user.common.DEFAULT_SHARE_PERCENT
 import domain.user.model.User
@@ -153,13 +152,15 @@ class DatabaseRepositoryImpl(
                     onColumn = Shares.id, otherColumn = UserShares.shareId,
                     additionalConstraint = { UserShares.userId eq userId }
                 )
-                .select(UserShares.id, Shares.ticker, Shares.name, UserShares.percent)
+                .select(UserShares.id, Shares.uid, Shares.ticker, Shares.name, UserShares.percent, UserShares.notified)
                 .map {
                     UserShare(
                         id = it[UserShares.id].value,
+                        uid = it[Shares.uid],
                         ticker = it[Shares.ticker],
                         name = it[Shares.name],
                         percent = it[UserShares.percent],
+                        notified = it[UserShares.notified]
                     )
                 }
         }
@@ -201,7 +202,15 @@ class DatabaseRepositoryImpl(
                     Shares, JoinType.INNER,
                     onColumn = UserShares.shareId, otherColumn = Shares.id
                 )
-                .select(Users.id, Shares.id, Shares.uid, Shares.ticker, UserShares.percent, UserShares.notified)
+                .select(
+                    Users.id,
+                    Shares.id,
+                    Shares.name,
+                    Shares.uid,
+                    Shares.ticker,
+                    UserShares.percent,
+                    UserShares.notified
+                )
                 .groupBy { it[Users.id] }
                 .map {
                     UserWithFollowedShares(
@@ -214,7 +223,7 @@ class DatabaseRepositoryImpl(
         }
     }
 
-    override suspend fun updateUserSharesNotified(userShares: List<FollowedShare>) {
+    override suspend fun updateUserSharesNotified(userShares: List<UserShare>) {
         if (userShares.isEmpty()) return
         database.transaction {
             val statement = BatchUpdateStatement(UserShares)
@@ -231,11 +240,12 @@ class DatabaseRepositoryImpl(
         }
     }
 
-    private fun ResultRow.toFollowedShare(): FollowedShare {
-        return FollowedShare(
+    private fun ResultRow.toFollowedShare(): UserShare {
+        return UserShare(
             id = this[Shares.id].value,
-            ticker = this[Shares.ticker],
             uid = this[Shares.uid],
+            ticker = this[Shares.ticker],
+            name = this[Shares.name],
             percent = this[UserShares.percent],
             notified = this[UserShares.notified],
         )
