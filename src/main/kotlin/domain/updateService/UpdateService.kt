@@ -42,7 +42,6 @@ class UpdateService(
         while (isActive) {
             val delayTime = Random.nextFloat() * MILLIS_MINUTE * 2
             delay(MILLIS_MINUTE + delayTime.toLong())
-            logger.info("Checking for updates")
             checkForUpdates()
         }
     }
@@ -108,7 +107,7 @@ class UpdateService(
         sharesToFutures: Map<String, List<TinkoffFuture>>,
         sharesPrices: Map<String, TinkoffPrice>,
         futuresPrices: Map<String, TinkoffPrice>
-    ) = coroutineScope {
+    ) {
         val handled = mutableListOf<UserShare>()
         logger.info("User id: ${user.id}")
         user.shares.forEach { share ->
@@ -121,7 +120,6 @@ class UpdateService(
                 val futurePrice = futuresPrices.getOrElse(future.uid) { TinkoffPrice() }
                 val futureSlotPrice = getFutureSharePrice(sharePrice.price, futurePrice.price)
                 val percent = percentBetweenDoubles(sharePrice.price, futureSlotPrice)
-                println("Future: ${future.ticker} - price: ${futurePrice.price} (minimal percent: ${share.percent}%) (actual percent: $percent%)")
                 if (abs(percent) > share.percent) {
                     futuresToNotify.add(
                         NotifyFuture(
