@@ -6,6 +6,7 @@ import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import domain.user.model.UserShare
 import presentation.telegram.callbackButtons.CALLBACK_BUTTON_ARGUMENT_SEPARATOR
 import presentation.telegram.callbackButtons.CallbackButton
+import presentation.telegram.common.formatAndTrim
 
 class MySecuritiesList(
     id: Long,
@@ -31,7 +32,7 @@ class MySecuritiesList(
 
         shares.forEachIndexed { index, share ->
             val shareIndex = pageSize * (page - 1) + index + 1
-            result += "\n$shareIndex. ${share.ticker}: ${share.name} (${share.percent}%)"
+            result += "\n$shareIndex. ${share.ticker}: ${share.name} (${share.percent.formatAndTrim(2)}%)"
         }
 
         return result

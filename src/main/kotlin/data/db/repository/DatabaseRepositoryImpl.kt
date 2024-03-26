@@ -5,17 +5,23 @@ import data.db.entities.Shares
 import data.db.entities.UserShares
 import data.db.entities.Users
 import domain.tinkoff.model.TinkoffShare
+import domain.updateService.model.UserWithFollowedShares
 import domain.user.common.DEFAULT_SHARE_PERCENT
 import domain.user.model.User
 import domain.user.model.UserShare
 import domain.user.repository.DatabaseRepository
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.statements.BatchUpdateStatement
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.slf4j.LoggerFactory
 
 class DatabaseRepositoryImpl(
     private val database: DatabaseConnector
 ) : DatabaseRepository {
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
     init {
         transaction {
             SchemaUtils.create(Shares, Users, UserShares)
@@ -90,6 +96,7 @@ class DatabaseRepositoryImpl(
                 it[UserShares.userId] = userId
                 it[UserShares.shareId] = shareId
                 it[percent] = DEFAULT_SHARE_PERCENT
+                it[notified] = false
             }
 
             true
@@ -145,12 +152,15 @@ class DatabaseRepositoryImpl(
                     onColumn = Shares.id, otherColumn = UserShares.shareId,
                     additionalConstraint = { UserShares.userId eq userId }
                 )
-                .select(Shares.ticker, Shares.name, UserShares.percent)
+                .select(UserShares.id, Shares.uid, Shares.ticker, Shares.name, UserShares.percent, UserShares.notified)
                 .map {
                     UserShare(
+                        id = it[UserShares.id].value,
+                        uid = it[Shares.uid],
                         ticker = it[Shares.ticker],
                         name = it[Shares.name],
-                        percent = it[UserShares.percent]
+                        percent = it[UserShares.percent],
+                        notified = it[UserShares.notified]
                     )
                 }
         }
@@ -179,5 +189,65 @@ class DatabaseRepositoryImpl(
 
             return@transaction updated > 0
         }
+    }
+
+    override suspend fun getUsersWithShares(): List<UserWithFollowedShares> {
+        return database.transaction {
+            Users
+                .join(
+                    UserShares, JoinType.LEFT,
+                    onColumn = Users.id, otherColumn = UserShares.userId
+                )
+                .join(
+                    Shares, JoinType.INNER,
+                    onColumn = UserShares.shareId, otherColumn = Shares.id
+                )
+                .select(
+                    Users.id,
+                    UserShares.id,
+                    Shares.name,
+                    Shares.uid,
+                    Shares.ticker,
+                    UserShares.percent,
+                    UserShares.notified
+                )
+                .groupBy { it[Users.id] }
+                .map {
+                    UserWithFollowedShares(
+                        id = it.key,
+                        shares = it.value.map { row ->
+                            row.toFollowedShare()
+                        }
+                    )
+                }
+        }
+    }
+
+    override suspend fun updateUserSharesNotified(userShares: List<UserShare>) {
+        if (userShares.isEmpty()) return
+        database.transaction {
+            val statement = BatchUpdateStatement(UserShares)
+            userShares.forEach {
+                statement.addBatch(EntityID(id = it.id, UserShares))
+                statement[UserShares.notified] = it.notified
+            }
+
+            try {
+                statement.execute(this)
+            } catch (e: Exception) {
+                logger.info(e.message)
+            }
+        }
+    }
+
+    private fun ResultRow.toFollowedShare(): UserShare {
+        return UserShare(
+            id = this[UserShares.id].value,
+            uid = this[Shares.uid],
+            ticker = this[Shares.ticker],
+            name = this[Shares.name],
+            percent = this[UserShares.percent],
+            notified = this[UserShares.notified],
+        )
     }
 }

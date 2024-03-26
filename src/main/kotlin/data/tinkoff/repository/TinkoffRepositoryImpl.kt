@@ -30,30 +30,22 @@ class TinkoffRepositoryImpl(private val service: TinkoffInvestService) : Tinkoff
         }
     }
 
-    override suspend fun getSharesPrice(securities: List<TinkoffShare>): Resource<List<TinkoffPrice>> {
-        if (securities.isEmpty()) {
-            return Resource.Success(emptyList())
+    override suspend fun getSharesPrice(shares: List<TinkoffShare>): Resource<List<TinkoffPrice>> {
+        if (shares.isEmpty()) {
+            Resource.Success(emptyList<TinkoffPrice>())
         }
+        val uids = shares.map { it.uid }
 
-        val uids = securities.map { it.uid }
-        val tinkoffPrices = service.getUidsLastPrices(uids).map(LastPrice::toTinkoffPrice)
-
-        return if (tinkoffPrices.isEmpty()) {
-            Resource.Error("")
-        } else {
-            Resource.Success(tinkoffPrices)
-        }
+        return getTinkoffPriceForUids(uids)
     }
 
     override suspend fun getFuturesPrices(futures: List<TinkoffFuture>): Resource<List<TinkoffPrice>> {
-        val uids = futures.map { it.uid }
-        val tinkoffPrices = service.getUidsLastPrices(uids).map(LastPrice::toTinkoffPrice)
-
-        return if (tinkoffPrices.isEmpty()) {
-            Resource.Error("")
-        } else {
-            Resource.Success(tinkoffPrices)
+        if (futures.isEmpty()) {
+            Resource.Success(emptyList<TinkoffPrice>())
         }
+        val uids = futures.map { it.uid }
+
+        return getTinkoffPriceForUids(uids)
     }
 
     override fun findSecurity(ticker: String): SecurityType {
@@ -66,5 +58,21 @@ class TinkoffRepositoryImpl(private val service: TinkoffInvestService) : Tinkoff
         }
 
         return SecurityType.NONE
+    }
+
+    private suspend fun getTinkoffPriceForUids(uids: List<String>): Resource<List<TinkoffPrice>> {
+        return try {
+            val tinkoffPrices = service
+                .getUidsLastPrices(uids)
+                .map(LastPrice::toTinkoffPrice)
+
+            if (tinkoffPrices.isEmpty()) {
+                Resource.Error("")
+            } else {
+                Resource.Success(tinkoffPrices)
+            }
+        } catch (e: Exception) {
+            Resource.Error(e.message)
+        }
     }
 }
