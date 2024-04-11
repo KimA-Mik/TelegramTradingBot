@@ -16,12 +16,12 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
     implementation("io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:6.1.0")
 
-    implementation("org.slf4j:slf4j-api:2.0.9")
-    implementation("org.slf4j:slf4j-simple:2.0.9")
+    implementation("org.slf4j:slf4j-api:2.0.12")
+    implementation("org.slf4j:slf4j-simple:2.0.12")
 
     implementation("ru.tinkoff.piapi:java-sdk-core:1.5")
 
-    val koinVersion = "3.5.3"
+    val koinVersion = "3.5.5"
     implementation("io.insert-koin:koin-core:$koinVersion")
 
     val exposedVersion: String by project
@@ -30,6 +30,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
 
     implementation("org.xerial:sqlite-jdbc:3.45.1.0")
+    implementation("org.xerial:sqlite-jdbc:3.45.2.0")
 }
 
 tasks.test {
