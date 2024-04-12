@@ -18,6 +18,7 @@ import domain.user.repository.DatabaseRepository
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.datetime.*
 import org.slf4j.LoggerFactory
 import kotlin.math.abs
 import kotlin.random.Random
@@ -43,7 +44,81 @@ class UpdateService(
             val delayTime = Random.nextFloat() * MILLIS_MINUTE * 2
             delay(MILLIS_MINUTE + delayTime.toLong())
             checkForUpdates()
+            delayNonWorkingHours(9, 50, 18, 49)
         }
+    }
+
+    private val timezone = TimeZone.of("Europe/Moscow")
+    private suspend fun delayNonWorkingHours(
+        startHour: Int,
+        startMinute: Int,
+        endHour: Int,
+        endMinute: Int
+    ) {
+        val now = Clock.System.now()
+        val currentDatetime = now.toLocalDateTime(timezone)
+
+        if (currentDatetime.dayOfWeek == DayOfWeek.SATURDAY ||
+            currentDatetime.dayOfWeek == DayOfWeek.SUNDAY
+        ) {
+            delayToMonday()
+        }
+
+        if (isHoursInRang(
+                currentDatetime.hour, currentDatetime.minute,
+                startHour, startMinute,
+                endHour, endMinute
+            )
+        ) {
+            return
+        }
+
+        var dayOfWork = Clock.System
+            .todayIn(timezone)
+
+        if (currentDatetime.hour <= 23) {
+            dayOfWork = dayOfWork.plus(1, DateTimeUnit.DAY)
+        }
+
+        val startOfWork = dayOfWork
+            .atStartOfDayIn(timezone)
+            .plus(startHour, DateTimeUnit.HOUR)
+            .plus(startMinute, DateTimeUnit.MINUTE)
+
+        val msUntillWork = now.until(startOfWork, DateTimeUnit.MILLISECOND)
+        delay(msUntillWork)
+    }
+
+    private suspend fun delayToMonday() {
+        var monday = Clock.System.todayIn(timezone)
+        while (monday.dayOfWeek != DayOfWeek.MONDAY) {
+            monday = monday.plus(1, DateTimeUnit.DAY)
+        }
+        val now = Clock.System.now()
+        val msToMonday = now.until(monday.atStartOfDayIn(timezone), DateTimeUnit.MILLISECOND) + 1L
+        delay(msToMonday)
+    }
+
+    private fun isHoursInRang(
+        hour: Int,
+        minute: Int,
+        startHour: Int,
+        startMinute: Int,
+        endHour: Int,
+        endMinute: Int
+    ): Boolean {
+        if (hour in (startHour + 1)..<endHour
+        ) {
+            return true
+        }
+
+        if ((hour == startHour && minute >= startMinute) ||
+            (hour == endHour && minute <= endMinute)
+        ) {
+            return true
+        }
+
+        return false
     }
 
     private suspend fun checkForUpdates() = supervisorScope {
