@@ -11,6 +11,7 @@ import domain.tinkoff.util.TinkoffFutureComparator
 import domain.updateService.model.NotifyFuture
 import domain.updateService.model.NotifyShare
 import domain.updateService.model.UserWithFollowedShares
+import domain.updateService.updates.SharePriceInsufficientUpdate
 import domain.updateService.updates.ShareUpdate
 import domain.updateService.updates.Update
 import domain.user.model.UserShare
@@ -216,10 +217,10 @@ class UpdateService(
                 minimalDifference = share.percent,
                 futures = futuresToNotify
             )
-            val update = ShareUpdate(
-                userId = user.id,
-                share = notifyShare
-            )
+            val update = if (shouldNotify)
+                ShareUpdate(userId = user.id, share = notifyShare)
+            else
+                SharePriceInsufficientUpdate(userId = user.id, share = notifyShare)
             _updates.emit(update)
         }
         logger.info("Handled ${handled.size} shares for user ${user.id}")
