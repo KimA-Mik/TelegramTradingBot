@@ -60,6 +60,7 @@ class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val s
 //                sb.append(it.format(priceDateFormat))
 //                sb.append("] ")
 //            }
+            sb.append('\n')
             sb.append(future.ticker)
             sb.append(" - ")
             sb.append(future.name)
