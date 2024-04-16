@@ -52,7 +52,7 @@ class FuturePriceUpdate(
         futures.forEach { future ->
             val date = future.expirationDate.toLocalDateTime(DateUtil.timezoneMoscow).format(futureDateFormat)
             res += "\n[$date] ${future.ticker}: ${future.price.formatAndTrim(2)}$ROUBLE_SIGN, " +
-                    "${future.actualDifference.formatAndTrim(2)}% годовых"
+                    "${future.annualPercent.formatAndTrim(2)}% годовых"
         }
 
         return res
