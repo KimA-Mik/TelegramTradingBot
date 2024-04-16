@@ -5,9 +5,7 @@ import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import domain.tinkoff.model.DisplayShare
 import domain.user.common.DEFAULT_SHARE_PERCENT
-import kotlinx.datetime.format
 import presentation.common.formatAndTrim
-import presentation.common.priceDateFormat
 import presentation.telegram.callbackButtons.CALLBACK_BUTTON_ARGUMENT_SEPARATOR
 import presentation.telegram.callbackButtons.CallbackButton
 import presentation.telegram.common.ROUBLE_SIGN
@@ -39,11 +37,11 @@ class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val s
 
     private fun resultToText(result: DisplayShare): String {
         val sb = StringBuilder()
-        result.priceDateTime?.let {
-            sb.append("[")
-            sb.append(it.format(priceDateFormat))
-            sb.append("] ")
-        }
+//        result.priceDateTime?.let {
+//            sb.append("[")
+//            sb.append(it.format(priceDateFormat))
+//            sb.append("] ")
+//        }
         sb.append(result.ticker)
         sb.append(" - ")
         sb.append(result.name)
@@ -57,11 +55,11 @@ class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val s
 //        var string = "${result.security.share.ticker} - ${result.security.share.name}: ${result.sharePrice.price}${ROUBLE_SIGN}"
         result.futures.forEach { future ->
 //            string += "\nФьючерс ${future.ticker} - ${future.name}: ${price.price}${TelegramBot.ROUBLE}"
-            future.priceDateTime?.let {
-                sb.append("\n[")
-                sb.append(it.format(priceDateFormat))
-                sb.append("] ")
-            }
+//            future.priceDateTime?.let {
+//                sb.append("\n[")
+//                sb.append(it.format(priceDateFormat))
+//                sb.append("] ")
+//            }
             sb.append(future.ticker)
             sb.append(" - ")
             sb.append(future.name)
