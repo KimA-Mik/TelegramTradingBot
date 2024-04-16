@@ -109,7 +109,7 @@ class UpdateService(
             resource
                 .data
                 ?.sortedWith(TinkoffFutureComparator)
-                ?.take(4)
+//                ?.take(4)
                 ?: emptyList()
         })
 
@@ -161,7 +161,7 @@ class UpdateService(
             futures.forEach { future ->
                 val futurePrice = futuresPrices.getOrElse(future.uid) { TinkoffPrice() }
                 val futureSlotPrice = getFutureSharePrice(sharePrice.price, futurePrice.price)
-                val percent = percentBetweenDoubles(sharePrice.price, futureSlotPrice)
+                val percent = percentBetweenDoubles(futureSlotPrice, sharePrice.price)
                 val annualPercent = FuturesUtil.getFutureAnnualPercent(percent, future.expirationDate)
                 if (abs(annualPercent) >= share.percent) {
                     futuresToNotify.add(
