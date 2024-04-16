@@ -4,9 +4,9 @@ import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import domain.user.model.UserShare
+import presentation.common.formatAndTrim
 import presentation.telegram.callbackButtons.CALLBACK_BUTTON_ARGUMENT_SEPARATOR
 import presentation.telegram.callbackButtons.CallbackButton
-import presentation.telegram.common.formatAndTrim
 
 class MySecuritiesList(
     id: Long,

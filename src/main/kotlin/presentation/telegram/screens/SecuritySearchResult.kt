@@ -6,11 +6,11 @@ import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import domain.tinkoff.model.DisplayShare
 import domain.user.common.DEFAULT_SHARE_PERCENT
 import kotlinx.datetime.format
+import presentation.common.formatAndTrim
 import presentation.common.priceDateFormat
 import presentation.telegram.callbackButtons.CALLBACK_BUTTON_ARGUMENT_SEPARATOR
 import presentation.telegram.callbackButtons.CallbackButton
 import presentation.telegram.common.ROUBLE_SIGN
-import presentation.telegram.common.formatAndTrim
 
 class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val state: State) :
     BotScreen(id, messageId) {

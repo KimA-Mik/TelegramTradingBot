@@ -1,7 +1,7 @@
 package presentation.telegram.screens
 
 import domain.updateService.model.NotifyShare
-import presentation.telegram.common.formatAndTrim
+import presentation.common.formatAndTrim
 
 class FuturePriceInsufficientUpdate(
     userId: Long,

@@ -3,9 +3,9 @@ package presentation.telegram.screens
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
+import presentation.common.formatAndTrim
 import presentation.telegram.callbackButtons.CallbackButton
 import presentation.telegram.common.NOT_SUBSCRIBED_TO_SHARE
-import presentation.telegram.common.formatAndTrim
 
 class EditShareScreen(
     id: Long,

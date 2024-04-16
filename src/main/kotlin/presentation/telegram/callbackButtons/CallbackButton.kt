@@ -1,6 +1,6 @@
 package presentation.telegram.callbackButtons
 
-import presentation.telegram.common.format
+import presentation.common.format
 import kotlin.math.abs
 
 sealed class CallbackButton(val text: String, val callbackData: String) {

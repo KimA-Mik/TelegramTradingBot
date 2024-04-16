@@ -1,4 +1,4 @@
-package presentation.telegram.common
+package presentation.common
 
 import java.util.*
 
