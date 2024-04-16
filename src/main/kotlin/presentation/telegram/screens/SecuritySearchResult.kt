@@ -3,11 +3,10 @@ package presentation.telegram.screens
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
-import domain.common.getFutureSharePrice
-import domain.common.percentBetweenDoubles
-import domain.tinkoff.model.FullTinkoffSecurity
-import domain.tinkoff.model.TinkoffPrice
+import domain.tinkoff.model.DisplayShare
 import domain.user.common.DEFAULT_SHARE_PERCENT
+import kotlinx.datetime.format
+import presentation.common.priceDateFormat
 import presentation.telegram.callbackButtons.CALLBACK_BUTTON_ARGUMENT_SEPARATOR
 import presentation.telegram.callbackButtons.CallbackButton
 import presentation.telegram.common.ROUBLE_SIGN
@@ -18,7 +17,7 @@ class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val s
     sealed class State(val followed: Boolean) {
         class SearchResult(
             followed: Boolean,
-            val result: FullTinkoffSecurity
+            val result: DisplayShare,
         ) : State(followed)
 
         class FollowUpdate(
@@ -38,39 +37,56 @@ class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val s
         }
     }
 
-    private fun resultToText(result: FullTinkoffSecurity): String {
-        val res = StringBuilder()
-        res.append(result.security.share.ticker)
-        res.append(" - ")
-        res.append(result.security.share.name)
-        res.append(": ")
-        res.append(result.sharePrice.price.formatAndTrim(2))
-        res.append(ROUBLE_SIGN)
-
+    private fun resultToText(result: DisplayShare): String {
+        val sb = StringBuilder()
+        result.priceDateTime?.let {
+            sb.append("[")
+            sb.append(it.format(priceDateFormat))
+            sb.append("] ")
+        }
+        sb.append(result.ticker)
+        sb.append(" - ")
+        sb.append(result.name)
+        sb.append(": ")
+        if (result.price > 0.0) {
+            sb.append(result.price.formatAndTrim(2))
+            sb.append(ROUBLE_SIGN)
+            sb.append(' ')
+        }
 
 //        var string = "${result.security.share.ticker} - ${result.security.share.name}: ${result.sharePrice.price}${ROUBLE_SIGN}"
-        result.security.futures.forEachIndexed { index, future ->
-            val price = result.futuresPrices.getOrElse(index) { TinkoffPrice() }
+        result.futures.forEach { future ->
 //            string += "\nФьючерс ${future.ticker} - ${future.name}: ${price.price}${TelegramBot.ROUBLE}"
-            res.append("\nФьючерс ")
-            res.append(future.ticker)
-            res.append(" - ")
-            res.append(future.name)
-            res.append(": ")
-            res.append(price.price.formatAndTrim(2))
-            res.append(ROUBLE_SIGN)
+            future.priceDateTime?.let {
+                sb.append("\n[")
+                sb.append(it.format(priceDateFormat))
+                sb.append("] ")
+            }
+            sb.append(future.ticker)
+            sb.append(" - ")
+            sb.append(future.name)
 
-            val futurePrice = getFutureSharePrice(result.sharePrice.price, price.price)
-            if (futurePrice > 0.0) {
-                val percent = percentBetweenDoubles(result.sharePrice.price, futurePrice)
-                res.append(" (")
-                if (percent >= DEFAULT_SHARE_PERCENT) res.append('❗')
-                res.append(percent.formatAndTrim(2))
-                res.append("%)")
+            if (future.price == 0.0) return@forEach
+            sb.append(": ")
+            sb.append(future.price.formatAndTrim(2))
+            sb.append(ROUBLE_SIGN)
+
+            if (future.percent != 0.0) {
+                sb.append(" (")
+//                if (future.percent >= DEFAULT_SHARE_PERCENT) sb.append('❗')
+                sb.append(future.percent.formatAndTrim(2))
+                sb.append("%), ")
+            }
+
+            if (future.annualPercent != 0.0) {
+                sb.append("Годовые: ")
+                if (future.annualPercent >= DEFAULT_SHARE_PERCENT) sb.append('❗')
+                sb.append(future.annualPercent.formatAndTrim(2))
+                sb.append("%")
             }
         }
 
-        return res.toString()
+        return sb.toString()
     }
 
     private fun calculateReplyMarkup(): ReplyMarkup {
