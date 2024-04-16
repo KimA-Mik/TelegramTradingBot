@@ -1,7 +1,6 @@
 package domain.utils
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.*
 
 object FuturesUtil {
     private val wrongDay = DayOfYear(-1, -1)
@@ -21,6 +20,16 @@ object FuturesUtil {
             'Z' to 12
         )
 
+    fun getDaysUntilExpiration(
+        ticker: String,
+        current: Instant = Clock.System.now()
+    ): Int {
+        return when (ticker.length) {
+            4 -> daysUntilShortCodeExpiration(ticker, current)
+            else -> -1
+        }
+    }
+
     fun getFutureExpireDay(ticker: String): DayOfYear {
         return when (ticker.length) {
             4 -> parseShortFutureExpirationDay(ticker)
@@ -38,6 +47,28 @@ object FuturesUtil {
             4 -> parseShortFutureExpirationYear(ticker, currentYear)
             else -> -1
         }
+    }
+
+    private fun daysUntilShortCodeExpiration(
+        ticker: String,
+        from: Instant = Clock.System.now()
+    ): Int {
+        val dayOfExpiration = parseShortFutureExpirationDay(ticker)
+        if (dayOfExpiration == wrongDay) return -1
+
+        val yearOfExpiration = parseShortFutureExpirationYear(
+            ticker = ticker,
+            currentYear = from.toLocalDateTime(DateUtil.timezoneMoscow).year
+        )
+        if (yearOfExpiration < 0) return -1
+
+        val dateOfExpiration = LocalDate(
+            year = yearOfExpiration,
+            monthNumber = dayOfExpiration.month,
+            dayOfMonth = dayOfExpiration.day
+        ).atStartOfDayIn(DateUtil.timezoneMoscow)
+
+        return from.daysUntil(dateOfExpiration, DateUtil.timezoneMoscow)
     }
 
     private fun parseShortFutureExpirationDay(
