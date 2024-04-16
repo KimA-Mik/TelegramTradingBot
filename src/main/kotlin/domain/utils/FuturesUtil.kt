@@ -20,12 +20,22 @@ object FuturesUtil {
             'Z' to 12
         )
 
+//    fun getFutureAnnualPercent(
+//        ticker: String,
+//        difference: Double,
+//        current: Instant = Clock.System.now()
+//    ): Double {
+//        val days = getDaysUntilExpiration(ticker, current)
+//        if (days < 1) return 0.0
+//        return difference * 365.0 / days
+//    }
+
     fun getFutureAnnualPercent(
-        ticker: String,
         difference: Double,
+        expirationDate: Instant,
         current: Instant = Clock.System.now()
     ): Double {
-        val days = getDaysUntilExpiration(ticker, current)
+        val days = current.daysUntil(expirationDate, DateUtil.timezoneMoscow)
         if (days < 1) return 0.0
         return difference * 365.0 / days
     }
