@@ -170,7 +170,8 @@ class UpdateService(
                             name = future.name,
                             price = futurePrice.price,
                             actualDifference = percent,
-                            annualPercent = annualPercent
+                            annualPercent = annualPercent,
+                            expirationDate = future.expirationDate
                         )
                     )
                 }
