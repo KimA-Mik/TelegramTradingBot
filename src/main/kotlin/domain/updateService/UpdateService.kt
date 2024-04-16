@@ -162,8 +162,8 @@ class UpdateService(
                 val futurePrice = futuresPrices.getOrElse(future.uid) { TinkoffPrice() }
                 val futureSlotPrice = getFutureSharePrice(sharePrice.price, futurePrice.price)
                 val percent = percentBetweenDoubles(sharePrice.price, futureSlotPrice)
-                val annualPercent = FuturesUtil.getFutureAnnualPercent(future.ticker, percent)
-                if (abs(percent) > share.percent) {
+                val annualPercent = FuturesUtil.getFutureAnnualPercent(percent, future.expirationDate)
+                if (abs(annualPercent) >= share.percent) {
                     futuresToNotify.add(
                         NotifyFuture(
                             ticker = future.ticker,
