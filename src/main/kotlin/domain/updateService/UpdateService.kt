@@ -17,6 +17,7 @@ import domain.updateService.updates.Update
 import domain.user.model.UserShare
 import domain.user.repository.DatabaseRepository
 import domain.utils.DateUtil
+import domain.utils.FuturesUtil
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -161,13 +162,15 @@ class UpdateService(
                 val futurePrice = futuresPrices.getOrElse(future.uid) { TinkoffPrice() }
                 val futureSlotPrice = getFutureSharePrice(sharePrice.price, futurePrice.price)
                 val percent = percentBetweenDoubles(sharePrice.price, futureSlotPrice)
+                val annualPercent = FuturesUtil.getFutureAnnualPercent(future.ticker, percent)
                 if (abs(percent) > share.percent) {
                     futuresToNotify.add(
                         NotifyFuture(
                             ticker = future.ticker,
                             name = future.name,
                             price = futurePrice.price,
-                            actualDifference = percent
+                            actualDifference = percent,
+                            annualPercent = annualPercent
                         )
                     )
                 }

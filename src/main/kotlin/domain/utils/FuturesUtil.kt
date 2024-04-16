@@ -4,7 +4,7 @@ import kotlinx.datetime.*
 
 object FuturesUtil {
     private val wrongDay = DayOfYear(-1, -1)
-    val codeToMonths =
+    private val codeToMonths =
         mapOf(
             'F' to 1,
             'G' to 2,
@@ -19,6 +19,16 @@ object FuturesUtil {
             'X' to 11,
             'Z' to 12
         )
+
+    fun getFutureAnnualPercent(
+        ticker: String,
+        difference: Double,
+        current: Instant = Clock.System.now()
+    ): Double {
+        val days = getDaysUntilExpiration(ticker, current)
+        if (days < 1) return 0.0
+        return difference * 365.0 / days
+    }
 
     fun getDaysUntilExpiration(
         ticker: String,
