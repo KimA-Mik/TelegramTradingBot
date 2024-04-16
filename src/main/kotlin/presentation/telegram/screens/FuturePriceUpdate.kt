@@ -50,11 +50,9 @@ class FuturePriceUpdate(
         res += "$shareTicker: ${sharePrice.formatAndTrim(2)}$ROUBLE_SIGN"
 
         futures.forEach { future ->
-            res += "\n${future.ticker}: ${future.price.formatAndTrim(2)}$ROUBLE_SIGN (${
-                future.actualDifference.formatAndTrim(
-                    2
-                )
-            }%)"
+            val date = future.expirationDate.toLocalDateTime(DateUtil.timezoneMoscow).format(futureDateFormat)
+            res += "\n[$date] ${future.ticker}: ${future.price.formatAndTrim(2)}$ROUBLE_SIGN, " +
+                    "${future.actualDifference.formatAndTrim(2)}% годовых"
         }
 
         return res

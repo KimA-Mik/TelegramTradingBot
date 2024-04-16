@@ -17,3 +17,11 @@ val priceDateFormat = LocalDateTime.Format {
     char(':')
     second()
 }
+
+val futureDateFormat = LocalDateTime.Format {
+    dayOfMonth()
+    char('.')
+    monthNumber()
+    char('.')
+    yearTwoDigits(2000)
+}

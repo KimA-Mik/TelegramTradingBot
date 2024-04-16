@@ -10,5 +10,6 @@ class FuturePriceInsufficientUpdate(
 ) : BotScreen(userId, messageId) {
     override val replyMarkup = null
     override val parseMode = null
-    override val text = "Для ${share.shareTicker} разница меньше ${share.minimalDifference.formatAndTrim(2)}%"
+    override val text =
+        "Для ${share.shareTicker} процент годовых стал меньше, чем ${share.minimalDifference.formatAndTrim(2)}%"
 }
