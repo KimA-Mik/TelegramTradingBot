@@ -78,7 +78,7 @@ object FuturesUtil {
             dayOfMonth = dayOfExpiration.day
         ).atStartOfDayIn(DateUtil.timezoneMoscow)
 
-        return from.daysUntil(dateOfExpiration, DateUtil.timezoneMoscow)
+        return from.daysUntil(dateOfExpiration, DateUtil.timezoneMoscow) + 1
     }
 
     private fun parseShortFutureExpirationDay(
