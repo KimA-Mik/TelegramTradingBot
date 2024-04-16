@@ -16,10 +16,14 @@ import domain.updateService.updates.ShareUpdate
 import domain.updateService.updates.Update
 import domain.user.model.UserShare
 import domain.user.repository.DatabaseRepository
+import domain.utils.DateUtil
+import domain.utils.FuturesUtil
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.datetime.*
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.toLocalDateTime
 import org.slf4j.LoggerFactory
 import kotlin.math.abs
 import kotlin.random.Random
@@ -49,23 +53,24 @@ class UpdateService(
         }
     }
 
-    private val timezone = TimeZone.of("Europe/Moscow")
+    private val weekends = setOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
     private suspend fun delayNonWorkingHours(
         startHour: Int,
         startMinute: Int,
         endHour: Int,
         endMinute: Int
     ) {
-        val now = Clock.System.now()
-        val currentDatetime = now.toLocalDateTime(timezone)
+        var now = Clock.System.now()
+        var currentDatetime = now.toLocalDateTime(DateUtil.timezoneMoscow)
 
-        if (currentDatetime.dayOfWeek == DayOfWeek.SATURDAY ||
-            currentDatetime.dayOfWeek == DayOfWeek.SUNDAY
-        ) {
-            delayToMonday()
+        if (currentDatetime.dayOfWeek in weekends) {
+            val delay = DateUtil.msUntilStartOfDay(now, DayOfWeek.MONDAY)
+            delay(delay)
+            now = Clock.System.now()
+            currentDatetime = now.toLocalDateTime(DateUtil.timezoneMoscow)
         }
 
-        if (isHoursInRang(
+        if (DateUtil.isHoursInRange(
                 currentDatetime.hour, currentDatetime.minute,
                 startHour, startMinute,
                 endHour, endMinute
@@ -74,53 +79,14 @@ class UpdateService(
             return
         }
 
-        var dayOfWork = Clock.System
-            .todayIn(timezone)
+        val msUntilWork = DateUtil.msUntilTime(
+            now,
+            startHour, startMinute
+        )
 
-        if (currentDatetime.hour <= 23) {
-            dayOfWork = dayOfWork.plus(1, DateTimeUnit.DAY)
-        }
-
-        val startOfWork = dayOfWork
-            .atStartOfDayIn(timezone)
-            .plus(startHour, DateTimeUnit.HOUR)
-            .plus(startMinute, DateTimeUnit.MINUTE)
-
-        val msUntillWork = now.until(startOfWork, DateTimeUnit.MILLISECOND)
-        delay(msUntillWork)
+        delay(msUntilWork)
     }
 
-    private suspend fun delayToMonday() {
-        var monday = Clock.System.todayIn(timezone)
-        while (monday.dayOfWeek != DayOfWeek.MONDAY) {
-            monday = monday.plus(1, DateTimeUnit.DAY)
-        }
-        val now = Clock.System.now()
-        val msToMonday = now.until(monday.atStartOfDayIn(timezone), DateTimeUnit.MILLISECOND) + 1L
-        delay(msToMonday)
-    }
-
-    private fun isHoursInRang(
-        hour: Int,
-        minute: Int,
-        startHour: Int,
-        startMinute: Int,
-        endHour: Int,
-        endMinute: Int
-    ): Boolean {
-        if (hour in (startHour + 1)..<endHour
-        ) {
-            return true
-        }
-
-        if ((hour == startHour && minute >= startMinute) ||
-            (hour == endHour && minute <= endMinute)
-        ) {
-            return true
-        }
-
-        return false
-    }
 
     private suspend fun checkForUpdates() = supervisorScope {
         val usersWithFollowedShares = database.getUsersWithShares()
@@ -143,7 +109,7 @@ class UpdateService(
             resource
                 .data
                 ?.sortedWith(TinkoffFutureComparator)
-                ?.take(4)
+//                ?.take(4)
                 ?: emptyList()
         })
 
@@ -195,14 +161,17 @@ class UpdateService(
             futures.forEach { future ->
                 val futurePrice = futuresPrices.getOrElse(future.uid) { TinkoffPrice() }
                 val futureSlotPrice = getFutureSharePrice(sharePrice.price, futurePrice.price)
-                val percent = percentBetweenDoubles(sharePrice.price, futureSlotPrice)
-                if (abs(percent) > share.percent) {
+                val percent = percentBetweenDoubles(futureSlotPrice, sharePrice.price)
+                val annualPercent = FuturesUtil.getFutureAnnualPercent(percent, future.expirationDate)
+                if (abs(annualPercent) >= share.percent) {
                     futuresToNotify.add(
                         NotifyFuture(
                             ticker = future.ticker,
                             name = future.name,
                             price = futurePrice.price,
-                            actualDifference = percent
+                            actualDifference = percent,
+                            annualPercent = annualPercent,
+                            expirationDate = future.expirationDate
                         )
                     )
                 }

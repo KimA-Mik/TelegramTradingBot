@@ -1,4 +1,4 @@
-package presentation.telegram.common
+package presentation.common
 
 import java.util.*
 
@@ -15,5 +15,7 @@ fun Double.formatAndTrim(length: Int): String {
         Locale.US,
         "%.${length}f",
         this
-    ).trimEnd('0', '.')
+    )
+        .trimEnd('0')
+        .trimEnd('.')
 }

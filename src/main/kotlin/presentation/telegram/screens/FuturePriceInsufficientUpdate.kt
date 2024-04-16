@@ -1,7 +1,7 @@
 package presentation.telegram.screens
 
 import domain.updateService.model.NotifyShare
-import presentation.telegram.common.formatAndTrim
+import presentation.common.formatAndTrim
 
 class FuturePriceInsufficientUpdate(
     userId: Long,
@@ -10,5 +10,6 @@ class FuturePriceInsufficientUpdate(
 ) : BotScreen(userId, messageId) {
     override val replyMarkup = null
     override val parseMode = null
-    override val text = "Для ${share.shareTicker} разница меньше ${share.minimalDifference.formatAndTrim(2)}%"
+    override val text =
+        "Для ${share.shareTicker} процент годовых стал меньше, чем ${share.minimalDifference.formatAndTrim(2)}%"
 }
