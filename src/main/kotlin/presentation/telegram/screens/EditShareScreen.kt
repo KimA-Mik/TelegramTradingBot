@@ -1,8 +1,11 @@
 package presentation.telegram.screens
 
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
+import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
+import presentation.common.TelegramUtil
+import presentation.common.TinInvestUtil
 import presentation.common.formatAndTrim
 import presentation.telegram.callbackButtons.CallbackButton
 import presentation.telegram.common.NOT_SUBSCRIBED_TO_SHARE
@@ -14,13 +17,18 @@ class EditShareScreen(
 ) : BotScreen(id, messageId) {
     override val text = markupText()
     override val replyMarkup = calculateReplayMarkup()
-    override val parseMode = null
+    override val parseMode = ParseMode.MARKDOWN
+    override val disableWebPagePreview = true
 
     private fun markupText(): String {
         return when (state) {
             is State.NotSubscribed -> NOT_SUBSCRIBED_TO_SHARE + state.ticker
             is State.Share -> {
-                "${state.ticker} - ${state.percent.formatAndTrim(2)}%"
+                val shareInlineUrl = TelegramUtil.markdownInlineUrl(
+                    text = state.ticker,
+                    url = TinInvestUtil.shareUrl(state.ticker)
+                )
+                "$shareInlineUrl - ${state.percent.formatAndTrim(2)}%"
             }
         }
     }
