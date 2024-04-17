@@ -95,7 +95,9 @@ class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val s
                 sb.append("Годовые: ")
                 if (future.annualPercent >= DEFAULT_SHARE_PERCENT) sb.append('❗')
                 sb.append(future.annualPercent.formatAndTrim(2))
-                sb.append("%")
+                sb.append("%, после налога: ")
+                sb.append(future.annualAfterTaxes.formatAndTrim(2))
+                sb.append('%')
             }
         }
 

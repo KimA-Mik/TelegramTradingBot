@@ -11,5 +11,6 @@ data class DisplayFuture(
     val price: Double,
     val priceDateTime: LocalDateTime? = Clock.System.now().toLocalDateTime(DateUtil.timezoneMoscow),
     val percent: Double,
-    val annualPercent: Double
+    val annualPercent: Double,
+    val annualAfterTaxes: Double
 )

@@ -1,5 +1,6 @@
 package domain.tinkoff.useCase
 
+import domain.common.TAX_MULTIPLIER
 import domain.common.getFutureSharePrice
 import domain.common.percentBetweenDoubles
 import domain.tinkoff.model.DisplayFuture
@@ -37,13 +38,15 @@ class GetFullSecurityUseCase(private val repository: TinkoffRepository) {
                 val price = futuresPrices[it.uid]
                 val singlePrice = getFutureSharePrice(sharePrice.price, price?.price ?: 0.0)
                 val percent = percentBetweenDoubles(singlePrice, sharePrice.price)
+                val annualPercent = FuturesUtil.getFutureAnnualPercent(percent, it.expirationDate)
                 DisplayFuture(
                     ticker = it.ticker,
                     name = it.ticker,
                     price = price?.price ?: 0.0,
                     priceDateTime = price?.dateTime?.toKotlinLocalDateTime(),
                     percent = percent,
-                    annualPercent = FuturesUtil.getFutureAnnualPercent(percent, it.expirationDate)
+                    annualPercent = annualPercent,
+                    annualAfterTaxes = annualPercent * TAX_MULTIPLIER
                 )
             }
         )
