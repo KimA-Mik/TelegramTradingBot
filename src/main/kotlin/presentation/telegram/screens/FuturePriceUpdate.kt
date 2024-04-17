@@ -64,7 +64,8 @@ class FuturePriceUpdate(
                 url = TinInvestUtil.futureUrl(future.ticker)
             )
             res += "\n$date - $inlineFutureUrl: ${future.price.formatAndTrim(2)}$ROUBLE_SIGN, " +
-                    "${future.annualPercent.formatAndTrim(2)}% годовых"
+                    "${future.annualPercent.formatAndTrim(2)}% годовых, " +
+                    "после налога ${future.annualAfterTaxes.formatAndTrim(2)}%"
         }
 
         return res
