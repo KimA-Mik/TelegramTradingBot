@@ -69,8 +69,8 @@ class TelegramBot(
                         messageId = it,
                         text = screen.text,
                         parseMode = screen.parseMode,
+                        disableWebPagePreview = screen.disableWebPagePreview,
                         replyMarkup = screen.replyMarkup
-
                     )
 
                     return@collect
@@ -79,8 +79,9 @@ class TelegramBot(
                 telegramBot.sendMessage(
                     chatId = ChatId.fromId(screen.id),
                     text = screen.text,
-                    replyMarkup = screen.replyMarkup,
-                    parseMode = screen.parseMode
+                    parseMode = screen.parseMode,
+                    disableWebPagePreview = screen.disableWebPagePreview,
+                    replyMarkup = screen.replyMarkup
                 )
             }
         }
