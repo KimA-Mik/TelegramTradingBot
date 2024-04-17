@@ -1,12 +1,15 @@
 package presentation.telegram.screens
 
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
+import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import domain.updateService.model.NotifyShare
 import domain.utils.DateUtil
 import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
+import presentation.common.TelegramUtil
+import presentation.common.TinInvestUtil
 import presentation.common.formatAndTrim
 import presentation.common.futureDateFormat
 import presentation.telegram.callbackButtons.CallbackButton
@@ -19,12 +22,13 @@ class FuturePriceUpdate(
 ) : BotScreen(userId, messageId) {
     override val text = markupText()
     override val replyMarkup = calculateReplayMarkup()
-    override val parseMode = null
+    override val parseMode = ParseMode.MARKDOWN
+    override val disableWebPagePreview = true
 
     private fun markupText(): String {
         return when (state) {
-            is State.ResetNotify -> state.originalText + "\n[Уведомление сброшено]"
-            is State.UnableResetNotify -> state.originalText + "\n[Сброс не требуется]"
+            is State.ResetNotify -> state.originalText + "\n\\[Уведомление сброшено]"
+            is State.UnableResetNotify -> state.originalText + "\n\\[Сброс не требуется]"
             is State.ShowUpdate -> state.share.toText()
         }
     }
@@ -47,11 +51,19 @@ class FuturePriceUpdate(
 
     private fun NotifyShare.toText(): String {
         var res = String()
-        res += "$shareTicker: ${sharePrice.formatAndTrim(2)}$ROUBLE_SIGN"
+        val inlineShareUrl = TelegramUtil.markdownInlineUrl(
+            text = shareTicker,
+            url = TinInvestUtil.shareUrl(shareTicker)
+        )
+        res += "$inlineShareUrl: ${sharePrice.formatAndTrim(2)}$ROUBLE_SIGN"
 
         futures.forEach { future ->
             val date = future.expirationDate.toLocalDateTime(DateUtil.timezoneMoscow).format(futureDateFormat)
-            res += "\n[$date] ${future.ticker}: ${future.price.formatAndTrim(2)}$ROUBLE_SIGN, " +
+            val inlineFutureUrl = TelegramUtil.markdownInlineUrl(
+                text = future.ticker,
+                url = TinInvestUtil.futureUrl(future.ticker)
+            )
+            res += "\n$date - $inlineFutureUrl: ${future.price.formatAndTrim(2)}$ROUBLE_SIGN, " +
                     "${future.annualPercent.formatAndTrim(2)}% годовых"
         }
 
