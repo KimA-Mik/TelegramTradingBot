@@ -1,6 +1,7 @@
 package domain.updateService
 
 import Resource
+import domain.common.TAX_MULTIPLIER
 import domain.common.getFutureSharePrice
 import domain.common.percentBetweenDoubles
 import domain.tinkoff.model.TinkoffFuture
@@ -171,6 +172,7 @@ class UpdateService(
                             price = futurePrice.price,
                             actualDifference = percent,
                             annualPercent = annualPercent,
+                            annualAfterTaxes = annualPercent * TAX_MULTIPLIER,
                             expirationDate = future.expirationDate
                         )
                     )

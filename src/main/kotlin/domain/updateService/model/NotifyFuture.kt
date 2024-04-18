@@ -8,5 +8,6 @@ data class NotifyFuture(
     val price: Double,
     val actualDifference: Double,
     val annualPercent: Double,
+    val annualAfterTaxes: Double,
     val expirationDate: Instant
 )

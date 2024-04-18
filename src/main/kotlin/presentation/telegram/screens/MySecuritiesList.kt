@@ -1,9 +1,12 @@
 package presentation.telegram.screens
 
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
+import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import domain.user.model.UserShare
+import presentation.common.TelegramUtil
+import presentation.common.TinInvestUtil
 import presentation.common.formatAndTrim
 import presentation.telegram.callbackButtons.CALLBACK_BUTTON_ARGUMENT_SEPARATOR
 import presentation.telegram.callbackButtons.CallbackButton
@@ -18,7 +21,8 @@ class MySecuritiesList(
 ) : BotScreen(id, messageId) {
     override val text: String
     override val replyMarkup: ReplyMarkup?
-    override val parseMode = null
+    override val parseMode = ParseMode.MARKDOWN
+    override val disableWebPagePreview = true
 
     init {
         text = markupText()
@@ -32,7 +36,11 @@ class MySecuritiesList(
 
         shares.forEachIndexed { index, share ->
             val shareIndex = pageSize * (page - 1) + index + 1
-            result += "\n$shareIndex. ${share.ticker}: ${share.name} (${share.percent.formatAndTrim(2)}%)"
+            val inlineShareUrl = TelegramUtil.markdownInlineUrl(
+                text = share.ticker,
+                url = TinInvestUtil.shareUrl(share.ticker)
+            )
+            result += "\n$shareIndex. $inlineShareUrl: ${share.name} (${share.percent.formatAndTrim(2)}%)"
         }
 
         return result

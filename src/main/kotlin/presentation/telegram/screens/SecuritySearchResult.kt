@@ -1,10 +1,13 @@
 package presentation.telegram.screens
 
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
+import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import domain.tinkoff.model.DisplayShare
 import domain.user.common.DEFAULT_SHARE_PERCENT
+import presentation.common.TelegramUtil
+import presentation.common.TinInvestUtil
 import presentation.common.formatAndTrim
 import presentation.telegram.callbackButtons.CALLBACK_BUTTON_ARGUMENT_SEPARATOR
 import presentation.telegram.callbackButtons.CallbackButton
@@ -26,7 +29,8 @@ class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val s
 
     override val text = calculateText()
     override val replyMarkup = calculateReplyMarkup()
-    override val parseMode = null
+    override val parseMode = ParseMode.MARKDOWN
+    override val disableWebPagePreview = true
 
     private fun calculateText(): String {
         return when (state) {
@@ -42,7 +46,12 @@ class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val s
 //            sb.append(it.format(priceDateFormat))
 //            sb.append("] ")
 //        }
-        sb.append(result.ticker)
+        sb.append(
+            TelegramUtil.markdownInlineUrl(
+                text = result.ticker,
+                url = TinInvestUtil.shareUrl(result.ticker)
+            )
+        )
         sb.append(" - ")
         sb.append(result.name)
         sb.append(": ")
@@ -61,7 +70,12 @@ class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val s
 //                sb.append("] ")
 //            }
             sb.append('\n')
-            sb.append(future.ticker)
+            sb.append(
+                TelegramUtil.markdownInlineUrl(
+                    text = future.ticker,
+                    url = TinInvestUtil.futureUrl(future.ticker)
+                )
+            )
             sb.append(" - ")
             sb.append(future.name)
 
@@ -81,7 +95,9 @@ class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val s
                 sb.append("Годовые: ")
                 if (future.annualPercent >= DEFAULT_SHARE_PERCENT) sb.append('❗')
                 sb.append(future.annualPercent.formatAndTrim(2))
-                sb.append("%")
+                sb.append("%, после налога: ")
+                sb.append(future.annualAfterTaxes.formatAndTrim(2))
+                sb.append('%')
             }
         }
 
