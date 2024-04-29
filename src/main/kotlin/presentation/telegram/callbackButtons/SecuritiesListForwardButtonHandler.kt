@@ -1,5 +1,6 @@
 package presentation.telegram.callbackButtons
 
+import domain.user.model.User
 import domain.user.useCase.GetUserSharesUseCase
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
@@ -9,7 +10,7 @@ class SecuritiesListForwardButtonHandler(
     private val getUserShares: GetUserSharesUseCase
 ) : CallbackButtonHandler {
     override suspend fun execute(
-        userId: Long,
+        user: User,
         messageId: Long,
         messageText: String,
         arguments: List<String>
@@ -18,13 +19,13 @@ class SecuritiesListForwardButtonHandler(
             try {
                 arguments.first().toInt() + 1
             } catch (e: Exception) {
-                return ErrorScreen(id = userId, UNKNOWN_BUTTON_ERROR)
+                return ErrorScreen(id = user.id, UNKNOWN_BUTTON_ERROR)
             }
 
-        return when (val result = getUserShares(userId, page)) {
-            GetUserSharesUseCase.GetUserSharesResult.NotFound -> MySecuritiesList(userId, messageId)
+        return when (val result = getUserShares(user.id, page)) {
+            GetUserSharesUseCase.GetUserSharesResult.NotFound -> MySecuritiesList(user.id, messageId)
             is GetUserSharesUseCase.GetUserSharesResult.Success -> MySecuritiesList(
-                id = userId,
+                id = user.id,
                 messageId = messageId,
                 shares = result.shares,
                 page = result.page,

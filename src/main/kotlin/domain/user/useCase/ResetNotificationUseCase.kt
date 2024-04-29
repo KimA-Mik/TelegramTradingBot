@@ -13,7 +13,7 @@ class ResetNotificationUseCase(
         if (!share.notified) return false
 
         val updatedShare = share.copy(notified = false)
-        database.updateUserSharesNotified(listOf(updatedShare))
+        database.updateUserShares(listOf(updatedShare))
 
         return true
     }

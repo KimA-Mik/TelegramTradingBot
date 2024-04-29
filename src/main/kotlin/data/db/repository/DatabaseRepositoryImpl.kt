@@ -6,7 +6,6 @@ import data.db.entities.UserShares
 import data.db.entities.Users
 import domain.tinkoff.model.TinkoffShare
 import domain.updateService.model.UserWithFollowedShares
-import domain.user.common.DEFAULT_SHARE_PERCENT
 import domain.user.model.User
 import domain.user.model.UserShare
 import domain.user.repository.DatabaseRepository
@@ -25,6 +24,12 @@ class DatabaseRepositoryImpl(
     init {
         transaction {
             SchemaUtils.create(Shares, Users, UserShares)
+
+            val migrations = SchemaUtils.addMissingColumnsStatements(Shares, Users, UserShares)
+            migrations.forEach { migration ->
+                val statement = connection.prepareStatement(migration, false)
+                statement.executeUpdate()
+            }
         }
     }
 
@@ -46,7 +51,8 @@ class DatabaseRepositoryImpl(
                     User(
                         id = it[Users.id],
                         registered = it[Users.registered],
-                        path = it[Users.path]
+                        path = it[Users.path],
+                        defaultPercent = it[Users.defaultPercent]
                     )
                 }
                 .firstOrNull()
@@ -59,13 +65,14 @@ class DatabaseRepositoryImpl(
                 it[id] = user.id
                 it[registered] = user.registered
                 it[path] = user.path
+                it[defaultPercent] = user.defaultPercent
             }
 
             return@transaction user
         }
     }
 
-    override suspend fun subscribeUserToShare(userId: Long, share: TinkoffShare): Boolean {
+    override suspend fun subscribeUserToShare(userId: Long, defaultPercent: Double, share: TinkoffShare): Boolean {
         return database.transaction {
             val sharesList = Shares
                 .select(Shares.id)
@@ -95,7 +102,7 @@ class DatabaseRepositoryImpl(
             UserShares.insert {
                 it[UserShares.userId] = userId
                 it[UserShares.shareId] = shareId
-                it[percent] = DEFAULT_SHARE_PERCENT
+                it[percent] = defaultPercent
                 it[notified] = false
             }
 
@@ -223,13 +230,14 @@ class DatabaseRepositoryImpl(
         }
     }
 
-    override suspend fun updateUserSharesNotified(userShares: List<UserShare>) {
+    override suspend fun updateUserShares(userShares: List<UserShare>) {
         if (userShares.isEmpty()) return
         database.transaction {
             val statement = BatchUpdateStatement(UserShares)
             userShares.forEach {
                 statement.addBatch(EntityID(id = it.id, UserShares))
                 statement[UserShares.notified] = it.notified
+                statement[UserShares.percent] = it.percent
             }
 
             try {

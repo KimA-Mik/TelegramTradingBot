@@ -1,5 +1,6 @@
 package presentation.telegram.callbackButtons
 
+import domain.user.model.User
 import domain.user.useCase.ResetNotificationUseCase
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
@@ -9,21 +10,21 @@ class ResetNotificationButtonHandler(
     private val resetNotification: ResetNotificationUseCase
 ) : CallbackButtonHandler {
     override suspend fun execute(
-        userId: Long,
+        user: User,
         messageId: Long,
         messageText: String,
         arguments: List<String>
     ): BotScreen {
         val ticker = arguments.firstOrNull()
-            ?: return ErrorScreen(userId, "")
+            ?: return ErrorScreen(user.id, BROKEN_BUTTON)
 
-        val screenState = when (resetNotification(userId, ticker)) {
+        val screenState = when (resetNotification(user.id, ticker)) {
             true -> FuturePriceUpdate.State.ResetNotify(messageText)
             false -> FuturePriceUpdate.State.UnableResetNotify(messageText)
         }
 
         return FuturePriceUpdate(
-            userId = userId,
+            userId = user.id,
             messageId = messageId,
             state = screenState
         )

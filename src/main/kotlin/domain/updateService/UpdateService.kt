@@ -195,7 +195,7 @@ class UpdateService(
             _updates.emit(update)
         }
         logger.info("Handled ${handled.size} shares for user ${user.id}")
-        database.updateUserSharesNotified(handled)
+        database.updateUserShares(handled)
     }
 
     private suspend fun getSharesPrices(sharesTickers: Iterable<String>): Resource<List<TinkoffPrice>> {

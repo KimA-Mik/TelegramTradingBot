@@ -15,16 +15,19 @@ import presentation.telegram.textModels.common.TextModel
 class RootTextModel(
     mySecuritiesTextModel: MySecuritiesTextModel,
     searchSecuritiesTextModel: SearchSecuritiesTextModel,
+    settingsTextModel: SettingsTextModel,
     private val navigateUser: NavigateUserUseCase
 ) : TextModel {
     private val textModels = mapOf(
         BotTextCommands.MySecurities.name to mySecuritiesTextModel,
-        BotTextCommands.SearchSecurities.name to searchSecuritiesTextModel
+        BotTextCommands.SearchSecurities.name to searchSecuritiesTextModel,
+        BotTextCommands.Settings.name to settingsTextModel
     )
 
     private val navigationCommands = mapOf(
         BotTextCommands.MySecurities.text to mySecuritiesTextModel,
-        BotTextCommands.SearchSecurities.text to searchSecuritiesTextModel
+        BotTextCommands.SearchSecurities.text to searchSecuritiesTextModel,
+        BotTextCommands.Settings.text to settingsTextModel
     )
 
     override fun executeCommand(user: User, path: List<String>, command: String) = flow<BotScreen> {
