@@ -16,7 +16,10 @@ class SettingsRoot(user: User) : BotScreen(user.id) {
     companion object {
         private val _replayMarkup = KeyboardReplyMarkup(
             listOf(
-                listOf(KeyboardButton(SettingsTextModel.SettingsTextCommands.DefaultPercent.text)),
+                listOf(
+                    KeyboardButton(SettingsTextModel.SettingsTextCommands.DefaultPercent.text),
+                    KeyboardButton(SettingsTextModel.SettingsTextCommands.ResetPercent.text)
+                ),
                 listOf(KeyboardButton(BotTextCommands.Root.text))
             ),
             resizeKeyboard = true
