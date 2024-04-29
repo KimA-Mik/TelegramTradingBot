@@ -5,7 +5,7 @@ import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import domain.tinkoff.model.DisplayShare
-import domain.user.common.DEFAULT_SHARE_PERCENT
+import domain.user.model.User
 import presentation.common.TelegramUtil
 import presentation.common.TinInvestUtil
 import presentation.common.formatAndTrim
@@ -13,8 +13,8 @@ import presentation.telegram.callbackButtons.CALLBACK_BUTTON_ARGUMENT_SEPARATOR
 import presentation.telegram.callbackButtons.CallbackButton
 import presentation.telegram.common.ROUBLE_SIGN
 
-class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val state: State) :
-    BotScreen(id, messageId) {
+class SecuritySearchResult(val user: User, messageId: Long?, val ticker: String, val state: State) :
+    BotScreen(user.id, messageId) {
     sealed class State(val followed: Boolean) {
         class SearchResult(
             followed: Boolean,
@@ -93,7 +93,7 @@ class SecuritySearchResult(id: Long, messageId: Long?, val ticker: String, val s
 
             if (future.annualPercent != 0.0) {
                 sb.append("Годовые: ")
-                if (future.annualPercent >= DEFAULT_SHARE_PERCENT) sb.append('❗')
+                if (future.annualPercent >= user.defaultPercent) sb.append('❗')
                 sb.append(future.annualPercent.formatAndTrim(2))
                 sb.append("%, после налога: ")
                 sb.append(future.annualAfterTaxes.formatAndTrim(2))

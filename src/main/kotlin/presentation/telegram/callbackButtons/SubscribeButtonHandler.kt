@@ -22,7 +22,7 @@ class SubscribeButtonHandler(
         return when (resource) {
             is Resource.Error -> ErrorScreen(user.id, UNABLE_TO_SUBSCRIBE)
             is Resource.Success -> SecuritySearchResult(
-                id = userId, messageId = messageId, ticker = ticker,
+                user = user, messageId = messageId, ticker = ticker,
                 state = SecuritySearchResult.State.FollowUpdate(
                     followed = true,
                     messageText = messageText
