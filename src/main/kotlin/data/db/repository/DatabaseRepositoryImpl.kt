@@ -25,6 +25,12 @@ class DatabaseRepositoryImpl(
     init {
         transaction {
             SchemaUtils.create(Shares, Users, UserShares)
+
+            val migrations = SchemaUtils.addMissingColumnsStatements(Shares, Users, UserShares)
+            migrations.forEach { migration ->
+                val statement = connection.prepareStatement(migration, false)
+                statement.executeUpdate()
+            }
         }
     }
 
