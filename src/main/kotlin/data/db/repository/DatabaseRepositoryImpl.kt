@@ -6,7 +6,6 @@ import data.db.entities.UserShares
 import data.db.entities.Users
 import domain.tinkoff.model.TinkoffShare
 import domain.updateService.model.UserWithFollowedShares
-import domain.user.common.DEFAULT_SHARE_PERCENT
 import domain.user.model.User
 import domain.user.model.UserShare
 import domain.user.repository.DatabaseRepository
@@ -73,7 +72,7 @@ class DatabaseRepositoryImpl(
         }
     }
 
-    override suspend fun subscribeUserToShare(userId: Long, share: TinkoffShare): Boolean {
+    override suspend fun subscribeUserToShare(userId: Long, defaultPercent: Double, share: TinkoffShare): Boolean {
         return database.transaction {
             val sharesList = Shares
                 .select(Shares.id)
@@ -103,7 +102,7 @@ class DatabaseRepositoryImpl(
             UserShares.insert {
                 it[UserShares.userId] = userId
                 it[UserShares.shareId] = shareId
-                it[percent] = DEFAULT_SHARE_PERCENT
+                it[percent] = defaultPercent
                 it[notified] = false
             }
 
