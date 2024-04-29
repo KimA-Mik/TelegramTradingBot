@@ -52,7 +52,8 @@ class DatabaseRepositoryImpl(
                     User(
                         id = it[Users.id],
                         registered = it[Users.registered],
-                        path = it[Users.path]
+                        path = it[Users.path],
+                        defaultPercent = it[Users.defaultPercent]
                     )
                 }
                 .firstOrNull()
@@ -65,6 +66,7 @@ class DatabaseRepositoryImpl(
                 it[id] = user.id
                 it[registered] = user.registered
                 it[path] = user.path
+                it[defaultPercent] = user.defaultPercent
             }
 
             return@transaction user
