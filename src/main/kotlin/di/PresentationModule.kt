@@ -9,6 +9,7 @@ import presentation.telegram.callbackButtons.*
 import presentation.telegram.textModels.MySecuritiesTextModel
 import presentation.telegram.textModels.RootTextModel
 import presentation.telegram.textModels.SearchSecuritiesTextModel
+import presentation.telegram.textModels.SettingsTextModel
 
 val presentationModule = module {
     singleOf(::BotModel)
@@ -18,6 +19,7 @@ val presentationModule = module {
     singleOf(::RootTextModel)
     singleOf(::MySecuritiesTextModel)
     singleOf(::SearchSecuritiesTextModel)
+    singleOf(::SettingsTextModel)
 
     singleOf(::EditShareButtonHandler)
     singleOf(::ResetNotificationButtonHandler)

@@ -7,7 +7,10 @@ import presentation.telegram.BotTextCommands
 
 class Root(id: Long) : BotScreen(id) {
     override val text =
-        "*Супер бот:*\n• ${BotTextCommands.MySecurities.text}\n• ${BotTextCommands.SearchSecurities.text}"
+        "*Супер бот:*\n" +
+                "• ${BotTextCommands.MySecurities.text}\n" +
+                "• ${BotTextCommands.SearchSecurities.text}\n" +
+                "• ${BotTextCommands.Settings.text}"
     override val replyMarkup = _replayMarkup
     override val parseMode = ParseMode.MARKDOWN_V2
 
@@ -16,7 +19,8 @@ class Root(id: Long) : BotScreen(id) {
             listOf(
                 listOf(
                     KeyboardButton(BotTextCommands.SearchSecurities.text),
-                    KeyboardButton(BotTextCommands.MySecurities.text)
+                    KeyboardButton(BotTextCommands.MySecurities.text),
+                    KeyboardButton(BotTextCommands.Settings.text)
                 ),
             ),
             resizeKeyboard = true
