@@ -1,6 +1,7 @@
 package presentation.telegram.callbackButtons
 
 import Resource
+import domain.user.model.User
 import domain.user.useCase.SubscribeUserToShareUseCase
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
@@ -10,17 +11,16 @@ class SubscribeButtonHandler(
     private val subscribeUserToShare: SubscribeUserToShareUseCase
 ) : CallbackButtonHandler {
     override suspend fun execute(
-        userId: Long,
+        user: User,
         messageId: Long,
         messageText: String,
         arguments: List<String>
     ): BotScreen {
         val ticker = arguments.getOrElse(0) { String() }
-
-        val resource = subscribeUserToShare(userId, ticker)
+        val resource = subscribeUserToShare(user.id, ticker)
 
         return when (resource) {
-            is Resource.Error -> ErrorScreen(userId, UNABLE_TO_SUBSCRIBE)
+            is Resource.Error -> ErrorScreen(user.id, UNABLE_TO_SUBSCRIBE)
             is Resource.Success -> SecuritySearchResult(
                 id = userId, messageId = messageId, ticker = ticker,
                 state = SecuritySearchResult.State.FollowUpdate(

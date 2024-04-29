@@ -1,9 +1,12 @@
 package presentation.telegram
 
+import domain.common.USER_NOT_FOUND_MESSAGE
+import domain.user.useCase.FindUserUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import presentation.telegram.callbackButtons.*
 import presentation.telegram.screens.BotScreen
+import presentation.telegram.screens.ErrorScreen
 
 class CallbackHandler(
     editShareButtonHandler: EditShareButtonHandler,
@@ -13,7 +16,8 @@ class CallbackHandler(
     sharePercentButtonHandler: SharePercentButtonHandler,
     subscribeButtonHandler: SubscribeButtonHandler,
     unsubscribeButtonHandler: UnsubscribeButtonHandler,
-    editDefaultPercentButtonHandler: EditDefaultPercentButtonHandler
+    editDefaultPercentButtonHandler: EditDefaultPercentButtonHandler,
+    private val findUser: FindUserUseCase
 ) {
     private val buttonHandlers = mapOf(
         CallbackButton.EditShare.callbackData to editShareButtonHandler,
@@ -36,12 +40,18 @@ class CallbackHandler(
         messageText: String
     ) {
         if (userId == 0L || messageId == 0L) return
+        val user = findUser(userId).data
+
+        if (user == null) {
+            _outFlow.emit(ErrorScreen(userId, USER_NOT_FOUND_MESSAGE))
+            return
+        }
 
         val parsedData = callbackData.split(CALLBACK_BUTTON_ARGUMENT_SEPARATOR)
         val callbackCommand = parsedData.first()
 
         buttonHandlers[callbackCommand]?.let { handler ->
-            val screen = handler.execute(userId, messageId, messageText, parsedData.drop(1))
+            val screen = handler.execute(user, messageId, messageText, parsedData.drop(1))
             _outFlow.emit(screen)
         }
     }

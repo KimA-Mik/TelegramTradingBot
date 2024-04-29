@@ -1,5 +1,6 @@
 package presentation.telegram.callbackButtons
 
+import domain.user.model.User
 import domain.user.useCase.EditDefaultPercentUseCase
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
@@ -9,7 +10,7 @@ class EditDefaultPercentButtonHandler(
     private val editDefaultPercent: EditDefaultPercentUseCase
 ) : CallbackButtonHandler {
     override suspend fun execute(
-        userId: Long,
+        user: User,
         messageId: Long,
         messageText: String,
         arguments: List<String>
@@ -17,12 +18,12 @@ class EditDefaultPercentButtonHandler(
         val change = arguments
             .firstOrNull()
             ?.toDoubleOrNull()
-            ?: return ErrorScreen(userId, BROKEN_BUTTON)
+            ?: return ErrorScreen(user.id, BROKEN_BUTTON)
 
-        return when (val res = editDefaultPercent(userId, change)) {
-            EditDefaultPercentUseCase.Result.Error -> ErrorScreen(userId, UNKNOWN_BUTTON_ERROR)
+        return when (val res = editDefaultPercent(user.id, change)) {
+            EditDefaultPercentUseCase.Result.Error -> ErrorScreen(user.id, UNKNOWN_BUTTON_ERROR)
             is EditDefaultPercentUseCase.Result.Success -> SettingsDefaultPercent(
-                userId = userId,
+                userId = user.id,
                 percent = res.newPercent,
                 messageId = messageId
             )
