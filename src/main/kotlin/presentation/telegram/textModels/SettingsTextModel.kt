@@ -13,4 +13,7 @@ class SettingsTextModel : TextModel {
             return@flow
         }
     }
+    enum class SettingsTextCommands(val text: String) {
+        DefaultPercent("Стандартный процент")
+    }
 }

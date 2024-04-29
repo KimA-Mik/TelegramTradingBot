@@ -13,6 +13,7 @@ class CallbackHandler(
     sharePercentButtonHandler: SharePercentButtonHandler,
     subscribeButtonHandler: SubscribeButtonHandler,
     unsubscribeButtonHandler: UnsubscribeButtonHandler,
+    editDefaultPercentButtonHandler: EditDefaultPercentButtonHandler
 ) {
     private val buttonHandlers = mapOf(
         CallbackButton.EditShare.callbackData to editShareButtonHandler,
@@ -22,6 +23,7 @@ class CallbackHandler(
         CallbackButton.SharePercent.callbackData to sharePercentButtonHandler,
         CallbackButton.Subscribe.callbackData to subscribeButtonHandler,
         CallbackButton.Unsubscribe.callbackData to unsubscribeButtonHandler,
+        CallbackButton.EditDefaultPercent.callbackData to editDefaultPercentButtonHandler,
     )
 
     private val _outFlow = MutableSharedFlow<BotScreen>()

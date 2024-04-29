@@ -28,4 +28,5 @@ val presentationModule = module {
     singleOf(::SharePercentButtonHandler)
     singleOf(::SubscribeButtonHandler)
     singleOf(::UnsubscribeButtonHandler)
+    singleOf(::EditDefaultPercentButtonHandler)
 }
