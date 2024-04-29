@@ -230,13 +230,14 @@ class DatabaseRepositoryImpl(
         }
     }
 
-    override suspend fun updateUserSharesNotified(userShares: List<UserShare>) {
+    override suspend fun updateUserShares(userShares: List<UserShare>) {
         if (userShares.isEmpty()) return
         database.transaction {
             val statement = BatchUpdateStatement(UserShares)
             userShares.forEach {
                 statement.addBatch(EntityID(id = it.id, UserShares))
                 statement[UserShares.notified] = it.notified
+                statement[UserShares.percent] = it.percent
             }
 
             try {
