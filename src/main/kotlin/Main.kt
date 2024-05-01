@@ -27,7 +27,8 @@ fun main() = runBlocking {
         return@runBlocking
     }
 
-    Locale.setDefault(Locale("ru", "RU"))
+    val ruLocale = Locale.Builder().setLanguage("ru").setRegion("RU").build()
+    Locale.setDefault(ruLocale)
 
     val dataModule = getDataModule(
         tinkoffInvestApiToken = tinkoffToken,
