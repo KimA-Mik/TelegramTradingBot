@@ -1,5 +1,6 @@
 package di
 
+import data.agent.AgentService
 import data.db.DatabaseConnector
 import data.tinkoff.service.TinkoffInvestService
 import kotlinx.coroutines.CoroutineScope
@@ -14,6 +15,7 @@ suspend fun getDataModule(tinkoffInvestApiToken: String, scope: CoroutineScope):
     scope.launch { tinkoffInvestService.launchUpdating() }
 
     return module {
+        singleOf(::AgentService)
         single { tinkoffInvestService }
         singleOf(::DatabaseConnector)
     }

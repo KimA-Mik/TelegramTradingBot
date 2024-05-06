@@ -1,7 +1,11 @@
 package di
 
+import data.agent.AgentRepositoryImpl
 import data.db.repository.DatabaseRepositoryImpl
 import data.tinkoff.repository.TinkoffRepositoryImpl
+import domain.agent.repositoty.AgentRepository
+import domain.agent.useCase.GetAgentBotIdUseCase
+import domain.agent.useCase.SetAgentBotIdUseCase
 import domain.tinkoff.repository.TinkoffRepository
 import domain.tinkoff.useCase.GetFullSecurityUseCase
 import domain.tinkoff.useCase.GetTinkoffShareUseCase
@@ -19,6 +23,7 @@ import org.koin.dsl.module
 val domainModule = module {
     singleOf(::TinkoffRepositoryImpl) bind TinkoffRepository::class
     singleOf(::DatabaseRepositoryImpl) bind DatabaseRepository::class
+    singleOf(::AgentRepositoryImpl) bind AgentRepository::class
 
     singleOf(::UpdateService)
 
@@ -40,4 +45,7 @@ val domainModule = module {
     singleOf(::PopUserUseCase)
     singleOf(::RegisterUserUseCase)
     singleOf(::UserToRootUseCase)
+
+    singleOf(::GetAgentBotIdUseCase)
+    singleOf(::SetAgentBotIdUseCase)
 }
