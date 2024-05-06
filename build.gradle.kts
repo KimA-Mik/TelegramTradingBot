@@ -19,6 +19,7 @@ dependencies {
     implementation("org.slf4j:slf4j-simple:2.0.13")
 
     implementation("ru.tinkoff.piapi:java-sdk-core:1.5")
+    implementation("ru.mail.im:bot-api:1.2.3")
 
     val koinVersion = "3.5.6"
     implementation("io.insert-koin:koin-core:$koinVersion")
