@@ -4,6 +4,8 @@ import di.presentationModule
 import kotlinx.coroutines.runBlocking
 import org.koin.core.context.startKoin
 import org.koin.java.KoinJavaComponent.get
+import presentation.agent.AgentBot
+import presentation.agent.AgentBotModel
 import presentation.telegram.BotModel
 import presentation.telegram.TelegramBot
 import java.util.*
@@ -23,6 +25,8 @@ fun main() = runBlocking {
         failed = true
     }
 
+    val agentBotApiToken = System.getenv("AGENT_BOT_TOKEN")
+
     if (failed) {
         return@runBlocking
     }
@@ -40,6 +44,14 @@ fun main() = runBlocking {
             domainModule,
             presentationModule
         )
+    }
+
+    agentBotApiToken?.let {
+        val agentBot = AgentBot(
+            token = it,
+            model = get(AgentBotModel::class.java)
+        )
+        agentBot.start()
     }
 
     val telegramBot = TelegramBot(telegramBotApiToken, get(BotModel::class.java))

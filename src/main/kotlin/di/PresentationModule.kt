@@ -2,6 +2,7 @@ package di
 
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
+import presentation.agent.AgentBotModel
 import presentation.telegram.BotModel
 import presentation.telegram.CallbackHandler
 import presentation.telegram.UpdateHandler
@@ -17,6 +18,8 @@ val presentationModule = module {
     singleOf(::BotModel)
     singleOf(::CallbackHandler)
     singleOf(::UpdateHandler)
+
+    singleOf(::AgentBotModel)
 
     singleOf(::RootTextModel)
     singleOf(::MySecuritiesTextModel)

@@ -9,9 +9,11 @@ class AgentBot(
     private val model: AgentBotModel
 ) {
     private val client: BotApiClient = BotApiClient(token)
-    private val controller: BotApiClientController = BotApiClientController.startBot(client)
+    private lateinit var controller: BotApiClientController
 
-    init {
+    fun start() {
+        controller = BotApiClientController.startBot(client)
+
         val selfInfo = controller.selfInfo
         model.initBot(selfInfo.userId, selfInfo.nick)
 
