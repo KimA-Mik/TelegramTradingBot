@@ -47,15 +47,8 @@ class DatabaseRepositoryImpl(
             Users
                 .selectAll()
                 .where { Users.id eq id }
-                .map {
-                    User(
-                        id = it[Users.id],
-                        registered = it[Users.registered],
-                        path = it[Users.path],
-                        defaultPercent = it[Users.defaultPercent]
-                    )
-                }
                 .firstOrNull()
+                ?.toUser()
         }
     }
 
@@ -256,6 +249,18 @@ class DatabaseRepositoryImpl(
             name = this[Shares.name],
             percent = this[UserShares.percent],
             notified = this[UserShares.notified],
+        )
+    }
+
+    private fun ResultRow.toUser(): User {
+        return User(
+            id = this[Users.id],
+            registered = this[Users.registered],
+            path = this[Users.path],
+            defaultPercent = this[Users.defaultPercent],
+            agentChatId = this[Users.agentChatId],
+            agentCode = this[Users.agentCode],
+            agentNotifications = this[Users.agentNotifications],
         )
     }
 }
