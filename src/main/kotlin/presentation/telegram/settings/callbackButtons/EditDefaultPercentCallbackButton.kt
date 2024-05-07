@@ -17,4 +17,12 @@ data object EditDefaultPercentCallbackButton : CallbackButton("", "editDefaultPe
                 CALLBACK_BUTTON_ARGUMENT_SEPARATOR +
                 percent.formatAndTrim(2)
     }
+
+    fun parseCallbackData(arguments: List<String>): CallbackData? {
+        val percent = arguments.firstOrNull()?.toDoubleOrNull() ?: return null
+
+        return CallbackData(percent)
+    }
+
+    data class CallbackData(val percent: Double)
 }

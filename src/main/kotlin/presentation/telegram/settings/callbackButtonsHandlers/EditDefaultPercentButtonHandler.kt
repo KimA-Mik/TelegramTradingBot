@@ -7,6 +7,7 @@ import presentation.telegram.callbackButtons.CallbackButtonHandler
 import presentation.telegram.callbackButtons.UNKNOWN_BUTTON_ERROR
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
+import presentation.telegram.settings.callbackButtons.EditDefaultPercentCallbackButton
 import presentation.telegram.settings.screens.SettingsDefaultPercent
 
 class EditDefaultPercentButtonHandler(
@@ -18,12 +19,11 @@ class EditDefaultPercentButtonHandler(
         messageText: String,
         arguments: List<String>
     ): BotScreen {
-        val change = arguments
-            .firstOrNull()
-            ?.toDoubleOrNull()
+        val callbackData = EditDefaultPercentCallbackButton
+            .parseCallbackData(arguments)
             ?: return ErrorScreen(user.id, BROKEN_BUTTON)
 
-        return when (val res = editDefaultPercent(user.id, change)) {
+        return when (val res = editDefaultPercent(user.id, callbackData.percent)) {
             EditDefaultPercentUseCase.Result.Error -> ErrorScreen(user.id, UNKNOWN_BUTTON_ERROR)
             is EditDefaultPercentUseCase.Result.Success -> SettingsDefaultPercent(
                 userId = user.id,
