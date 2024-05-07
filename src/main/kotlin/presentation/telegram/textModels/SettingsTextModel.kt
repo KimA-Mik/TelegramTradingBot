@@ -20,6 +20,7 @@ class SettingsTextModel(
         val screen = when (command) {
             SettingsTextCommands.DefaultPercent.text -> SettingsDefaultPercent(user.id, user.defaultPercent)
             SettingsTextCommands.ResetPercent.text -> reset(user)
+            SettingsTextCommands.AgentSettings.text -> SettingsAgent(user)
             else -> ErrorScreen(user.id, UNKNOWN_COMMAND)
         }
 
@@ -47,6 +48,7 @@ class SettingsTextModel(
 
     enum class SettingsTextCommands(val text: String) {
         DefaultPercent("Стандартный процент"),
-        ResetPercent("Сбросить процент")
+        ResetPercent("Сбросить процент"),
+        AgentSettings("Настройки Agent")
     }
 }
