@@ -1,18 +1,33 @@
 package presentation.telegram.settings.screens
 
-import com.github.kotlintelegrambot.entities.KeyboardReplyMarkup
-import com.github.kotlintelegrambot.entities.keyboard.KeyboardButton
+import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
+import com.github.kotlintelegrambot.entities.ReplyMarkup
+import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import domain.user.model.User
-import presentation.telegram.BotTextCommands
 import presentation.telegram.screens.BotScreen
+import presentation.telegram.settings.callbackButtons.LinkAgentAccountCallbackButton
+import presentation.telegram.settings.callbackButtons.UnlinkAgentAccountCallbackButton
 
 class SettingsAgent(user: User) : BotScreen(user.id) {
     override val text = "Настройки Agent"
-    override val replyMarkup = KeyboardReplyMarkup(
-        listOf(
-            listOf(KeyboardButton(BotTextCommands.Root.text))
-        ),
-        resizeKeyboard = true
-    )
+    override val replyMarkup = calculateReplayMarkup(user)
     override val parseMode = null
+
+    private fun calculateReplayMarkup(user: User): ReplyMarkup {
+        val linkButton = if (user.agentChatId == null) {
+            InlineKeyboardButton.CallbackData(
+                LinkAgentAccountCallbackButton.text,
+                LinkAgentAccountCallbackButton.getCallbackData(user.id)
+            )
+        } else {
+            InlineKeyboardButton.CallbackData(
+                UnlinkAgentAccountCallbackButton.text,
+                UnlinkAgentAccountCallbackButton.getCallbackData(user.id)
+            )
+        }
+
+        return InlineKeyboardMarkup.create(
+            listOf(linkButton)
+        )
+    }
 }

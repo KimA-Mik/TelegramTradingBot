@@ -4,8 +4,9 @@ import data.agent.AgentRepositoryImpl
 import data.db.repository.DatabaseRepositoryImpl
 import data.tinkoff.repository.TinkoffRepositoryImpl
 import domain.agent.repositoty.AgentRepository
+import domain.agent.useCase.CreateAgentLinkRequestUseCase
 import domain.agent.useCase.GetAgentBotIdUseCase
-import domain.agent.useCase.SetAgentBotIdUseCase
+import domain.agent.useCase.SetAgentBotInfoUseCase
 import domain.tinkoff.repository.TinkoffRepository
 import domain.tinkoff.useCase.GetFullSecurityUseCase
 import domain.tinkoff.useCase.GetTinkoffShareUseCase
@@ -47,5 +48,7 @@ val domainModule = module {
     singleOf(::UserToRootUseCase)
 
     singleOf(::GetAgentBotIdUseCase)
-    singleOf(::SetAgentBotIdUseCase)
+    singleOf(::SetAgentBotInfoUseCase)
+
+    singleOf(::CreateAgentLinkRequestUseCase)
 }
