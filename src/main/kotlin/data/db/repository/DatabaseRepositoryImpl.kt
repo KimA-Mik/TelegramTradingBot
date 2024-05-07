@@ -13,6 +13,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.BatchUpdateStatement
+import org.jetbrains.exposed.sql.statements.UpdateStatement
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
 
@@ -55,10 +56,7 @@ class DatabaseRepositoryImpl(
     override suspend fun updateUser(user: User): User {
         return database.transaction {
             Users.update({ Users.id eq user.id }) {
-                it[id] = user.id
-                it[registered] = user.registered
-                it[path] = user.path
-                it[defaultPercent] = user.defaultPercent
+                it.updateUser(user)
             }
 
             return@transaction user
@@ -262,5 +260,15 @@ class DatabaseRepositoryImpl(
             agentCode = this[Users.agentCode],
             agentNotifications = this[Users.agentNotifications],
         )
+    }
+
+    private fun UpdateStatement.updateUser(user: User) {
+        this[Users.id] = user.id
+        this[Users.registered] = user.registered
+        this[Users.path] = user.path
+        this[Users.defaultPercent] = user.defaultPercent
+        this[Users.agentChatId] = user.agentChatId
+        this[Users.agentCode] = user.agentCode
+        this[Users.agentNotifications] = user.agentNotifications
     }
 }
