@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import presentation.telegram.callbackButtons.*
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
+import presentation.telegram.settings.callbackButtons.EditDefaultPercentCallbackButton
+import presentation.telegram.settings.callbackButtonsHandlers.EditDefaultPercentButtonHandler
 
 class CallbackHandler(
     editShareButtonHandler: EditShareButtonHandler,
@@ -27,7 +29,7 @@ class CallbackHandler(
         CallbackButton.SharePercent.callbackData to sharePercentButtonHandler,
         CallbackButton.Subscribe.callbackData to subscribeButtonHandler,
         CallbackButton.Unsubscribe.callbackData to unsubscribeButtonHandler,
-        CallbackButton.EditDefaultPercent.callbackData to editDefaultPercentButtonHandler,
+        EditDefaultPercentCallbackButton.callbackData to editDefaultPercentButtonHandler,
     )
 
     private val _outFlow = MutableSharedFlow<BotScreen>()
