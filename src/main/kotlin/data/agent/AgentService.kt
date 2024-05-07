@@ -1,12 +1,22 @@
 package data.agent
 
 class AgentService {
-    private var id: String? = null
+    private var _id: String? = null
+    private var _name: String? = null
+
     fun setBotId(agentId: String) {
-        id = agentId
+        _id = agentId
+    }
+
+    fun setBotName(name: String) {
+        _name = name
     }
 
     fun getBotId(): String? {
-        return id
+        return _id
+    }
+
+    fun genBotName(): String? {
+        return _name
     }
 }

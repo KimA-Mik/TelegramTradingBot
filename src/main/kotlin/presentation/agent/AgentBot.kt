@@ -12,8 +12,8 @@ class AgentBot(
     private val controller: BotApiClientController = BotApiClientController.startBot(client)
 
     init {
-        val selfId = controller.selfInfo.userId
-        model.initBotId(selfId)
+        val selfInfo = controller.selfInfo
+        model.initBot(selfInfo.userId, selfInfo.nick)
 
         client.addOnEventFetchListener { events: List<Event<*>?>? ->
             events?.forEach { event ->

@@ -1,6 +1,6 @@
 package presentation.agent
 
-import domain.agent.useCase.SetAgentBotIdUseCase
+import domain.agent.useCase.SetAgentBotInfoUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import ru.mail.im.botapi.fetcher.event.Event
 
 class AgentBotModel(
-    private val setAgentBotIdUseCase: SetAgentBotIdUseCase
+    private val setAgentBotInfoUseCase: SetAgentBotInfoUseCase
 ) {
     private val visitor = AgentVisitor()
     private val botEventFlow = MutableSharedFlow<AgentBotEvent>()
@@ -23,8 +23,8 @@ class AgentBotModel(
         }
     }
 
-    fun initBotId(botId: String) {
-        setAgentBotIdUseCase(botId)
+    fun initBot(botId: String, botName: String) {
+        setAgentBotInfoUseCase(botId, botName)
     }
 
     fun acceptEvent(event: Event<*>) {
