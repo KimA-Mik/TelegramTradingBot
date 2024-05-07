@@ -1,10 +1,9 @@
 package presentation.telegram.callbackButtons
 
 import presentation.common.format
-import presentation.common.formatAndTrim
 import kotlin.math.abs
 
-sealed class CallbackButton(val text: String, val callbackData: String) {
+abstract class CallbackButton(val text: String, val callbackData: String) {
     data object Subscribe : CallbackButton("Отслеживать", "followSecurity")
     data object Unsubscribe : CallbackButton("Перестать отслеживать", "unfollowSecurity")
     data object SecuritiesListBack : CallbackButton("Предыдущая страница", "securitiesListBack")
@@ -33,21 +32,6 @@ sealed class CallbackButton(val text: String, val callbackData: String) {
             return callbackData +
                     CALLBACK_BUTTON_ARGUMENT_SEPARATOR +
                     shareTicker
-        }
-    }
-
-    //TODO: Get rid of sealed class
-    data object EditDefaultPercent : CallbackButton("", "editDefaultPercent") {
-        fun getText(percent: Double): String {
-            val sign = if (percent > 0) '+' else '-'
-            val f = abs(percent).formatAndTrim(2)
-            return "${sign}${f}%"
-        }
-
-        fun getCallbackData(percent: Double): String {
-            return callbackData +
-                    CALLBACK_BUTTON_ARGUMENT_SEPARATOR +
-                    percent.formatAndTrim(2)
         }
     }
 }
