@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import presentation.telegram.callbackButtons.*
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
+import presentation.telegram.settings.callbackButtonsHandlers.EditDefaultPercentButtonHandler
 
 class CallbackHandler(
     editShareButtonHandler: EditShareButtonHandler,

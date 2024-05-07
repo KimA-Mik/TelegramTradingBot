@@ -1,11 +1,16 @@
-package presentation.telegram.textModels
+package presentation.telegram.settings.textModels
 
 import domain.user.model.User
 import domain.user.useCase.ResetUserSharesPercentUseCase
 import kotlinx.coroutines.flow.flow
 import presentation.telegram.callbackButtons.UNABLE_TO_RESET
 import presentation.telegram.common.UNKNOWN_COMMAND
-import presentation.telegram.screens.*
+import presentation.telegram.screens.BotScreen
+import presentation.telegram.screens.ErrorScreen
+import presentation.telegram.screens.SharesResetResult
+import presentation.telegram.settings.screens.SettingsAgent
+import presentation.telegram.settings.screens.SettingsDefaultPercent
+import presentation.telegram.settings.screens.SettingsRoot
 import presentation.telegram.textModels.common.TextModel
 
 class SettingsTextModel(

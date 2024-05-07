@@ -1,11 +1,12 @@
-package presentation.telegram.screens
+package presentation.telegram.settings.screens
 
 import com.github.kotlintelegrambot.entities.KeyboardReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.KeyboardButton
 import domain.user.model.User
 import presentation.common.formatAndTrim
 import presentation.telegram.BotTextCommands
-import presentation.telegram.textModels.SettingsTextModel
+import presentation.telegram.screens.BotScreen
+import presentation.telegram.settings.textModels.SettingsTextModel
 
 class SettingsRoot(user: User) : BotScreen(user.id) {
     override val text = generateText(user)

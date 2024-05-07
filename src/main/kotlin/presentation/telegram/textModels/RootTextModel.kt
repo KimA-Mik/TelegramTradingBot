@@ -10,6 +10,7 @@ import presentation.telegram.common.UNKNOWN_PATH
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
 import presentation.telegram.screens.Root
+import presentation.telegram.settings.textModels.SettingsTextModel
 import presentation.telegram.textModels.common.TextModel
 
 class RootTextModel(

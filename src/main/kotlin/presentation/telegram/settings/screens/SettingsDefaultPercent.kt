@@ -1,9 +1,10 @@
-package presentation.telegram.screens
+package presentation.telegram.settings.screens
 
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import presentation.common.formatAndTrim
 import presentation.telegram.callbackButtons.CallbackButton
+import presentation.telegram.screens.BotScreen
 
 class SettingsDefaultPercent(userId: Long, percent: Double, messageId: Long? = null) : BotScreen(userId, messageId) {
     override val text = "Текущий стандартный процент: ${percent.formatAndTrim(2)}%"
