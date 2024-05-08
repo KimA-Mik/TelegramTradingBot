@@ -35,6 +35,7 @@ class AgentBot(
                 val request = SendTextRequest()
                     .setChatId(screen.chatId)
                     .setText(screen.text)
+                    .setParseMode(screen.parseMode)
                 controller.sendTextMessage(request)
             }
         }
