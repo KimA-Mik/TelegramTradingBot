@@ -11,9 +11,24 @@ import presentation.telegram.settings.callbackButtons.LinkAgentAccountCallbackBu
 import presentation.telegram.settings.callbackButtons.UnlinkAgentAccountCallbackButton
 
 class SettingsAgent(user: User, messageId: Long? = null) : BotScreen(user.id, messageId) {
-    override val text = "Настройки Agent"
+    override val text = calculateText(user)
     override val replyMarkup = calculateReplayMarkup(user)
     override val parseMode = null
+
+    private fun calculateText(user: User): String {
+        var res = "Текущие настрокйи Agent:\n"
+
+        val login = user.agentChatId ?: "не привящан"
+        res += "Логин : $login\n"
+
+        val enabled = when (user.agentNotifications) {
+            true -> "включены"
+            false -> "выключены"
+        }
+        res += "Уведомления через Agent: $enabled"
+
+        return res
+    }
 
     private fun calculateReplayMarkup(user: User): ReplyMarkup {
         val linkButton = if (user.agentChatId == null) {
@@ -40,9 +55,16 @@ class SettingsAgent(user: User, messageId: Long? = null) : BotScreen(user.id, me
             )
         }
 
+        val buttons = mutableListOf(
+            listOf(linkButton)
+        )
+
+        if (user.agentChatId != null) {
+            buttons.add(listOf(notificationsButton))
+        }
+
         return InlineKeyboardMarkup.create(
-            listOf(linkButton),
-            listOf(notificationsButton)
+            buttons
         )
     }
 }
