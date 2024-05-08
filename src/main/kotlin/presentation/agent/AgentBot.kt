@@ -1,7 +1,11 @@
 package presentation.agent
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.mail.im.botapi.BotApiClient
 import ru.mail.im.botapi.BotApiClientController
+import ru.mail.im.botapi.api.entity.SendTextRequest
 import ru.mail.im.botapi.fetcher.event.Event
 
 class AgentBot(
@@ -10,6 +14,7 @@ class AgentBot(
 ) {
     private val client: BotApiClient = BotApiClient(token)
     private lateinit var controller: BotApiClientController
+    private val outScope = CoroutineScope(Dispatchers.IO)
 
     fun start() {
         controller = BotApiClientController.startBot(client)
@@ -22,6 +27,15 @@ class AgentBot(
                 event?.let {
                     model.acceptEvent(it)
                 }
+            }
+        }
+
+        outScope.launch {
+            model.outScreens.collect { screen ->
+                val request = SendTextRequest()
+                    .setChatId(screen.chatId)
+                    .setText(screen.text)
+                controller.sendTextMessage(request)
             }
         }
     }

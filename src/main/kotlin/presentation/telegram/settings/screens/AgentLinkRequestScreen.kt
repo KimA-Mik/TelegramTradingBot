@@ -13,7 +13,7 @@ class AgentLinkRequestScreen(
 ) : BotScreen(userId) {
     override val text = markupText(userCode, agentBotInfo)
     override val replyMarkup = null
-    override val parseMode = ParseMode.MARKDOWN_V2
+    override val parseMode = ParseMode.MARKDOWN
     override val disableWebPagePreview = true
 
     private fun markupText(
