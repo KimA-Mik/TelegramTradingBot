@@ -48,6 +48,7 @@ val domainModule = module {
     singleOf(::GetAgentBotIdUseCase)
     singleOf(::SetAgentBotInfoUseCase)
 
+    singleOf(::SetAgentNotificationsStatusUseCase)
     singleOf(::CreateAgentLinkRequestUseCase)
     singleOf(::LinkAgentAccountUseCase)
     singleOf(::UnlinkAgentUseCase)

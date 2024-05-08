@@ -5,6 +5,8 @@ import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import domain.user.model.User
 import presentation.telegram.screens.BotScreen
+import presentation.telegram.settings.callbackButtons.DisableAgentNotificationsCallbackButton
+import presentation.telegram.settings.callbackButtons.EnableAgentNotificationsCallbackButton
 import presentation.telegram.settings.callbackButtons.LinkAgentAccountCallbackButton
 import presentation.telegram.settings.callbackButtons.UnlinkAgentAccountCallbackButton
 
@@ -26,8 +28,21 @@ class SettingsAgent(user: User, messageId: Long? = null) : BotScreen(user.id, me
             )
         }
 
+        val notificationsButton = if (user.agentNotifications) {
+            InlineKeyboardButton.CallbackData(
+                DisableAgentNotificationsCallbackButton.text,
+                DisableAgentNotificationsCallbackButton.callbackData
+            )
+        } else {
+            InlineKeyboardButton.CallbackData(
+                EnableAgentNotificationsCallbackButton.text,
+                EnableAgentNotificationsCallbackButton.callbackData
+            )
+        }
+
         return InlineKeyboardMarkup.create(
-            listOf(linkButton)
+            listOf(linkButton),
+            listOf(notificationsButton)
         )
     }
 }

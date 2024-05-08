@@ -7,12 +7,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import presentation.telegram.callbackButtons.*
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
-import presentation.telegram.settings.callbackButtons.EditDefaultPercentCallbackButton
-import presentation.telegram.settings.callbackButtons.LinkAgentAccountCallbackButton
-import presentation.telegram.settings.callbackButtons.UnlinkAgentAccountCallbackButton
-import presentation.telegram.settings.callbackButtonsHandlers.EditDefaultPercentButtonHandler
-import presentation.telegram.settings.callbackButtonsHandlers.LinkAgentAccountButtonHandler
-import presentation.telegram.settings.callbackButtonsHandlers.UnlinkAgentAccountButtonHandler
+import presentation.telegram.settings.callbackButtons.*
+import presentation.telegram.settings.callbackButtonsHandlers.*
 
 class CallbackHandler(
     editShareButtonHandler: EditShareButtonHandler,
@@ -23,6 +19,8 @@ class CallbackHandler(
     subscribeButtonHandler: SubscribeButtonHandler,
     unsubscribeButtonHandler: UnsubscribeButtonHandler,
     editDefaultPercentButtonHandler: EditDefaultPercentButtonHandler,
+    disableAgentNotificationsButtonHandler: DisableAgentNotificationsButtonHandler,
+    enableAgentNotificationsButtonHandler: EnableAgentNotificationsButtonHandler,
     linkAgentAccountButtonHandler: LinkAgentAccountButtonHandler,
     unlinkAgentAccountButtonHandler: UnlinkAgentAccountButtonHandler,
     private val findUser: FindUserUseCase
@@ -36,6 +34,8 @@ class CallbackHandler(
         CallbackButton.Subscribe.callbackData to subscribeButtonHandler,
         CallbackButton.Unsubscribe.callbackData to unsubscribeButtonHandler,
         EditDefaultPercentCallbackButton.callbackData to editDefaultPercentButtonHandler,
+        DisableAgentNotificationsCallbackButton.callbackData to disableAgentNotificationsButtonHandler,
+        EnableAgentNotificationsCallbackButton.callbackData to enableAgentNotificationsButtonHandler,
         LinkAgentAccountCallbackButton.callbackData to linkAgentAccountButtonHandler,
         UnlinkAgentAccountCallbackButton.callbackData to unlinkAgentAccountButtonHandler
     )
