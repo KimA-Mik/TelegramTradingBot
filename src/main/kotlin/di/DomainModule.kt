@@ -7,6 +7,7 @@ import domain.agent.repositoty.AgentRepository
 import domain.agent.useCase.CreateAgentLinkRequestUseCase
 import domain.agent.useCase.GetAgentBotIdUseCase
 import domain.agent.useCase.SetAgentBotInfoUseCase
+import domain.agent.useCase.UnlinkAgentUseCase
 import domain.tinkoff.repository.TinkoffRepository
 import domain.tinkoff.useCase.GetFullSecurityUseCase
 import domain.tinkoff.useCase.GetTinkoffShareUseCase
@@ -51,4 +52,5 @@ val domainModule = module {
     singleOf(::SetAgentBotInfoUseCase)
 
     singleOf(::CreateAgentLinkRequestUseCase)
+    singleOf(::UnlinkAgentUseCase)
 }

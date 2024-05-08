@@ -9,8 +9,10 @@ import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
 import presentation.telegram.settings.callbackButtons.EditDefaultPercentCallbackButton
 import presentation.telegram.settings.callbackButtons.LinkAgentAccountCallbackButton
+import presentation.telegram.settings.callbackButtons.UnlinkAgentAccountCallbackButton
 import presentation.telegram.settings.callbackButtonsHandlers.EditDefaultPercentButtonHandler
 import presentation.telegram.settings.callbackButtonsHandlers.LinkAgentAccountButtonHandler
+import presentation.telegram.settings.callbackButtonsHandlers.UnlinkAgentAccountButtonHandler
 
 class CallbackHandler(
     editShareButtonHandler: EditShareButtonHandler,
@@ -22,6 +24,7 @@ class CallbackHandler(
     unsubscribeButtonHandler: UnsubscribeButtonHandler,
     editDefaultPercentButtonHandler: EditDefaultPercentButtonHandler,
     linkAgentAccountButtonHandler: LinkAgentAccountButtonHandler,
+    unlinkAgentAccountButtonHandler: UnlinkAgentAccountButtonHandler,
     private val findUser: FindUserUseCase
 ) {
     private val buttonHandlers = mapOf(
@@ -34,6 +37,7 @@ class CallbackHandler(
         CallbackButton.Unsubscribe.callbackData to unsubscribeButtonHandler,
         EditDefaultPercentCallbackButton.callbackData to editDefaultPercentButtonHandler,
         LinkAgentAccountCallbackButton.callbackData to linkAgentAccountButtonHandler,
+        UnlinkAgentAccountCallbackButton.callbackData to unlinkAgentAccountButtonHandler
     )
 
     private val _outFlow = MutableSharedFlow<BotScreen>()

@@ -9,6 +9,7 @@ import presentation.telegram.UpdateHandler
 import presentation.telegram.callbackButtons.*
 import presentation.telegram.settings.callbackButtonsHandlers.EditDefaultPercentButtonHandler
 import presentation.telegram.settings.callbackButtonsHandlers.LinkAgentAccountButtonHandler
+import presentation.telegram.settings.callbackButtonsHandlers.UnlinkAgentAccountButtonHandler
 import presentation.telegram.settings.textModels.SettingsTextModel
 import presentation.telegram.textModels.MySecuritiesTextModel
 import presentation.telegram.textModels.RootTextModel
@@ -36,4 +37,5 @@ val presentationModule = module {
     singleOf(::EditDefaultPercentButtonHandler)
 
     singleOf(::LinkAgentAccountButtonHandler)
+    singleOf(::UnlinkAgentAccountButtonHandler)
 }

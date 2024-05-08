@@ -8,7 +8,7 @@ import presentation.telegram.screens.BotScreen
 import presentation.telegram.settings.callbackButtons.LinkAgentAccountCallbackButton
 import presentation.telegram.settings.callbackButtons.UnlinkAgentAccountCallbackButton
 
-class SettingsAgent(user: User) : BotScreen(user.id) {
+class SettingsAgent(user: User, messageId: Long? = null) : BotScreen(user.id, messageId) {
     override val text = "Настройки Agent"
     override val replyMarkup = calculateReplayMarkup(user)
     override val parseMode = null
