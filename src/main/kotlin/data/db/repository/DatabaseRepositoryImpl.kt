@@ -53,6 +53,26 @@ class DatabaseRepositoryImpl(
         }
     }
 
+    override suspend fun findUserByAgentChatId(chatId: String): User? {
+        return database.transaction {
+            Users
+                .selectAll()
+                .where { Users.agentChatId eq chatId }
+                .firstOrNull()
+                ?.toUser()
+        }
+    }
+
+    override suspend fun findUserByAgentCode(code: String): User? {
+        return database.transaction {
+            Users
+                .selectAll()
+                .where { Users.agentCode eq code }
+                .firstOrNull()
+                ?.toUser()
+        }
+    }
+
     override suspend fun updateUser(user: User): User {
         return database.transaction {
             Users.update({ Users.id eq user.id }) {
