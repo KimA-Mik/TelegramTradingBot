@@ -8,7 +8,7 @@ import domain.updateService.model.NotifyShare
 import domain.utils.DateUtil
 import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
-import presentation.common.TelegramUtil
+import presentation.common.MarkdownUtil
 import presentation.common.TinInvestUtil
 import presentation.common.formatAndTrim
 import presentation.common.futureDateFormat
@@ -51,7 +51,7 @@ class FuturePriceUpdate(
 
     private fun NotifyShare.toText(): String {
         var res = String()
-        val inlineShareUrl = TelegramUtil.markdownInlineUrl(
+        val inlineShareUrl = MarkdownUtil.inlineUrl(
             text = shareTicker,
             url = TinInvestUtil.shareUrl(shareTicker)
         )
@@ -59,7 +59,7 @@ class FuturePriceUpdate(
 
         futures.forEach { future ->
             val date = future.expirationDate.toLocalDateTime(DateUtil.timezoneMoscow).format(futureDateFormat)
-            val inlineFutureUrl = TelegramUtil.markdownInlineUrl(
+            val inlineFutureUrl = MarkdownUtil.inlineUrl(
                 text = future.ticker,
                 url = TinInvestUtil.futureUrl(future.ticker)
             )

@@ -5,7 +5,7 @@ import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import domain.user.model.UserShare
-import presentation.common.TelegramUtil
+import presentation.common.MarkdownUtil
 import presentation.common.TinInvestUtil
 import presentation.common.formatAndTrim
 import presentation.telegram.callbackButtons.CALLBACK_BUTTON_ARGUMENT_SEPARATOR
@@ -36,7 +36,7 @@ class MySecuritiesList(
 
         shares.forEachIndexed { index, share ->
             val shareIndex = pageSize * (page - 1) + index + 1
-            val inlineShareUrl = TelegramUtil.markdownInlineUrl(
+            val inlineShareUrl = MarkdownUtil.inlineUrl(
                 text = share.ticker,
                 url = TinInvestUtil.shareUrl(share.ticker)
             )

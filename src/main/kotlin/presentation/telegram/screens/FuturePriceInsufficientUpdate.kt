@@ -2,7 +2,7 @@ package presentation.telegram.screens
 
 import com.github.kotlintelegrambot.entities.ParseMode
 import domain.updateService.model.NotifyShare
-import presentation.common.TelegramUtil
+import presentation.common.MarkdownUtil
 import presentation.common.TinInvestUtil
 import presentation.common.formatAndTrim
 
@@ -17,7 +17,7 @@ class FuturePriceInsufficientUpdate(
     override val disableWebPagePreview = true
 
     private fun generateText(): String {
-        val shareInlineUrl = TelegramUtil.markdownInlineUrl(
+        val shareInlineUrl = MarkdownUtil.inlineUrl(
             text = share.shareTicker,
             url = TinInvestUtil.shareUrl(share.shareTicker)
         )
