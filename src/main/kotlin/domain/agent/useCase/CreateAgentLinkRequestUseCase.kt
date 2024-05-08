@@ -9,11 +9,10 @@ class CreateAgentLinkRequestUseCase(
     suspend operator fun invoke(userId: Long): Result {
         val user = repository.findUser(userId) ?: return Result.Error
 
-        val tail = List(7) { Random.nextInt(10) }
-            .joinToString(separator = "")
-
-        val leading = (Random.nextInt(9) + 1).toString()
-        val code = leading + tail
+        var code = generateCode()
+        while (repository.findUserByAgentCode(code) != null) {
+            code = generateCode()
+        }
 
         val newUser = user.copy(agentCode = code)
         val updated = repository.updateUser(newUser) ?: return Result.Error
@@ -28,5 +27,13 @@ class CreateAgentLinkRequestUseCase(
     sealed interface Result {
         data class Success(val code: String) : Result
         data object Error : Result
+    }
+
+    private fun generateCode(): String {
+        val tail = List(7) { Random.nextInt(10) }
+            .joinToString(separator = "")
+
+        val leading = (Random.nextInt(9) + 1).toString()
+        return leading + tail
     }
 }
