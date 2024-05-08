@@ -5,27 +5,31 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import ru.mail.im.botapi.fetcher.event.Event
 
 class AgentBotModel(
     private val setAgentBotInfoUseCase: SetAgentBotInfoUseCase,
-    private val eventHandler: AgentEventHandler
+    private val eventHandler: AgentEventHandler,
+    updateHandler: AgentUpdateHandler
 ) {
     private val visitor = AgentVisitor()
     private val botEventFlow = MutableSharedFlow<AgentBotEvent>()
     private val scope = CoroutineScope(Dispatchers.Default)
 
-    private val _outScreens = MutableSharedFlow<AgentScreen>()
-    val outScreens = _outScreens.asSharedFlow()
+    private val outMessages = MutableSharedFlow<AgentScreen>()
+    val outScreens = merge(
+        outMessages,
+        updateHandler.updateScreens
+    )
 
     init {
         scope.launch {
             botEventFlow.collect { event ->
                 val resScreen = eventHandler.handleEvent(event)
-                resScreen?.let {
-                    _outScreens.emit(it)
+                resScreen.let {
+                    outMessages.emit(it)
                 }
             }
         }
