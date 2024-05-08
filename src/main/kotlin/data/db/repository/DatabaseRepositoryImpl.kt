@@ -222,6 +222,8 @@ class DatabaseRepositoryImpl(
                 )
                 .select(
                     Users.id,
+                    Users.agentChatId,
+                    Users.agentNotifications,
                     UserShares.id,
                     Shares.name,
                     Shares.uid,
@@ -233,6 +235,8 @@ class DatabaseRepositoryImpl(
                 .map {
                     UserWithFollowedShares(
                         id = it.key,
+                        agentChatId = it.value.firstOrNull()?.get(Users.agentChatId),
+                        agentNotifications = it.value.firstOrNull()?.get(Users.agentNotifications) ?: false,
                         shares = it.value.map { row ->
                             row.toFollowedShare()
                         }
