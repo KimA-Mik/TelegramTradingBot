@@ -5,15 +5,8 @@ import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import domain.updateService.model.NotifyShare
-import domain.utils.DateUtil
-import kotlinx.datetime.format
-import kotlinx.datetime.toLocalDateTime
-import presentation.common.TelegramUtil
-import presentation.common.TinInvestUtil
-import presentation.common.formatAndTrim
-import presentation.common.futureDateFormat
+import presentation.common.mappers.toUpdateText
 import presentation.telegram.callbackButtons.CallbackButton
-import presentation.telegram.common.ROUBLE_SIGN
 
 class FuturePriceUpdate(
     userId: Long,
@@ -29,7 +22,7 @@ class FuturePriceUpdate(
         return when (state) {
             is State.ResetNotify -> state.originalText + "\n\\[Уведомление сброшено]"
             is State.UnableResetNotify -> state.originalText + "\n\\[Сброс не требуется]"
-            is State.ShowUpdate -> state.share.toText()
+            is State.ShowUpdate -> state.share.toUpdateText()
         }
     }
 
@@ -47,28 +40,6 @@ class FuturePriceUpdate(
             )
 
         }
-    }
-
-    private fun NotifyShare.toText(): String {
-        var res = String()
-        val inlineShareUrl = TelegramUtil.markdownInlineUrl(
-            text = shareTicker,
-            url = TinInvestUtil.shareUrl(shareTicker)
-        )
-        res += "$inlineShareUrl: ${sharePrice.formatAndTrim(2)}$ROUBLE_SIGN"
-
-        futures.forEach { future ->
-            val date = future.expirationDate.toLocalDateTime(DateUtil.timezoneMoscow).format(futureDateFormat)
-            val inlineFutureUrl = TelegramUtil.markdownInlineUrl(
-                text = future.ticker,
-                url = TinInvestUtil.futureUrl(future.ticker)
-            )
-            res += "\n$date - $inlineFutureUrl: ${future.price.formatAndTrim(2)}$ROUBLE_SIGN, " +
-                    "${future.annualPercent.formatAndTrim(2)}% годовых, " +
-                    "после налога ${future.annualAfterTaxes.formatAndTrim(2)}%"
-        }
-
-        return res
     }
 
     sealed interface State {

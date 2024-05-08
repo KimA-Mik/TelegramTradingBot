@@ -13,6 +13,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.BatchUpdateStatement
+import org.jetbrains.exposed.sql.statements.UpdateStatement
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
 
@@ -47,25 +48,35 @@ class DatabaseRepositoryImpl(
             Users
                 .selectAll()
                 .where { Users.id eq id }
-                .map {
-                    User(
-                        id = it[Users.id],
-                        registered = it[Users.registered],
-                        path = it[Users.path],
-                        defaultPercent = it[Users.defaultPercent]
-                    )
-                }
                 .firstOrNull()
+                ?.toUser()
+        }
+    }
+
+    override suspend fun findUserByAgentChatId(chatId: String): User? {
+        return database.transaction {
+            Users
+                .selectAll()
+                .where { Users.agentChatId eq chatId }
+                .firstOrNull()
+                ?.toUser()
+        }
+    }
+
+    override suspend fun findUserByAgentCode(code: String): User? {
+        return database.transaction {
+            Users
+                .selectAll()
+                .where { Users.agentCode eq code }
+                .firstOrNull()
+                ?.toUser()
         }
     }
 
     override suspend fun updateUser(user: User): User {
         return database.transaction {
             Users.update({ Users.id eq user.id }) {
-                it[id] = user.id
-                it[registered] = user.registered
-                it[path] = user.path
-                it[defaultPercent] = user.defaultPercent
+                it.updateUser(user)
             }
 
             return@transaction user
@@ -211,6 +222,8 @@ class DatabaseRepositoryImpl(
                 )
                 .select(
                     Users.id,
+                    Users.agentChatId,
+                    Users.agentNotifications,
                     UserShares.id,
                     Shares.name,
                     Shares.uid,
@@ -222,6 +235,8 @@ class DatabaseRepositoryImpl(
                 .map {
                     UserWithFollowedShares(
                         id = it.key,
+                        agentChatId = it.value.firstOrNull()?.get(Users.agentChatId),
+                        agentNotifications = it.value.firstOrNull()?.get(Users.agentNotifications) ?: false,
                         shares = it.value.map { row ->
                             row.toFollowedShare()
                         }
@@ -257,5 +272,27 @@ class DatabaseRepositoryImpl(
             percent = this[UserShares.percent],
             notified = this[UserShares.notified],
         )
+    }
+
+    private fun ResultRow.toUser(): User {
+        return User(
+            id = this[Users.id],
+            registered = this[Users.registered],
+            path = this[Users.path],
+            defaultPercent = this[Users.defaultPercent],
+            agentChatId = this[Users.agentChatId],
+            agentCode = this[Users.agentCode],
+            agentNotifications = this[Users.agentNotifications],
+        )
+    }
+
+    private fun UpdateStatement.updateUser(user: User) {
+        this[Users.id] = user.id
+        this[Users.registered] = user.registered
+        this[Users.path] = user.path
+        this[Users.defaultPercent] = user.defaultPercent
+        this[Users.agentChatId] = user.agentChatId
+        this[Users.agentCode] = user.agentCode
+        this[Users.agentNotifications] = user.agentNotifications
     }
 }

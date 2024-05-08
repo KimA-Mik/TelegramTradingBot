@@ -6,7 +6,7 @@ import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import domain.tinkoff.model.DisplayShare
 import domain.user.model.User
-import presentation.common.TelegramUtil
+import presentation.common.MarkdownUtil
 import presentation.common.TinInvestUtil
 import presentation.common.formatAndTrim
 import presentation.telegram.callbackButtons.CALLBACK_BUTTON_ARGUMENT_SEPARATOR
@@ -47,7 +47,7 @@ class SecuritySearchResult(val user: User, messageId: Long?, val ticker: String,
 //            sb.append("] ")
 //        }
         sb.append(
-            TelegramUtil.markdownInlineUrl(
+            MarkdownUtil.inlineUrl(
                 text = result.ticker,
                 url = TinInvestUtil.shareUrl(result.ticker)
             )
@@ -71,7 +71,7 @@ class SecuritySearchResult(val user: User, messageId: Long?, val ticker: String,
 //            }
             sb.append('\n')
             sb.append(
-                TelegramUtil.markdownInlineUrl(
+                MarkdownUtil.inlineUrl(
                     text = future.ticker,
                     url = TinInvestUtil.futureUrl(future.ticker)
                 )

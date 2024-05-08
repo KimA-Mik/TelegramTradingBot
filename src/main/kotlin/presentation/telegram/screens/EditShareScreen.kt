@@ -4,7 +4,7 @@ import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
-import presentation.common.TelegramUtil
+import presentation.common.MarkdownUtil
 import presentation.common.TinInvestUtil
 import presentation.common.formatAndTrim
 import presentation.telegram.callbackButtons.CallbackButton
@@ -24,7 +24,7 @@ class EditShareScreen(
         return when (state) {
             is State.NotSubscribed -> NOT_SUBSCRIBED_TO_SHARE + state.ticker
             is State.Share -> {
-                val shareInlineUrl = TelegramUtil.markdownInlineUrl(
+                val shareInlineUrl = MarkdownUtil.inlineUrl(
                     text = state.ticker,
                     url = TinInvestUtil.shareUrl(state.ticker)
                 )

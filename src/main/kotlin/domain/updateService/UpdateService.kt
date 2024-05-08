@@ -9,6 +9,9 @@ import domain.tinkoff.model.TinkoffPrice
 import domain.tinkoff.model.TinkoffShare
 import domain.tinkoff.repository.TinkoffRepository
 import domain.tinkoff.util.TinkoffFutureComparator
+import domain.updateService.agentUpdates.AgentSharePriceInsufficientUpdate
+import domain.updateService.agentUpdates.AgentShareUpdate
+import domain.updateService.agentUpdates.AgentUpdate
 import domain.updateService.model.NotifyFuture
 import domain.updateService.model.NotifyShare
 import domain.updateService.model.UserWithFollowedShares
@@ -35,6 +38,9 @@ class UpdateService(
 ) {
     private val _updates = MutableSharedFlow<Update>()
     val updates = _updates.asSharedFlow()
+
+    private val _agentUpdates = MutableSharedFlow<AgentUpdate>()
+    val agentUpdates = _agentUpdates.asSharedFlow()
 
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.Default + job)
@@ -193,6 +199,14 @@ class UpdateService(
             else
                 SharePriceInsufficientUpdate(userId = user.id, share = notifyShare)
             _updates.emit(update)
+
+            if (user.agentNotifications && user.agentChatId != null) {
+                val agentUpdate = if (shouldNotify)
+                    AgentShareUpdate(chatId = user.agentChatId, share = notifyShare)
+                else
+                    AgentSharePriceInsufficientUpdate(chatId = user.agentChatId, share = notifyShare)
+                _agentUpdates.emit(agentUpdate)
+            }
         }
         logger.info("Handled ${handled.size} shares for user ${user.id}")
         database.updateUserShares(handled)

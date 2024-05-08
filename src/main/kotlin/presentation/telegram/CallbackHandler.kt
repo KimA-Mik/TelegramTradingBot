@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import presentation.telegram.callbackButtons.*
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
+import presentation.telegram.settings.callbackButtons.*
+import presentation.telegram.settings.callbackButtonsHandlers.*
 
 class CallbackHandler(
     editShareButtonHandler: EditShareButtonHandler,
@@ -17,6 +19,10 @@ class CallbackHandler(
     subscribeButtonHandler: SubscribeButtonHandler,
     unsubscribeButtonHandler: UnsubscribeButtonHandler,
     editDefaultPercentButtonHandler: EditDefaultPercentButtonHandler,
+    disableAgentNotificationsButtonHandler: DisableAgentNotificationsButtonHandler,
+    enableAgentNotificationsButtonHandler: EnableAgentNotificationsButtonHandler,
+    linkAgentAccountButtonHandler: LinkAgentAccountButtonHandler,
+    unlinkAgentAccountButtonHandler: UnlinkAgentAccountButtonHandler,
     private val findUser: FindUserUseCase
 ) {
     private val buttonHandlers = mapOf(
@@ -27,7 +33,11 @@ class CallbackHandler(
         CallbackButton.SharePercent.callbackData to sharePercentButtonHandler,
         CallbackButton.Subscribe.callbackData to subscribeButtonHandler,
         CallbackButton.Unsubscribe.callbackData to unsubscribeButtonHandler,
-        CallbackButton.EditDefaultPercent.callbackData to editDefaultPercentButtonHandler,
+        EditDefaultPercentCallbackButton.callbackData to editDefaultPercentButtonHandler,
+        DisableAgentNotificationsCallbackButton.callbackData to disableAgentNotificationsButtonHandler,
+        EnableAgentNotificationsCallbackButton.callbackData to enableAgentNotificationsButtonHandler,
+        LinkAgentAccountCallbackButton.callbackData to linkAgentAccountButtonHandler,
+        UnlinkAgentAccountCallbackButton.callbackData to unlinkAgentAccountButtonHandler
     )
 
     private val _outFlow = MutableSharedFlow<BotScreen>()
