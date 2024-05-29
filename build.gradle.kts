@@ -31,7 +31,7 @@ dependencies {
 
     implementation("org.xerial:sqlite-jdbc:3.46.0.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0-RC.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
 }
 
 tasks.test {
