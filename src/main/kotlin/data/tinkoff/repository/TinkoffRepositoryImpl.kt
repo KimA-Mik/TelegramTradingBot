@@ -1,16 +1,13 @@
 package data.tinkoff.repository
 
 import Resource
-import data.tinkoff.mappers.toTinkoffFuture
-import data.tinkoff.mappers.toTinkoffPrice
-import data.tinkoff.mappers.toTinkoffSecurity
+import data.tinkoff.mappers.*
 import data.tinkoff.service.TinkoffInvestService
-import domain.tinkoff.model.SecurityType
-import domain.tinkoff.model.TinkoffFuture
-import domain.tinkoff.model.TinkoffPrice
-import domain.tinkoff.model.TinkoffShare
+import domain.tinkoff.model.*
 import domain.tinkoff.repository.TinkoffRepository
+import kotlinx.datetime.Instant
 import ru.tinkoff.piapi.contract.v1.Future
+import ru.tinkoff.piapi.contract.v1.HistoricCandle
 import ru.tinkoff.piapi.contract.v1.LastPrice
 
 class TinkoffRepositoryImpl(private val service: TinkoffInvestService) : TinkoffRepository {
@@ -58,6 +55,30 @@ class TinkoffRepositoryImpl(private val service: TinkoffInvestService) : Tinkoff
         }
 
         return SecurityType.NONE
+    }
+
+    override suspend fun getShareCandles(
+        uid: String,
+        from: Instant,
+        to: Instant,
+        interval: TinkoffCandleInterval
+    ): Resource<List<TinkoffCandle>> {
+        return try {
+            val candles = service.getShareClosePriceHistory(
+                uid = uid,
+                from = from,
+                to = to,
+                interval = interval.toCandleInterval()
+            ).map(HistoricCandle::toTinkoffCandle)
+
+            if (candles.isEmpty()) {
+                Resource.Error("")
+            } else {
+                Resource.Success(candles)
+            }
+        } catch (e: Exception) {
+            Resource.Error(e.message)
+        }
     }
 
     private suspend fun getTinkoffPriceForUids(uids: List<String>): Resource<List<TinkoffPrice>> {

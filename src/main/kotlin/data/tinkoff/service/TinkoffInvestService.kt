@@ -2,9 +2,9 @@ package data.tinkoff.service
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import ru.tinkoff.piapi.contract.v1.Future
-import ru.tinkoff.piapi.contract.v1.LastPrice
-import ru.tinkoff.piapi.contract.v1.Share
+import kotlinx.datetime.Instant
+import kotlinx.datetime.toJavaInstant
+import ru.tinkoff.piapi.contract.v1.*
 import ru.tinkoff.piapi.core.InvestApi
 
 class TinkoffInvestService(private val api: InvestApi) {
@@ -35,6 +35,26 @@ class TinkoffInvestService(private val api: InvestApi) {
     suspend fun getUidsLastPrices(uids: List<String>): List<LastPrice> {
         return withContext(Dispatchers.IO) {
             api.marketDataService.getLastPricesSync(uids)
+        }
+    }
+
+    suspend fun getShareClosePriceHistory(
+        uid: String,
+        from: Instant,
+        to: Instant,
+        interval: CandleInterval
+    ): List<HistoricCandle> {
+        return withContext(Dispatchers.IO) {
+            try {
+                api.marketDataService.getCandlesSync(
+                    uid,
+                    from.toJavaInstant(),
+                    to.toJavaInstant(),
+                    interval
+                )
+            } catch (e: Exception) {
+                emptyList()
+            }
         }
     }
 
