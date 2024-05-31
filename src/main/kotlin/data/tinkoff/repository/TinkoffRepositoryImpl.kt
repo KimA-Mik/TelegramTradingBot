@@ -5,7 +5,8 @@ import data.tinkoff.mappers.*
 import data.tinkoff.service.TinkoffInvestService
 import domain.tinkoff.model.*
 import domain.tinkoff.repository.TinkoffRepository
-import kotlinx.datetime.Instant
+import domain.utils.DateUtil
+import kotlinx.datetime.*
 import ru.tinkoff.piapi.contract.v1.Future
 import ru.tinkoff.piapi.contract.v1.HistoricCandle
 import ru.tinkoff.piapi.contract.v1.LastPrice
@@ -79,6 +80,25 @@ class TinkoffRepositoryImpl(private val service: TinkoffInvestService) : Tinkoff
         } catch (e: Exception) {
             Resource.Error(e.message)
         }
+    }
+
+    override suspend fun getDailyCandles(uid: String): Resource<List<TinkoffCandle>> {
+        val to = Clock.System.now()
+        val from = to.minus(365, DateTimeUnit.DAY, DateUtil.timezoneMoscow)
+        return getShareCandles(
+            uid = uid, from = from, to = to,
+            interval = TinkoffCandleInterval.CANDLE_INTERVAL_DAY
+        )
+    }
+
+    override suspend fun getHourlyCandles(uid: String): Resource<List<TinkoffCandle>> {
+        val to = Clock.System.now().plus(1, DateTimeUnit.HOUR, DateUtil.timezoneMoscow)
+        val from = to.minus(7, DateTimeUnit.DAY, DateUtil.timezoneMoscow)
+
+        return getShareCandles(
+            uid = uid, from = from, to = to,
+            interval = TinkoffCandleInterval.CANDLE_INTERVAL_HOUR
+        )
     }
 
     private suspend fun getTinkoffPriceForUids(uids: List<String>): Resource<List<TinkoffPrice>> {

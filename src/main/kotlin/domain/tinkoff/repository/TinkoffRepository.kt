@@ -16,4 +16,7 @@ interface TinkoffRepository {
         to: Instant,
         interval: TinkoffCandleInterval
     ): Resource<List<TinkoffCandle>>
+
+    suspend fun getDailyCandles(uid: String): Resource<List<TinkoffCandle>>
+    suspend fun getHourlyCandles(uid: String): Resource<List<TinkoffCandle>>
 }
