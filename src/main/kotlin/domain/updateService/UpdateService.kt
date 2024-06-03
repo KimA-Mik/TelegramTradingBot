@@ -61,8 +61,6 @@ class UpdateService(
             delay(MILLIS_MINUTE + delayTime.toLong())
             checkForUpdates()
             delayNonWorkingHours(9, 50, 18, 49)
-
-            delay(10000)
         }
     }
 
