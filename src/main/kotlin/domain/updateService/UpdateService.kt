@@ -18,6 +18,7 @@ import domain.updateService.model.IndicatorCache
 import domain.updateService.model.NotifyFuture
 import domain.updateService.model.NotifyShare
 import domain.updateService.model.UserWithFollowedShares
+import domain.updateService.updates.IndicatorUpdate
 import domain.updateService.updates.SharePriceInsufficientUpdate
 import domain.updateService.updates.ShareUpdate
 import domain.updateService.updates.Update
@@ -60,6 +61,8 @@ class UpdateService(
             delay(MILLIS_MINUTE + delayTime.toLong())
             checkForUpdates()
             delayNonWorkingHours(9, 50, 18, 49)
+
+            delay(10000)
         }
     }
 
@@ -134,7 +137,7 @@ class UpdateService(
         val sharesPrices = when (val res = sharesPricesDeferred.await()) {
             is Resource.Success -> res.data!!.associateBy { it.uid }
             is Resource.Error -> {
-                logger.info("Unable to load futures prices: ${res.message}")
+                logger.info("Unable to load shares prices: ${res.message}")
                 return@supervisorScope
             }
         }
@@ -197,8 +200,8 @@ class UpdateService(
             }
 
             val shouldNotify = futuresToNotify.isNotEmpty()
-            if (share.notified == shouldNotify) return@forEach
-            handled.add(share.copy(notified = shouldNotify))
+            if (share.futuresNotified == shouldNotify) return@forEach
+            handled.add(share.copy(futuresNotified = shouldNotify))
             val notifyShare = NotifyShare(
                 shareTicker = share.ticker,
                 sharePrice = sharePrice.price,
@@ -261,7 +264,38 @@ class UpdateService(
 
 
     private suspend fun handleIndicatorsForUser(user: UserWithFollowedShares, cache: IndicatorCache) {
+        for (share in user.shares) {
+            val updateData = mutableListOf<IndicatorUpdate.IndicatorUpdateData>()
+            val dailyRsi = cache.dailyRsiCache[share.ticker] ?: continue
+            val hourlyRsi = cache.hourlyRsiCache[share.ticker] ?: continue
+            val price = cache.prices[share.ticker] ?: continue
 
+            if (dailyRsi > MathUtil.RSI_HIGH && hourlyRsi > MathUtil.RSI_HIGH) {
+                updateData.add(
+                    IndicatorUpdate.IndicatorUpdateData.RsiHighData(
+                        hourlyRse = hourlyRsi,
+                        dailyRsi = dailyRsi
+                    )
+                )
+            } else if (dailyRsi < MathUtil.RSI_LOW && hourlyRsi < MathUtil.RSI_LOW) {
+                updateData.add(
+                    IndicatorUpdate.IndicatorUpdateData.RsiLowData(
+                        hourlyRse = hourlyRsi,
+                        dailyRsi = dailyRsi
+                    )
+                )
+            }
+
+            if (updateData.isNotEmpty()) {
+                val update = IndicatorUpdate(
+                    userId = user.id,
+                    ticker = share.ticker,
+                    price = price,
+                    data = updateData
+                )
+                _updates.emit(update)
+            }
+        }
     }
 
     private suspend fun getSharesPrices(sharesTickers: Iterable<String>): Resource<List<TinkoffPrice>> {

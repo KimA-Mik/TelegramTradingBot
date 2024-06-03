@@ -1,6 +1,9 @@
 package domain.math
 
 object MathUtil {
+    const val RSI_LOW = 30.0
+    const val RSI_HIGH = 70.0
+
     //https://stackoverflow.com/questions/69980426/how-to-get-the-same-rsi-as-tradingview-in-java
     fun calculateRma(values: DoubleArray, period: Int): Double {
         if (values.isEmpty()) {

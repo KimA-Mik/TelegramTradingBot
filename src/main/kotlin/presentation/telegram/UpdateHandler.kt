@@ -1,6 +1,7 @@
 package presentation.telegram
 
 import domain.updateService.UpdateService
+import domain.updateService.updates.IndicatorUpdate
 import domain.updateService.updates.SharePriceInsufficientUpdate
 import domain.updateService.updates.ShareUpdate
 import domain.updateService.updates.Update
@@ -18,7 +19,7 @@ class UpdateHandler(
             updateToScreen(it)
         }
 
-    private fun updateToScreen(update: Update): BotScreen {
+    private fun updateToScreen(update: Update): BotScreen? {
         return when (update) {
             is ShareUpdate -> FuturePriceUpdate(
                 userId = update.userId,
@@ -31,6 +32,8 @@ class UpdateHandler(
                 userId = update.userId,
                 share = update.share
             )
+
+            is IndicatorUpdate -> null
         }
     }
 }
