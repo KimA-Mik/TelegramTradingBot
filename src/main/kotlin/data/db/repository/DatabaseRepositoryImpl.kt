@@ -170,17 +170,16 @@ class DatabaseRepositoryImpl(
                     onColumn = Shares.id, otherColumn = UserShares.shareId,
                     additionalConstraint = { UserShares.userId eq userId }
                 )
-                .select(UserShares.id, Shares.uid, Shares.ticker, Shares.name, UserShares.percent, UserShares.notified)
-                .map {
-                    UserShare(
-                        id = it[UserShares.id].value,
-                        uid = it[Shares.uid],
-                        ticker = it[Shares.ticker],
-                        name = it[Shares.name],
-                        percent = it[UserShares.percent],
-                        notified = it[UserShares.notified]
-                    )
-                }
+                .select(
+                    UserShares.id,
+                    Shares.uid,
+                    Shares.ticker,
+                    Shares.name,
+                    UserShares.percent,
+                    UserShares.notified,
+                    UserShares.indicatorsNotified
+                )
+                .map { it.toFollowedShare() }
         }
     }
 
@@ -229,7 +228,8 @@ class DatabaseRepositoryImpl(
                     Shares.uid,
                     Shares.ticker,
                     UserShares.percent,
-                    UserShares.notified
+                    UserShares.notified,
+                    UserShares.indicatorsNotified
                 )
                 .groupBy { it[Users.id] }
                 .map {
@@ -251,8 +251,9 @@ class DatabaseRepositoryImpl(
             val statement = BatchUpdateStatement(UserShares)
             userShares.forEach {
                 statement.addBatch(EntityID(id = it.id, UserShares))
-                statement[UserShares.notified] = it.notified
+                statement[UserShares.notified] = it.futuresNotified
                 statement[UserShares.percent] = it.percent
+                statement[UserShares.indicatorsNotified] = it.indicatorsNotified
             }
 
             try {
@@ -270,7 +271,8 @@ class DatabaseRepositoryImpl(
             ticker = this[Shares.ticker],
             name = this[Shares.name],
             percent = this[UserShares.percent],
-            notified = this[UserShares.notified],
+            futuresNotified = this[UserShares.notified],
+            indicatorsNotified = this[UserShares.indicatorsNotified]
         )
     }
 

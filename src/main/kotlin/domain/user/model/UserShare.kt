@@ -6,5 +6,6 @@ data class UserShare(
     val ticker: String,
     val name: String,
     val percent: Double,
-    val notified: Boolean
+    val futuresNotified: Boolean,
+    val indicatorsNotified: Boolean
 )
