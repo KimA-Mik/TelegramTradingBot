@@ -224,8 +224,10 @@ class UpdateService(
     }
 
     private suspend fun constructIndicatorCache(shares: List<UserShare>): IndicatorCache {
-        val dailyRsiCache = mutableMapOf<String, Double>()
-        val hourlyRsiCache = mutableMapOf<String, Double>()
+        val prices = HashMap<String, Double>(shares.size)
+        val hourlyRsiCache = HashMap<String, Double>(shares.size)
+        val dailyRsiCache = HashMap<String, Double>(shares.size)
+
 
         for (share in shares) {
             val dailyCandlesResource = tinkoff.getDailyCandles(share.uid)
@@ -246,6 +248,7 @@ class UpdateService(
 
             dailyRsiCache[share.ticker] = MathUtil.calculateRsi(dailyPrices)
             hourlyRsiCache[share.ticker] = MathUtil.calculateRsi(hourlyPrices)
+            prices[share.ticker] = hourlyPrices.last()
 
             delay(10)
         }
