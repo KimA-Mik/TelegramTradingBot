@@ -1,23 +1,23 @@
 package presentation.common.mappers
 
 import domain.math.MathUtil
-import domain.updateService.updates.IndicatorUpdate
+import domain.updateService.updates.IndicatorUpdateData
 import presentation.common.formatAndTrim
 
 object IndicatorUpdateMapper {
-    fun convertToText(data: IndicatorUpdate.IndicatorUpdateData): String {
+    fun convertToText(data: IndicatorUpdateData): String {
         return when (data) {
-            is IndicatorUpdate.IndicatorUpdateData.RsiHighData -> rsiHighDataMapper(data)
-            is IndicatorUpdate.IndicatorUpdateData.RsiLowData -> rsiLowDataMapper(data)
+            is IndicatorUpdateData.RsiHighData -> rsiHighDataMapper(data)
+            is IndicatorUpdateData.RsiLowData -> rsiLowDataMapper(data)
         }
     }
 
-    private fun rsiHighDataMapper(data: IndicatorUpdate.IndicatorUpdateData.RsiHighData): String {
+    private fun rsiHighDataMapper(data: IndicatorUpdateData.RsiHighData): String {
         return "Rsi выше ${MathUtil.RSI_HIGH.formatAndTrim(2)}\n" +
                 onCandles(daily = data.dailyRsi, hourly = data.hourlyRsi)
     }
 
-    private fun rsiLowDataMapper(data: IndicatorUpdate.IndicatorUpdateData.RsiLowData): String {
+    private fun rsiLowDataMapper(data: IndicatorUpdateData.RsiLowData): String {
         return "Rsi ниже ${MathUtil.RSI_LOW.formatAndTrim(2)}\n" +
                 onCandles(daily = data.dailyRsi, hourly = data.hourlyRsi)
     }

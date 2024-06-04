@@ -1,7 +1,7 @@
 package presentation.telegram.indicatorUpdate
 
 import com.github.kotlintelegrambot.entities.ParseMode
-import domain.updateService.updates.IndicatorUpdate
+import domain.updateService.updates.IndicatorUpdateData
 import presentation.common.MarkdownUtil
 import presentation.common.TinInvestUtil
 import presentation.common.formatAndTrim
@@ -14,7 +14,7 @@ class IndicatorsUpdateScreen(
     messageId: Long? = null,
     ticker: String,
     price: Double,
-    updateData: List<IndicatorUpdate.IndicatorUpdateData>
+    updateData: List<IndicatorUpdateData>
 ) : BotScreen(userId, messageId) {
     override val text: String
     override val replyMarkup = null

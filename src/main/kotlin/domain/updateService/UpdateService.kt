@@ -11,17 +11,18 @@ import domain.tinkoff.model.TinkoffPrice
 import domain.tinkoff.model.TinkoffShare
 import domain.tinkoff.repository.TinkoffRepository
 import domain.tinkoff.util.TinkoffFutureComparator
-import domain.updateService.agentUpdates.AgentSharePriceInsufficientUpdate
-import domain.updateService.agentUpdates.AgentShareUpdate
-import domain.updateService.agentUpdates.AgentUpdate
 import domain.updateService.model.IndicatorCache
 import domain.updateService.model.NotifyFuture
 import domain.updateService.model.NotifyShare
 import domain.updateService.model.UserWithFollowedShares
-import domain.updateService.updates.IndicatorUpdate
-import domain.updateService.updates.SharePriceInsufficientUpdate
-import domain.updateService.updates.ShareUpdate
-import domain.updateService.updates.Update
+import domain.updateService.updates.IndicatorUpdateData
+import domain.updateService.updates.agentUpdates.AgentSharePriceInsufficientUpdate
+import domain.updateService.updates.agentUpdates.AgentShareUpdate
+import domain.updateService.updates.agentUpdates.AgentUpdate
+import domain.updateService.updates.telegramUpdates.IndicatorUpdate
+import domain.updateService.updates.telegramUpdates.SharePriceInsufficientUpdate
+import domain.updateService.updates.telegramUpdates.ShareUpdate
+import domain.updateService.updates.telegramUpdates.Update
 import domain.user.model.UserShare
 import domain.user.repository.DatabaseRepository
 import domain.utils.DateUtil
@@ -265,21 +266,21 @@ class UpdateService(
         val handled = mutableListOf<UserShare>()
 
         for (share in user.shares) {
-            val updateData = mutableListOf<IndicatorUpdate.IndicatorUpdateData>()
+            val updateData = mutableListOf<IndicatorUpdateData>()
             val dailyRsi = cache.dailyRsiCache[share.ticker] ?: continue
             val hourlyRsi = cache.hourlyRsiCache[share.ticker] ?: continue
             val price = cache.prices[share.ticker] ?: continue
 
             if (dailyRsi > MathUtil.RSI_HIGH && hourlyRsi > MathUtil.RSI_HIGH) {
                 updateData.add(
-                    IndicatorUpdate.IndicatorUpdateData.RsiHighData(
+                    IndicatorUpdateData.RsiHighData(
                         hourlyRsi = hourlyRsi,
                         dailyRsi = dailyRsi
                     )
                 )
             } else if (dailyRsi < MathUtil.RSI_LOW && hourlyRsi < MathUtil.RSI_LOW) {
                 updateData.add(
-                    IndicatorUpdate.IndicatorUpdateData.RsiLowData(
+                    IndicatorUpdateData.RsiLowData(
                         hourlyRsi = hourlyRsi,
                         dailyRsi = dailyRsi
                     )
@@ -300,6 +301,10 @@ class UpdateService(
                     data = updateData
                 )
                 _updates.emit(update)
+
+                if (user.agentNotifications) {
+
+                }
             }
         }
         database.updateUserShares(handled)

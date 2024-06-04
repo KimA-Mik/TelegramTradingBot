@@ -1,4 +1,4 @@
-package domain.updateService.updates
+package domain.updateService.updates.telegramUpdates
 
 import domain.updateService.model.NotifyShare
 

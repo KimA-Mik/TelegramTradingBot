@@ -1,10 +1,10 @@
 package presentation.telegram
 
 import domain.updateService.UpdateService
-import domain.updateService.updates.IndicatorUpdate
-import domain.updateService.updates.SharePriceInsufficientUpdate
-import domain.updateService.updates.ShareUpdate
-import domain.updateService.updates.Update
+import domain.updateService.updates.telegramUpdates.IndicatorUpdate
+import domain.updateService.updates.telegramUpdates.SharePriceInsufficientUpdate
+import domain.updateService.updates.telegramUpdates.ShareUpdate
+import domain.updateService.updates.telegramUpdates.Update
 import kotlinx.coroutines.flow.mapNotNull
 import presentation.telegram.indicatorUpdate.IndicatorsUpdateScreen
 import presentation.telegram.screens.BotScreen
