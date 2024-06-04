@@ -7,4 +7,5 @@ object UserShares : LongIdTable() {
     val userId = long("userId")
     val shareId = long("shareId")
     val notified = bool("notified")
+    val indicatorsNotified = bool("indicators_notified").default(false)
 }

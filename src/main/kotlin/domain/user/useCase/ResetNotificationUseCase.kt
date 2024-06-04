@@ -10,9 +10,9 @@ class ResetNotificationUseCase(
         val share = shares.find { it.ticker == shareTicker }
             ?: return false
 
-        if (!share.notified) return false
+        if (!share.futuresNotified) return false
 
-        val updatedShare = share.copy(notified = false)
+        val updatedShare = share.copy(futuresNotified = false)
         database.updateUserShares(listOf(updatedShare))
 
         return true

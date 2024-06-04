@@ -1,4 +1,4 @@
-package domain.updateService.agentUpdates
+package domain.updateService.updates.agentUpdates
 
 import domain.updateService.model.NotifyShare
 

@@ -1,16 +1,14 @@
 package data.tinkoff.repository
 
 import Resource
-import data.tinkoff.mappers.toTinkoffFuture
-import data.tinkoff.mappers.toTinkoffPrice
-import data.tinkoff.mappers.toTinkoffSecurity
+import data.tinkoff.mappers.*
 import data.tinkoff.service.TinkoffInvestService
-import domain.tinkoff.model.SecurityType
-import domain.tinkoff.model.TinkoffFuture
-import domain.tinkoff.model.TinkoffPrice
-import domain.tinkoff.model.TinkoffShare
+import domain.tinkoff.model.*
 import domain.tinkoff.repository.TinkoffRepository
+import domain.utils.DateUtil
+import kotlinx.datetime.*
 import ru.tinkoff.piapi.contract.v1.Future
+import ru.tinkoff.piapi.contract.v1.HistoricCandle
 import ru.tinkoff.piapi.contract.v1.LastPrice
 
 class TinkoffRepositoryImpl(private val service: TinkoffInvestService) : TinkoffRepository {
@@ -58,6 +56,49 @@ class TinkoffRepositoryImpl(private val service: TinkoffInvestService) : Tinkoff
         }
 
         return SecurityType.NONE
+    }
+
+    override suspend fun getShareCandles(
+        uid: String,
+        from: Instant,
+        to: Instant,
+        interval: TinkoffCandleInterval
+    ): Resource<List<TinkoffCandle>> {
+        return try {
+            val candles = service.getShareClosePriceHistory(
+                uid = uid,
+                from = from,
+                to = to,
+                interval = interval.toCandleInterval()
+            ).map(HistoricCandle::toTinkoffCandle)
+
+            if (candles.isEmpty()) {
+                Resource.Error("")
+            } else {
+                Resource.Success(candles)
+            }
+        } catch (e: Exception) {
+            Resource.Error(e.message)
+        }
+    }
+
+    override suspend fun getDailyCandles(uid: String): Resource<List<TinkoffCandle>> {
+        val to = Clock.System.now()
+        val from = to.minus(365, DateTimeUnit.DAY, DateUtil.timezoneMoscow)
+        return getShareCandles(
+            uid = uid, from = from, to = to,
+            interval = TinkoffCandleInterval.CANDLE_INTERVAL_DAY
+        )
+    }
+
+    override suspend fun getHourlyCandles(uid: String): Resource<List<TinkoffCandle>> {
+        val to = Clock.System.now().plus(1, DateTimeUnit.HOUR, DateUtil.timezoneMoscow)
+        val from = to.minus(7, DateTimeUnit.DAY, DateUtil.timezoneMoscow)
+
+        return getShareCandles(
+            uid = uid, from = from, to = to,
+            interval = TinkoffCandleInterval.CANDLE_INTERVAL_HOUR
+        )
     }
 
     private suspend fun getTinkoffPriceForUids(uids: List<String>): Resource<List<TinkoffPrice>> {

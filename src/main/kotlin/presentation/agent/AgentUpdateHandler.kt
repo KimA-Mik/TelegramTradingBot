@@ -1,17 +1,19 @@
 package presentation.agent
 
 import domain.updateService.UpdateService
-import domain.updateService.agentUpdates.AgentSharePriceInsufficientUpdate
-import domain.updateService.agentUpdates.AgentShareUpdate
-import domain.updateService.agentUpdates.AgentUpdate
-import kotlinx.coroutines.flow.map
+import domain.updateService.updates.agentUpdates.AgentIndicatorUpdate
+import domain.updateService.updates.agentUpdates.AgentSharePriceInsufficientUpdate
+import domain.updateService.updates.agentUpdates.AgentShareUpdate
+import domain.updateService.updates.agentUpdates.AgentUpdate
+import kotlinx.coroutines.flow.mapNotNull
+import presentation.agent.updates.AgentIndicatorUpdateScreen
 import presentation.agent.updates.AgentSharePriceInsufficientUpdateScreen
 import presentation.agent.updates.AgentShareUpdateScreen
 
 class AgentUpdateHandler(
     updateService: UpdateService
 ) {
-    val updateScreens = updateService.agentUpdates.map {
+    val updateScreens = updateService.agentUpdates.mapNotNull {
         it.toScreen()
     }
 
@@ -25,6 +27,13 @@ class AgentUpdateHandler(
             is AgentShareUpdate -> AgentShareUpdateScreen(
                 chatId = chatId,
                 share = share
+            )
+
+            is AgentIndicatorUpdate -> AgentIndicatorUpdateScreen(
+                chatId = chatId,
+                ticker = ticker,
+                price = price,
+                updateData = data
             )
         }
     }
