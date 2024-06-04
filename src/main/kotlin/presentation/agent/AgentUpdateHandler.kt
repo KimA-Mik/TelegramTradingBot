@@ -6,6 +6,7 @@ import domain.updateService.updates.agentUpdates.AgentSharePriceInsufficientUpda
 import domain.updateService.updates.agentUpdates.AgentShareUpdate
 import domain.updateService.updates.agentUpdates.AgentUpdate
 import kotlinx.coroutines.flow.mapNotNull
+import presentation.agent.updates.AgentIndicatorUpdateScreen
 import presentation.agent.updates.AgentSharePriceInsufficientUpdateScreen
 import presentation.agent.updates.AgentShareUpdateScreen
 
@@ -16,7 +17,7 @@ class AgentUpdateHandler(
         it.toScreen()
     }
 
-    private fun AgentUpdate.toScreen(): AgentScreen? {
+    private fun AgentUpdate.toScreen(): AgentScreen {
         return when (this) {
             is AgentSharePriceInsufficientUpdate -> AgentSharePriceInsufficientUpdateScreen(
                 chatId = chatId,
@@ -28,7 +29,12 @@ class AgentUpdateHandler(
                 share = share
             )
 
-            is AgentIndicatorUpdate -> null
+            is AgentIndicatorUpdate -> AgentIndicatorUpdateScreen(
+                chatId = chatId,
+                ticker = ticker,
+                price = price,
+                updateData = data
+            )
         }
     }
 }
