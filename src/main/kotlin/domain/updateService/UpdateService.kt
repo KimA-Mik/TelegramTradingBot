@@ -16,6 +16,7 @@ import domain.updateService.model.NotifyFuture
 import domain.updateService.model.NotifyShare
 import domain.updateService.model.UserWithFollowedShares
 import domain.updateService.updates.IndicatorUpdateData
+import domain.updateService.updates.agentUpdates.AgentIndicatorUpdate
 import domain.updateService.updates.agentUpdates.AgentSharePriceInsufficientUpdate
 import domain.updateService.updates.agentUpdates.AgentShareUpdate
 import domain.updateService.updates.agentUpdates.AgentUpdate
@@ -302,8 +303,14 @@ class UpdateService(
                 )
                 _updates.emit(update)
 
-                if (user.agentNotifications) {
-
+                if (user.agentNotifications && user.agentChatId != null) {
+                    val agentUpdate = AgentIndicatorUpdate(
+                        chatId = user.agentChatId,
+                        ticker = share.ticker,
+                        price = price,
+                        data = updateData
+                    )
+                    _agentUpdates.emit(agentUpdate)
                 }
             }
         }
