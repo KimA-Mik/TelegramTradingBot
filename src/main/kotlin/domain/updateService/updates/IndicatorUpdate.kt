@@ -2,9 +2,9 @@ package domain.updateService.updates
 
 class IndicatorUpdate(
     userId: Long,
-    private val ticker: String,
-    private val price: Double,
-    private val data: List<IndicatorUpdateData>
+    val ticker: String,
+    val price: Double,
+    val data: List<IndicatorUpdateData>
 ) : Update(userId) {
 
     sealed interface IndicatorUpdateData {

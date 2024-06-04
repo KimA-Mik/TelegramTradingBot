@@ -6,6 +6,7 @@ import domain.updateService.updates.SharePriceInsufficientUpdate
 import domain.updateService.updates.ShareUpdate
 import domain.updateService.updates.Update
 import kotlinx.coroutines.flow.mapNotNull
+import presentation.telegram.indicatorUpdate.IndicatorsUpdateScreen
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.FuturePriceInsufficientUpdate
 import presentation.telegram.screens.FuturePriceUpdate
@@ -19,7 +20,7 @@ class UpdateHandler(
             updateToScreen(it)
         }
 
-    private fun updateToScreen(update: Update): BotScreen? {
+    private fun updateToScreen(update: Update): BotScreen {
         return when (update) {
             is ShareUpdate -> FuturePriceUpdate(
                 userId = update.userId,
@@ -33,7 +34,12 @@ class UpdateHandler(
                 share = update.share
             )
 
-            is IndicatorUpdate -> null
+            is IndicatorUpdate -> IndicatorsUpdateScreen(
+                userId = update.userId,
+                ticker = update.ticker,
+                price = update.price,
+                updateData = update.data
+            )
         }
     }
 }
