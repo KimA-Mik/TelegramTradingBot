@@ -6,10 +6,10 @@ import domain.updateService.updates.telegramUpdates.TelegramSharePriceInsufficie
 import domain.updateService.updates.telegramUpdates.TelegramShareUpdate
 import domain.updateService.updates.telegramUpdates.TelegramUpdate
 import kotlinx.coroutines.flow.mapNotNull
-import presentation.telegram.indicatorUpdate.IndicatorsUpdateScreen
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.FuturePriceInsufficientUpdate
 import presentation.telegram.screens.FuturePriceUpdate
+import presentation.telegram.updates.indicatorUpdate.IndicatorsUpdateScreen
 
 class UpdateHandler(
     service: UpdateService

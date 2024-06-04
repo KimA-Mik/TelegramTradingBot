@@ -1,4 +1,4 @@
-package presentation.telegram.indicatorUpdate
+package presentation.telegram.updates.indicatorUpdate
 
 import com.github.kotlintelegrambot.entities.ParseMode
 import domain.updateService.updates.IndicatorUpdateData
