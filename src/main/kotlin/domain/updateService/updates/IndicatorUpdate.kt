@@ -8,7 +8,7 @@ class IndicatorUpdate(
 ) : Update(userId) {
 
     sealed interface IndicatorUpdateData {
-        data class RsiHighData(val hourlyRse: Double, val dailyRsi: Double) : IndicatorUpdateData
-        data class RsiLowData(val hourlyRse: Double, val dailyRsi: Double) : IndicatorUpdateData
+        data class RsiHighData(val hourlyRsi: Double, val dailyRsi: Double) : IndicatorUpdateData
+        data class RsiLowData(val hourlyRsi: Double, val dailyRsi: Double) : IndicatorUpdateData
     }
 }

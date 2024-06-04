@@ -271,14 +271,14 @@ class UpdateService(
             if (dailyRsi > MathUtil.RSI_HIGH && hourlyRsi > MathUtil.RSI_HIGH) {
                 updateData.add(
                     IndicatorUpdate.IndicatorUpdateData.RsiHighData(
-                        hourlyRse = hourlyRsi,
+                        hourlyRsi = hourlyRsi,
                         dailyRsi = dailyRsi
                     )
                 )
             } else if (dailyRsi < MathUtil.RSI_LOW && hourlyRsi < MathUtil.RSI_LOW) {
                 updateData.add(
                     IndicatorUpdate.IndicatorUpdateData.RsiLowData(
-                        hourlyRse = hourlyRsi,
+                        hourlyRsi = hourlyRsi,
                         dailyRsi = dailyRsi
                     )
                 )
