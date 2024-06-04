@@ -2,7 +2,7 @@ package domain.updateService.updates.telegramUpdates
 
 import domain.updateService.updates.IndicatorUpdateData
 
-class IndicatorTelegramUpdate(
+class TelegramIndicatorUpdate(
     userId: Long,
     val ticker: String,
     val price: Double,

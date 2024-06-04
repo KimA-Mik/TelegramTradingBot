@@ -19,9 +19,9 @@ import domain.updateService.updates.IndicatorUpdateData
 import domain.updateService.updates.agentUpdates.AgentSharePriceInsufficientUpdate
 import domain.updateService.updates.agentUpdates.AgentShareUpdate
 import domain.updateService.updates.agentUpdates.AgentUpdate
-import domain.updateService.updates.telegramUpdates.IndicatorTelegramUpdate
-import domain.updateService.updates.telegramUpdates.SharePriceInsufficientTelegramUpdate
-import domain.updateService.updates.telegramUpdates.ShareTelegramUpdate
+import domain.updateService.updates.telegramUpdates.TelegramIndicatorUpdate
+import domain.updateService.updates.telegramUpdates.TelegramSharePriceInsufficientUpdate
+import domain.updateService.updates.telegramUpdates.TelegramShareUpdate
 import domain.updateService.updates.telegramUpdates.TelegramUpdate
 import domain.user.model.UserShare
 import domain.user.repository.DatabaseRepository
@@ -208,9 +208,9 @@ class UpdateService(
                 futures = futuresToNotify
             )
             val update = if (shouldNotify)
-                ShareTelegramUpdate(userId = user.id, share = notifyShare)
+                TelegramShareUpdate(userId = user.id, share = notifyShare)
             else
-                SharePriceInsufficientTelegramUpdate(userId = user.id, share = notifyShare)
+                TelegramSharePriceInsufficientUpdate(userId = user.id, share = notifyShare)
             _updates.emit(update)
 
             if (user.agentNotifications && user.agentChatId != null) {
@@ -294,7 +294,7 @@ class UpdateService(
             handled.add(handledShare)
 
             if (shouldNotify) {
-                val update = IndicatorTelegramUpdate(
+                val update = TelegramIndicatorUpdate(
                     userId = user.id,
                     ticker = share.ticker,
                     price = price,

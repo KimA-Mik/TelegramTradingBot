@@ -1,9 +1,9 @@
 package presentation.telegram
 
 import domain.updateService.UpdateService
-import domain.updateService.updates.telegramUpdates.IndicatorTelegramUpdate
-import domain.updateService.updates.telegramUpdates.SharePriceInsufficientTelegramUpdate
-import domain.updateService.updates.telegramUpdates.ShareTelegramUpdate
+import domain.updateService.updates.telegramUpdates.TelegramIndicatorUpdate
+import domain.updateService.updates.telegramUpdates.TelegramSharePriceInsufficientUpdate
+import domain.updateService.updates.telegramUpdates.TelegramShareUpdate
 import domain.updateService.updates.telegramUpdates.TelegramUpdate
 import kotlinx.coroutines.flow.mapNotNull
 import presentation.telegram.indicatorUpdate.IndicatorsUpdateScreen
@@ -22,19 +22,19 @@ class UpdateHandler(
 
     private fun updateToScreen(update: TelegramUpdate): BotScreen {
         return when (update) {
-            is ShareTelegramUpdate -> FuturePriceUpdate(
+            is TelegramShareUpdate -> FuturePriceUpdate(
                 userId = update.userId,
                 state = FuturePriceUpdate.State.ShowUpdate(
                     share = update.share
                 )
             )
 
-            is SharePriceInsufficientTelegramUpdate -> FuturePriceInsufficientUpdate(
+            is TelegramSharePriceInsufficientUpdate -> FuturePriceInsufficientUpdate(
                 userId = update.userId,
                 share = update.share
             )
 
-            is IndicatorTelegramUpdate -> IndicatorsUpdateScreen(
+            is TelegramIndicatorUpdate -> IndicatorsUpdateScreen(
                 userId = update.userId,
                 ticker = update.ticker,
                 price = update.price,
