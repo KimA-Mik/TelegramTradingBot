@@ -19,10 +19,10 @@ import domain.updateService.updates.IndicatorUpdateData
 import domain.updateService.updates.agentUpdates.AgentSharePriceInsufficientUpdate
 import domain.updateService.updates.agentUpdates.AgentShareUpdate
 import domain.updateService.updates.agentUpdates.AgentUpdate
-import domain.updateService.updates.telegramUpdates.IndicatorUpdate
-import domain.updateService.updates.telegramUpdates.SharePriceInsufficientUpdate
-import domain.updateService.updates.telegramUpdates.ShareUpdate
-import domain.updateService.updates.telegramUpdates.Update
+import domain.updateService.updates.telegramUpdates.IndicatorTelegramUpdate
+import domain.updateService.updates.telegramUpdates.SharePriceInsufficientTelegramUpdate
+import domain.updateService.updates.telegramUpdates.ShareTelegramUpdate
+import domain.updateService.updates.telegramUpdates.TelegramUpdate
 import domain.user.model.UserShare
 import domain.user.repository.DatabaseRepository
 import domain.utils.DateUtil
@@ -41,7 +41,7 @@ class UpdateService(
     private val database: DatabaseRepository,
     private val tinkoff: TinkoffRepository
 ) {
-    private val _updates = MutableSharedFlow<Update>()
+    private val _updates = MutableSharedFlow<TelegramUpdate>()
     val updates = _updates.asSharedFlow()
 
     private val _agentUpdates = MutableSharedFlow<AgentUpdate>()
@@ -208,9 +208,9 @@ class UpdateService(
                 futures = futuresToNotify
             )
             val update = if (shouldNotify)
-                ShareUpdate(userId = user.id, share = notifyShare)
+                ShareTelegramUpdate(userId = user.id, share = notifyShare)
             else
-                SharePriceInsufficientUpdate(userId = user.id, share = notifyShare)
+                SharePriceInsufficientTelegramUpdate(userId = user.id, share = notifyShare)
             _updates.emit(update)
 
             if (user.agentNotifications && user.agentChatId != null) {
@@ -294,7 +294,7 @@ class UpdateService(
             handled.add(handledShare)
 
             if (shouldNotify) {
-                val update = IndicatorUpdate(
+                val update = IndicatorTelegramUpdate(
                     userId = user.id,
                     ticker = share.ticker,
                     price = price,

@@ -2,7 +2,7 @@ package domain.updateService.updates.telegramUpdates
 
 import domain.updateService.model.NotifyShare
 
-class ShareUpdate(
+class ShareTelegramUpdate(
     userId: Long,
     val share: NotifyShare
-) : Update(userId)
+) : TelegramUpdate(userId)

@@ -1,3 +1,3 @@
 package domain.updateService.updates.telegramUpdates
 
-sealed class Update(val userId: Long)
+sealed class TelegramUpdate(val userId: Long)
