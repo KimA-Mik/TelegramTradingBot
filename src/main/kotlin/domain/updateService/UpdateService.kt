@@ -262,6 +262,8 @@ class UpdateService(
 
 
     private suspend fun handleIndicatorsForUser(user: UserWithFollowedShares, cache: IndicatorCache) {
+        val handled = mutableListOf<UserShare>()
+
         for (share in user.shares) {
             val updateData = mutableListOf<IndicatorUpdate.IndicatorUpdateData>()
             val dailyRsi = cache.dailyRsiCache[share.ticker] ?: continue
@@ -284,7 +286,13 @@ class UpdateService(
                 )
             }
 
-            if (updateData.isNotEmpty()) {
+            val shouldNotify = updateData.isNotEmpty()
+            //TODO: Make more flexible system
+            if (shouldNotify == share.indicatorsNotified) continue
+            val handledShare = share.copy(indicatorsNotified = shouldNotify)
+            handled.add(handledShare)
+
+            if (shouldNotify) {
                 val update = IndicatorUpdate(
                     userId = user.id,
                     ticker = share.ticker,
@@ -294,6 +302,7 @@ class UpdateService(
                 _updates.emit(update)
             }
         }
+        database.updateUserShares(handled)
     }
 
     private suspend fun getSharesPrices(sharesTickers: Iterable<String>): Resource<List<TinkoffPrice>> {
