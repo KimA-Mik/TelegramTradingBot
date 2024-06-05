@@ -38,8 +38,39 @@ object MathUtil {
         val upsRma = calculateRma(ups, period)
         val downsRma = calculateRma(downs, period)
 
+        if (downsRma == 0.0) {
+            return 0.0
+        }
+
         val rs = upsRma / downsRma
         val rsi = 100.0 - (100.0 / (1.0 + rs))
         return rsi
+    }
+
+    fun calculateStochasticRsi(values: DoubleArray, period: Int = 14): Double {
+        if (values.isEmpty() || values.size <= period) {
+            return 0.0
+        }
+
+        var prices = values
+        val rsi = DoubleArray(period)
+        for (i in 0 until period) {
+            rsi[rsi.size - 1 - i] = calculateRsi(prices, period)
+
+            val temp = DoubleArray(prices.size - 1)
+            for (j in temp.indices) {
+                temp[j] = prices[j]
+            }
+            prices = temp
+        }
+
+        val highest = rsi.max()
+        val lowest = rsi.min()
+        val denominator = (highest - lowest)
+
+        if (denominator == 0.0) {
+            return 0.0
+        }
+        return (rsi.last() - lowest) / denominator
     }
 }
