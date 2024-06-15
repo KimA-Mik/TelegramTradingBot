@@ -32,6 +32,9 @@ dependencies {
     implementation("org.xerial:sqlite-jdbc:3.46.0.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
+
+    val ta4jVersion: String by project
+    implementation("org.ta4j:ta4j-core:$ta4jVersion")
 }
 
 tasks.test {
