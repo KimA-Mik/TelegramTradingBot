@@ -257,6 +257,7 @@ class UpdateService(
         }
 
         return IndicatorCache(
+            prices = prices,
             hourlyRsiCache = hourlyRsiCache,
             dailyRsiCache = dailyRsiCache
         )

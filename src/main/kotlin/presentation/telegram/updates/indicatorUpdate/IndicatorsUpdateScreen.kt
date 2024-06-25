@@ -19,6 +19,7 @@ class IndicatorsUpdateScreen(
     override val text: String
     override val replyMarkup = null
     override val parseMode = ParseMode.MARKDOWN
+    override val disableWebPagePreview = true
 
     init {
         val tickerUrl = TinInvestUtil.shareUrl(ticker)
