@@ -89,10 +89,10 @@ class TinkoffInvestService(private val api: InvestApi) {
             if (shares.isNotEmpty()) {
                 tradableShares = shares.associateBy { it.ticker }
                 errorsCount = 0L
-                delay(24L * TimeUtil.HOURS_MILLIS)
+                delay(24L * TimeUtil.HOUR_MILLIS)
             } else {
                 errorsCount++
-                delay(errorsCount * TimeUtil.MINUTES_MILLIS)
+                delay(errorsCount * TimeUtil.MINUTE_MILLIS)
             }
         }
     }
@@ -113,10 +113,10 @@ class TinkoffInvestService(private val api: InvestApi) {
                 tradableFutures = futures.associateBy { it.ticker }
                 sharesToFurures = futures.groupBy { it.basicAsset }
                 errorsCount = 0L
-                delay(24L * TimeUtil.HOURS_MILLIS)
+                delay(24L * TimeUtil.HOUR_MILLIS)
             } else {
                 errorsCount++
-                delay(errorsCount * TimeUtil.MINUTES_MILLIS)
+                delay(errorsCount * TimeUtil.MINUTE_MILLIS)
             }
         }
     }
