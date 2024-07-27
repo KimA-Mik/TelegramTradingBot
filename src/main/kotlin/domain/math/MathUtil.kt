@@ -4,6 +4,8 @@ object MathUtil {
     const val RSI_LOW = 30.0
     const val RSI_HIGH = 70.0
 
+    const val ORDER_BOOK_DEPTH = 20
+
     //https://stackoverflow.com/questions/69980426/how-to-get-the-same-rsi-as-tradingview-in-java
     fun calculateRma(values: DoubleArray, period: Int): Double {
         if (values.isEmpty()) {

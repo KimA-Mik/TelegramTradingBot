@@ -1,7 +1,10 @@
 package data.tinkoff.service
 
+import Resource
+import domain.math.MathUtil
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.future.asDeferred
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toJavaInstant
 import ru.tinkoff.piapi.contract.v1.*
@@ -55,6 +58,19 @@ class TinkoffInvestService(private val api: InvestApi) {
             } catch (e: Exception) {
                 emptyList()
             }
+        }
+    }
+
+    suspend fun getOrderBook(uid: String, depth: Int = MathUtil.ORDER_BOOK_DEPTH): Resource<GetOrderBookResponse> {
+        return try {
+            val response = api
+                .marketDataService
+                .getOrderBook(uid, depth)
+                .asDeferred()
+                .await()
+            Resource.Success(response)
+        } catch (e: Exception) {
+            Resource.Error(e.message)
         }
     }
 
