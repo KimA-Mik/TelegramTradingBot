@@ -226,11 +226,27 @@ class UpdateService(
         database.updateUserShares(handled)
     }
 
-    private suspend fun constructIndicatorCache(shares: List<UserShare>): IndicatorCache {
-        val prices = HashMap<String, Double>(shares.size)
+    private suspend fun constructCache(usersWithFollowedShares: List<UserWithFollowedShares>): Cache? {
+        if (usersWithFollowedShares.isEmpty()) return null
+
+        val shares = extractUniqueShares(usersWithFollowedShares)
+        val sharesPricesCache = HashMap<String, TinkoffCandle>(shares.size)
         val hourlyRsiCache = HashMap<String, Double>(shares.size)
         val dailyRsiCache = HashMap<String, Double>(shares.size)
 
+        val sharesTickers = shares.map { it.ticker }
+
+        val sharesToFutures = sharesTickers.associateBy({ it }, {
+            val temp = TinkoffShare(ticker = it)
+            val resource = tinkoff.getSecurityFutures(temp)
+            resource
+                .data
+                ?.sortedWith(TinkoffFutureComparator)
+//                ?.take(4)
+                ?: emptyList()
+        })
+
+        val futuresList = sharesToFutures.flatMap { it.value }
 
         for (share in shares) {
             val dailyCandlesResource = tinkoff.getDailyCandles(share.uid)
@@ -251,13 +267,27 @@ class UpdateService(
 
             dailyRsiCache[share.ticker] = MathUtil.calculateRsi(dailyPrices)
             hourlyRsiCache[share.ticker] = MathUtil.calculateRsi(hourlyPrices)
-            prices[share.ticker] = hourlyPrices.last()
+            sharesPricesCache[share.ticker] = hourlyCandles.last()
 
             delay(10)
         }
 
-        return IndicatorCache(
-            prices = prices,
+
+        val futuresPrice = mutableMapOf<String, TinkoffCandle>()
+        for (future in futuresList) {
+            val hourlyCandlesResource = tinkoff.getHourlyCandles(future.uid)
+            if (hourlyCandlesResource.data.isNullOrEmpty()) {
+                logger.info("Unable to get hourly candles for future ${future.ticker} because of ${hourlyCandlesResource.message}")
+                continue
+            }
+            futuresPrice[future.ticker] = hourlyCandlesResource.data.last()
+            delay(10)
+        }
+
+        return Cache(
+            shares = sharesPricesCache,
+            sharesToFutures = sharesToFutures,
+            futures = futuresPrice,
             hourlyRsiCache = hourlyRsiCache,
             dailyRsiCache = dailyRsiCache
         )
