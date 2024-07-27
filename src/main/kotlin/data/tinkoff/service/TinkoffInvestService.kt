@@ -2,6 +2,7 @@ package data.tinkoff.service
 
 import Resource
 import domain.math.MathUtil
+import domain.utils.TimeUtil
 import kotlinx.coroutines.*
 import kotlinx.coroutines.future.asDeferred
 import kotlinx.datetime.Instant
@@ -88,10 +89,10 @@ class TinkoffInvestService(private val api: InvestApi) {
             if (shares.isNotEmpty()) {
                 tradableShares = shares.associateBy { it.ticker }
                 errorsCount = 0L
-                delay(24L * HOURS)
+                delay(24L * TimeUtil.HOURS_MILLIS)
             } else {
                 errorsCount++
-                delay(errorsCount * MINUTES)
+                delay(errorsCount * TimeUtil.MINUTES_MILLIS)
             }
         }
     }
@@ -112,18 +113,11 @@ class TinkoffInvestService(private val api: InvestApi) {
                 tradableFutures = futures.associateBy { it.ticker }
                 sharesToFurures = futures.groupBy { it.basicAsset }
                 errorsCount = 0L
-                delay(24L * HOURS)
+                delay(24L * TimeUtil.HOURS_MILLIS)
             } else {
                 errorsCount++
-                delay(errorsCount * MINUTES)
+                delay(errorsCount * TimeUtil.MINUTES_MILLIS)
             }
         }
-    }
-
-    companion object {
-        private const val MILLIS = 1000L
-        private const val SECONDS = 60L * MILLIS
-        private const val MINUTES = 60L * SECONDS
-        private const val HOURS = 60L * MINUTES
     }
 }
