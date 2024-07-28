@@ -11,7 +11,7 @@ import domain.tinkoff.model.TinkoffPrice
 import domain.tinkoff.model.TinkoffShare
 import domain.tinkoff.repository.TinkoffRepository
 import domain.tinkoff.util.TinkoffFutureComparator
-import domain.updateService.model.IndicatorCache
+import domain.updateService.model.Cache
 import domain.updateService.model.NotifyFuture
 import domain.updateService.model.NotifyShare
 import domain.updateService.model.UserWithFollowedShares
@@ -28,6 +28,7 @@ import domain.user.model.UserShare
 import domain.user.repository.DatabaseRepository
 import domain.utils.DateUtil
 import domain.utils.FuturesUtil
+import domain.utils.TimeUtil
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -36,7 +37,6 @@ import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.toLocalDateTime
 import org.slf4j.LoggerFactory
 import kotlin.math.abs
-import kotlin.random.Random
 
 class UpdateService(
     private val database: DatabaseRepository,
@@ -59,8 +59,8 @@ class UpdateService(
 
     private fun run() = scope.launch {
         while (isActive) {
-            val delayTime = Random.nextFloat() * MILLIS_MINUTE * 2
-            delay(MILLIS_MINUTE + delayTime.toLong())
+//            val delayTime = Random.nextFloat() * MILLIS_MINUTE * 2
+//            delay(MILLIS_MINUTE + delayTime.toLong())
             checkForUpdates()
             delayNonWorkingHours(9, 50, 18, 49)
         }
@@ -103,63 +103,13 @@ class UpdateService(
 
     private suspend fun checkForUpdates() = supervisorScope {
         val usersWithFollowedShares = database.getUsersWithShares()
-        if (usersWithFollowedShares.isEmpty()) return@supervisorScope
 
-        val set = mutableSetOf<UserShare>()
-        usersWithFollowedShares.forEach { userWithFollowedShares ->
-            userWithFollowedShares.shares.forEach { share ->
-                set.add(share)
-            }
-        }
-
-        val shares = set.toList()
-        val sharesTickers = shares.map { it.ticker }
-
-        val sharesPricesDeferred = async {
-            getSharesPrices(sharesTickers)
-        }
-
-        val sharesToFutures = sharesTickers.associateBy({ it }, {
-            val temp = TinkoffShare(ticker = it)
-            val resource = tinkoff.getSecurityFutures(temp)
-            resource
-                .data
-                ?.sortedWith(TinkoffFutureComparator)
-//                ?.take(4)
-                ?: emptyList()
-        })
-
-        val futuresList = sharesToFutures.flatMap { it.value }
-        val futuresPricesDeferred = async {
-            getFuturesPrices(futuresList)
-        }
-
-        val sharesPrices = when (val res = sharesPricesDeferred.await()) {
-            is Resource.Success -> res.data!!.associateBy { it.uid }
-            is Resource.Error -> {
-                logger.info("Unable to load shares prices: ${res.message}")
-                return@supervisorScope
-            }
-        }
-
-        val futuresPrices = when (val res = futuresPricesDeferred.await()) {
-            is Resource.Success -> res.data!!.associateBy { it.uid }
-            is Resource.Error -> {
-                logger.info("Unable to load futures prices: ${res.message}")
-                return@supervisorScope
-            }
-        }
+        val cache = constructCache(usersWithFollowedShares) ?: return@supervisorScope
 
         usersWithFollowedShares.forEach { user ->
-            handleUserFutures(
-                user = user,
-                sharesToFutures = sharesToFutures,
-                sharesPrices = sharesPrices,
-                futuresPrices = futuresPrices
-            )
+            handleUserFutures(user = user, cache = cache)
         }
 
-        val cache = constructIndicatorCache(shares)
         usersWithFollowedShares.forEach {
             handleIndicatorsForUser(user = it, cache = cache)
         }
@@ -167,29 +117,27 @@ class UpdateService(
 
     private suspend fun handleUserFutures(
         user: UserWithFollowedShares,
-        sharesToFutures: Map<String, List<TinkoffFuture>>,
-        sharesPrices: Map<String, TinkoffPrice>,
-        futuresPrices: Map<String, TinkoffPrice>
+        cache: Cache
     ) {
         val handled = mutableListOf<UserShare>()
         logger.info("User id: ${user.id}")
         user.shares.forEach { share ->
-            val sharePrice = sharesPrices[share.uid] ?: return@forEach
-            val futures = sharesToFutures[share.ticker] ?: return@forEach
-            if (futures.isEmpty()) return@forEach
+            val sharePrice = cache.shares[share.ticker] ?: return@forEach
+            val futures = cache.sharesToFutures[share.ticker]
+            if (futures.isNullOrEmpty()) return@forEach
 
             val futuresToNotify = mutableListOf<NotifyFuture>()
             futures.forEach { future ->
-                val futurePrice = futuresPrices.getOrElse(future.uid) { TinkoffPrice() }
-                val futureSlotPrice = getFutureSharePrice(sharePrice.price, futurePrice.price)
-                val percent = percentBetweenDoubles(futureSlotPrice, sharePrice.price)
+                val futurePrice = cache.futures.getOrElse(future.uid) { 0.0 }
+                val futureSlotPrice = getFutureSharePrice(sharePrice, futurePrice)
+                val percent = percentBetweenDoubles(futureSlotPrice, sharePrice)
                 val annualPercent = FuturesUtil.getFutureAnnualPercent(percent, future.expirationDate)
                 if (abs(annualPercent) >= share.percent) {
                     futuresToNotify.add(
                         NotifyFuture(
                             ticker = future.ticker,
                             name = future.name,
-                            price = futurePrice.price,
+                            price = futurePrice,
                             actualDifference = percent,
                             annualPercent = annualPercent,
                             annualAfterTaxes = annualPercent * TAX_MULTIPLIER,
@@ -204,7 +152,7 @@ class UpdateService(
             handled.add(share.copy(futuresNotified = shouldNotify))
             val notifyShare = NotifyShare(
                 shareTicker = share.ticker,
-                sharePrice = sharePrice.price,
+                sharePrice = sharePrice,
                 minimalDifference = share.percent,
                 futures = futuresToNotify
             )
@@ -229,8 +177,10 @@ class UpdateService(
     private suspend fun constructCache(usersWithFollowedShares: List<UserWithFollowedShares>): Cache? {
         if (usersWithFollowedShares.isEmpty()) return null
 
+        delay(5000)
+
         val shares = extractUniqueShares(usersWithFollowedShares)
-        val sharesPricesCache = HashMap<String, TinkoffCandle>(shares.size)
+        val sharesPricesCache = HashMap<String, Double>(shares.size)
         val hourlyRsiCache = HashMap<String, Double>(shares.size)
         val dailyRsiCache = HashMap<String, Double>(shares.size)
 
@@ -249,17 +199,34 @@ class UpdateService(
         val futuresList = sharesToFutures.flatMap { it.value }
 
         for (share in shares) {
+            val orderBookResource = tinkoff.getOrderBook(share.uid)
+            if (orderBookResource.data == null) {
+                logger.info("Unable to get order book for ${share.ticker} because of ${orderBookResource.message}")
+                continue
+            }
+
+            val orderBook = orderBookResource.data
+            if (orderBook.bids.isEmpty()) {
+                logger.info("Order book bids for ${share.ticker} is empty")
+                continue
+            }
+
+            val tinkoffShare = tinkoff.getSecurity(share.ticker).data ?: continue
+            sharesPricesCache[share.ticker] = orderBook.bids.first().price * tinkoffShare.lot
+            delay(10)
+
             val dailyCandlesResource = tinkoff.getDailyCandles(share.uid)
             if (dailyCandlesResource.data.isNullOrEmpty()) {
                 logger.info("Unable to get daily candles for ${share.ticker} because of ${dailyCandlesResource.message}")
                 continue
             }
+
             val dailyCandles = dailyCandlesResource.data
             val dailyPrices = extractPrices(dailyCandles)
 
             val hourlyCandlesResource = tinkoff.getHourlyCandles(share.uid)
             if (hourlyCandlesResource.data.isNullOrEmpty()) {
-                logger.info("Unable to get hourly candles for ${share.ticker} because of ${hourlyCandlesResource.message}")
+                logger.info("Unable to get hourly candles for share ${share.ticker} because of ${hourlyCandlesResource.message}")
                 continue
             }
             val hourlyCandles = hourlyCandlesResource.data
@@ -267,20 +234,27 @@ class UpdateService(
 
             dailyRsiCache[share.ticker] = MathUtil.calculateRsi(dailyPrices)
             hourlyRsiCache[share.ticker] = MathUtil.calculateRsi(hourlyPrices)
-            sharesPricesCache[share.ticker] = hourlyCandles.last()
 
             delay(10)
         }
 
+        delay(TimeUtil.SECOND_MILLIS)
 
-        val futuresPrice = mutableMapOf<String, TinkoffCandle>()
+        val futuresPrice = mutableMapOf<String, Double>()
         for (future in futuresList) {
-            val hourlyCandlesResource = tinkoff.getHourlyCandles(future.uid)
-            if (hourlyCandlesResource.data.isNullOrEmpty()) {
-                logger.info("Unable to get hourly candles for future ${future.ticker} because of ${hourlyCandlesResource.message}")
+            val orderBookResource = tinkoff.getOrderBook(future.uid)
+            if (orderBookResource.data == null) {
+                logger.info("Unable to get order book for future ${future.ticker} because of ${orderBookResource.message}")
                 continue
             }
-            futuresPrice[future.ticker] = hourlyCandlesResource.data.last()
+
+            val orderBook = orderBookResource.data
+            if (orderBook.asks.isEmpty()) {
+                logger.info("Order book asks for ${future.ticker} is empty")
+                continue
+            }
+
+            futuresPrice[future.ticker] = orderBook.asks.first().price * future.lot
             delay(10)
         }
 
@@ -294,14 +268,14 @@ class UpdateService(
     }
 
 
-    private suspend fun handleIndicatorsForUser(user: UserWithFollowedShares, cache: IndicatorCache) {
+    private suspend fun handleIndicatorsForUser(user: UserWithFollowedShares, cache: Cache) {
         val handled = mutableListOf<UserShare>()
 
         for (share in user.shares) {
             val updateData = mutableListOf<IndicatorUpdateData>()
             val dailyRsi = cache.dailyRsiCache[share.ticker] ?: continue
             val hourlyRsi = cache.hourlyRsiCache[share.ticker] ?: continue
-            val price = cache.prices[share.ticker] ?: continue
+            val price = cache.shares[share.ticker] ?: continue
 
             if (dailyRsi > MathUtil.RSI_HIGH && hourlyRsi > MathUtil.RSI_HIGH) {
                 updateData.add(
@@ -379,7 +353,14 @@ class UpdateService(
         return res
     }
 
-    companion object {
-        private const val MILLIS_MINUTE = 60000L
+    private fun extractUniqueShares(users: List<UserWithFollowedShares>): List<UserShare> {
+        val res = mutableSetOf<UserShare>()
+        for (user in users) {
+            for (share in user.shares) {
+                res.add(share)
+            }
+        }
+
+        return res.toList()
     }
 }
