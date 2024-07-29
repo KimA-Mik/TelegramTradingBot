@@ -129,7 +129,7 @@ class UpdateService(
 
             val futuresToNotify = mutableListOf<NotifyFuture>()
             futures.forEach { future ->
-                val futurePrice = cache.futures.getOrElse(future.uid) { 0.0 }
+                val futurePrice = cache.futures.getOrElse(future.ticker) { 0.0 }
                 val futureSlotPrice = getFutureSharePrice(sharePrice, futurePrice)
                 val percent = percentBetweenDoubles(futureSlotPrice, sharePrice)
                 val annualPercent = FuturesUtil.getFutureAnnualPercent(percent, future.expirationDate)
