@@ -13,7 +13,7 @@ import kotlinx.datetime.toKotlinLocalDateTime
 
 class GetFullSecurityUseCase(private val repository: TinkoffRepository) {
     suspend operator fun invoke(ticker: String): GetSecurityResult {
-        val shareResource = repository.getSecurity(ticker)
+        val shareResource = repository.getSecurity(ticker.trim().uppercase())
         if (shareResource.data == null) {
             return GetSecurityResult.SecurityNotFound
         }

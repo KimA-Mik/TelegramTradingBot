@@ -21,6 +21,8 @@ dependencies {
     implementation("ru.tinkoff.piapi:java-sdk-core:1.5")
     implementation("ru.mail.im:bot-api:1.2.3")
 
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
     val koinVersion = "3.5.6"
     implementation("io.insert-koin:koin-core:$koinVersion")
 

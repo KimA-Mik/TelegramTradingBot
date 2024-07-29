@@ -19,4 +19,5 @@ interface TinkoffRepository {
 
     suspend fun getDailyCandles(uid: String): Resource<List<TinkoffCandle>>
     suspend fun getHourlyCandles(uid: String): Resource<List<TinkoffCandle>>
+    suspend fun getOrderBook(uid: String): Resource<TinkoffOrderBook>
 }

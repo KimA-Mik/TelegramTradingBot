@@ -116,4 +116,11 @@ class TinkoffRepositoryImpl(private val service: TinkoffInvestService) : Tinkoff
             Resource.Error(e.message)
         }
     }
+
+    override suspend fun getOrderBook(uid: String): Resource<TinkoffOrderBook> {
+        return when (val orderBookResource = service.getOrderBook(uid)) {
+            is Resource.Error -> Resource.Error(orderBookResource.message)
+            is Resource.Success -> Resource.Success(orderBookResource.data!!.toTinkoffOrderBook())
+        }
+    }
 }

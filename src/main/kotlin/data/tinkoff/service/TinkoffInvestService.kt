@@ -1,16 +1,22 @@
 package data.tinkoff.service
 
+import Resource
+import domain.math.MathUtil
+import domain.utils.TimeUtil
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.future.asDeferred
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toJavaInstant
+import org.slf4j.LoggerFactory
 import ru.tinkoff.piapi.contract.v1.*
 import ru.tinkoff.piapi.core.InvestApi
 
 class TinkoffInvestService(private val api: InvestApi) {
-    //TODO: Use maps for faster search
-    private val tradableShares = MutableStateFlow(emptyList<Share>())
-    private val tradableFutures = MutableStateFlow(emptyList<Future>())
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
+    private var tradableShares: Map<String, Share> = emptyMap()  //MutableStateFlow(emptyList<Share>())
+    private var tradableFutures: Map<String, Future> = emptyMap() //= MutableStateFlow(emptyList<Future>())
+    private var sharesToFurures: Map<String, List<Future>> = emptyMap()
 
     suspend fun launchUpdating() = coroutineScope {
         launch { updateShares() }
@@ -18,18 +24,15 @@ class TinkoffInvestService(private val api: InvestApi) {
     }
 
     fun findShare(ticker: String): Share? {
-        return tradableShares.value.find { it.ticker.equals(ticker, true) }
+        return tradableShares[ticker] // .value.find { it.ticker.equals(ticker, true) }
     }
 
     fun findFuture(ticker: String): Future? {
-        return tradableFutures.value.find { it.ticker.equals(ticker, true) }
+        return tradableFutures[ticker]  //.value.find { it.ticker.equals(ticker, true) }
     }
 
     fun getFuturesForShare(ticker: String): List<Future> {
-        val futures = tradableFutures.value
-            .filter { it.basicAsset.equals(ticker, true) }
-
-        return futures
+        return sharesToFurures[ticker] ?: emptyList()
     }
 
     suspend fun getUidsLastPrices(uids: List<String>): List<LastPrice> {
@@ -58,25 +61,38 @@ class TinkoffInvestService(private val api: InvestApi) {
         }
     }
 
+    suspend fun getOrderBook(uid: String, depth: Int = MathUtil.ORDER_BOOK_DEPTH): Resource<GetOrderBookResponse> {
+        return try {
+            val response = api
+                .marketDataService
+                .getOrderBook(uid, depth)
+                .asDeferred()
+                .await()
+            Resource.Success(response)
+        } catch (e: Exception) {
+            Resource.Error(e.message)
+        }
+    }
+
     private suspend fun updateShares() = coroutineScope {
         var errorsCount = 0L
         while (isActive) {
-            val shares = withContext(Dispatchers.IO) {
-                try {
-                    api.instrumentsService.tradableSharesSync
-                } catch (e: Exception) {
-                    println(e)
-                    return@withContext emptyList<Share>()
-                }
+            val shares = try {
+                api.instrumentsService
+                    .tradableShares
+                    .asDeferred().await()
+            } catch (e: Exception) {
+                logger.error("Unable to update shares because of: ${e.message}")
+                emptyList()
             }
 
             if (shares.isNotEmpty()) {
-                tradableShares.value = shares
+                tradableShares = shares.associateBy { it.ticker }
                 errorsCount = 0L
-                delay(24L * HOURS)
+                delay(24L * TimeUtil.HOUR_MILLIS)
             } else {
                 errorsCount++
-                delay(errorsCount * MINUTES)
+                delay(errorsCount * TimeUtil.MINUTE_MILLIS)
             }
         }
     }
@@ -84,30 +100,24 @@ class TinkoffInvestService(private val api: InvestApi) {
     private suspend fun updateFutures() = coroutineScope {
         var errorsCount = 0L
         while (isActive) {
-            val futures = withContext(Dispatchers.IO) {
-                try {
-                    api.instrumentsService.tradableFuturesSync
-                } catch (e: Exception) {
-                    println(e)
-                    return@withContext emptyList<Future>()
-                }
+            val futures = try {
+                api.instrumentsService
+                    .tradableFutures
+                    .asDeferred().await()
+            } catch (e: Exception) {
+                logger.error("Unable to update futures because of: ${e.message}")
+                emptyList()
             }
 
             if (futures.isNotEmpty()) {
-                tradableFutures.value = futures
+                tradableFutures = futures.associateBy { it.ticker }
+                sharesToFurures = futures.groupBy { it.basicAsset }
                 errorsCount = 0L
-                delay(24L * HOURS)
+                delay(24L * TimeUtil.HOUR_MILLIS)
             } else {
                 errorsCount++
-                delay(errorsCount * MINUTES)
+                delay(errorsCount * TimeUtil.MINUTE_MILLIS)
             }
         }
-    }
-
-    companion object {
-        private const val MILLIS = 1000L
-        private const val SECONDS = 60L * MILLIS
-        private const val MINUTES = 60L * SECONDS
-        private const val HOURS = 60L * MINUTES
     }
 }
