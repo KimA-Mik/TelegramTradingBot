@@ -122,14 +122,14 @@ class UpdateService(
     ) {
         val handled = mutableListOf<UserShare>()
         logger.info("User id: ${user.id}")
-        user.shares.forEach { share ->
-            val sharePrice = cache.shares[share.ticker] ?: return@forEach
+        for (share in user.shares) {
+            val sharePrice = cache.shares[share.ticker] ?: continue
             val futures = cache.sharesToFutures[share.ticker]
-            if (futures.isNullOrEmpty()) return@forEach
+            if (futures.isNullOrEmpty()) continue
 
             val futuresToNotify = mutableListOf<NotifyFuture>()
-            futures.forEach { future ->
-                val futurePrice = cache.futures.getOrElse(future.ticker) { 0.0 }
+            for (future in futures) {
+                val futurePrice = cache.futures[future.ticker] ?: continue
                 val futureSlotPrice = getFutureSharePrice(sharePrice, futurePrice)
                 val percent = percentBetweenDoubles(futureSlotPrice, sharePrice)
                 val annualPercent = FuturesUtil.getFutureAnnualPercent(percent, future.expirationDate)
@@ -149,7 +149,7 @@ class UpdateService(
             }
 
             val shouldNotify = futuresToNotify.isNotEmpty()
-            if (share.futuresNotified == shouldNotify) return@forEach
+            if (share.futuresNotified == shouldNotify) continue
             handled.add(share.copy(futuresNotified = shouldNotify))
             val notifyShare = NotifyShare(
                 shareTicker = share.ticker,
@@ -191,7 +191,7 @@ class UpdateService(
             resource
                 .data
                 ?.sortedWith(TinkoffFutureComparator)
-                ?.take(4)
+//                ?.take(4)
                 ?: emptyList()
         })
 
