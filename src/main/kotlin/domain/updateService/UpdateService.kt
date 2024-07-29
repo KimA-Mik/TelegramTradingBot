@@ -1,13 +1,10 @@
 package domain.updateService
 
-import Resource
 import domain.common.TAX_MULTIPLIER
 import domain.common.getFutureSharePrice
 import domain.common.percentBetweenDoubles
 import domain.math.MathUtil
 import domain.tinkoff.model.TinkoffCandle
-import domain.tinkoff.model.TinkoffFuture
-import domain.tinkoff.model.TinkoffPrice
 import domain.tinkoff.model.TinkoffShare
 import domain.tinkoff.repository.TinkoffRepository
 import domain.tinkoff.util.TinkoffFutureComparator
@@ -210,8 +207,7 @@ class UpdateService(
                 continue
             }
 
-            val tinkoffShare = tinkoff.getSecurity(share.ticker).data ?: continue
-            sharesPricesCache[share.ticker] = orderBook.asks.first().price * tinkoffShare.lot
+            sharesPricesCache[share.ticker] = orderBook.asks.first().price * share.lot
             delay(10)
 
             val dailyCandlesResource = tinkoff.getDailyCandles(share.uid)
@@ -322,29 +318,6 @@ class UpdateService(
         database.updateUserShares(handled)
     }
 
-    private suspend fun getSharesPrices(sharesTickers: Iterable<String>): Resource<List<TinkoffPrice>> {
-        val shares = sharesTickers.mapNotNull {
-            tinkoff.getSecurity(it).data
-        }
-
-        return try {
-            val res = tinkoff.getSharesPrice(shares)
-            res
-        } catch (e: Exception) {
-            logger.info(e.message)
-            Resource.Error(e.message)
-        }
-    }
-
-    private suspend fun getFuturesPrices(futuresList: List<TinkoffFuture>): Resource<List<TinkoffPrice>> {
-        return try {
-            tinkoff.getFuturesPrices(futuresList)
-        } catch (e: Exception) {
-            logger.info(e.message)
-            Resource.Error(e.message)
-        }
-    }
-
     private fun extractPrices(candles: List<TinkoffCandle>): DoubleArray {
         val res = DoubleArray(candles.size)
         candles.forEachIndexed { index, candle ->
@@ -353,14 +326,16 @@ class UpdateService(
         return res
     }
 
-    private fun extractUniqueShares(users: List<UserWithFollowedShares>): List<UserShare> {
-        val res = mutableSetOf<UserShare>()
+    private fun extractUniqueShares(users: List<UserWithFollowedShares>): List<TinkoffShare> {
+        val tickers = mutableSetOf<String>()
         for (user in users) {
             for (share in user.shares) {
-                res.add(share)
+                tickers.add(share.ticker)
             }
         }
 
-        return res.toList()
+        return tickers.mapNotNull {
+            tinkoff.getSecurity(it).data
+        }
     }
 }
