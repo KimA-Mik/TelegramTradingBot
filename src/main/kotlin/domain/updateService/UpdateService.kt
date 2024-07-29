@@ -206,13 +206,13 @@ class UpdateService(
             }
 
             val orderBook = orderBookResource.data
-            if (orderBook.bids.isEmpty()) {
-                logger.info("Order book bids for ${share.ticker} is empty")
+            if (orderBook.asks.isEmpty()) {
+                logger.info("Order book asks for ${share.ticker} is empty")
                 continue
             }
 
             val tinkoffShare = tinkoff.getSecurity(share.ticker).data ?: continue
-            sharesPricesCache[share.ticker] = orderBook.bids.first().price * tinkoffShare.lot
+            sharesPricesCache[share.ticker] = orderBook.asks.first().price * tinkoffShare.lot
             delay(10)
 
             val dailyCandlesResource = tinkoff.getDailyCandles(share.uid)
@@ -249,12 +249,13 @@ class UpdateService(
             }
 
             val orderBook = orderBookResource.data
-            if (orderBook.asks.isEmpty()) {
-                logger.info("Order book asks for ${future.ticker} is empty")
+            if (orderBook.bids.isEmpty()) {
+                logger.info("Order book bids for ${future.ticker} is empty")
+                futuresPrice[future.ticker] = orderBook.lastPrice * future.lot
                 continue
             }
 
-            futuresPrice[future.ticker] = orderBook.asks.first().price * future.lot
+            futuresPrice[future.ticker] = orderBook.bids.first().price * future.lot
             delay(10)
         }
 
