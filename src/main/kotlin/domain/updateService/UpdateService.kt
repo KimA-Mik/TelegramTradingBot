@@ -37,6 +37,7 @@ import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.toLocalDateTime
 import org.slf4j.LoggerFactory
 import kotlin.math.abs
+import kotlin.random.Random
 
 class UpdateService(
     private val database: DatabaseRepository,
@@ -59,8 +60,8 @@ class UpdateService(
 
     private fun run() = scope.launch {
         while (isActive) {
-//            val delayTime = Random.nextFloat() * MILLIS_MINUTE * 2
-//            delay(MILLIS_MINUTE + delayTime.toLong())
+            val delayTime = Random.nextFloat() * TimeUtil.MINUTE_MILLIS * 2
+            delay(TimeUtil.MINUTE_MILLIS + delayTime.toLong())
             checkForUpdates()
             delayNonWorkingHours(9, 50, 18, 49)
         }
@@ -177,8 +178,6 @@ class UpdateService(
     private suspend fun constructCache(usersWithFollowedShares: List<UserWithFollowedShares>): Cache? {
         if (usersWithFollowedShares.isEmpty()) return null
 
-        delay(5000)
-
         val shares = extractUniqueShares(usersWithFollowedShares)
         val sharesPricesCache = HashMap<String, Double>(shares.size)
         val hourlyRsiCache = HashMap<String, Double>(shares.size)
@@ -192,7 +191,7 @@ class UpdateService(
             resource
                 .data
                 ?.sortedWith(TinkoffFutureComparator)
-//                ?.take(4)
+                ?.take(4)
                 ?: emptyList()
         })
 
