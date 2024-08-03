@@ -207,7 +207,13 @@ class UpdateService(
                 continue
             }
 
-            sharesPricesCache[share.ticker] = orderBook.asks.first().price * share.lot
+            val price = orderBook.asks.first().price * share.lot
+            if (price > 0.0) {
+                sharesPricesCache[share.ticker] = price
+            } else {
+                continue
+            }
+
             delay(10)
 
             val dailyCandlesResource = tinkoff.getDailyCandles(share.uid)
@@ -250,7 +256,8 @@ class UpdateService(
                 continue
             }
 
-            futuresPrice[future.ticker] = orderBook.bids.first().price * future.lot
+            val price = orderBook.bids.first().price * future.lot
+            if (price > 0.0) futuresPrice[future.ticker] = price
             delay(10)
         }
 
