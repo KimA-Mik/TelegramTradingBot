@@ -298,8 +298,8 @@ class UpdateService(
 
             val shouldNotify = updateData.isNotEmpty()
             //TODO: Make more flexible system
-            if (shouldNotify == share.indicatorsNotified) continue
-            val handledShare = share.copy(indicatorsNotified = shouldNotify)
+            if (shouldNotify == share.rsiNotified) continue
+            val handledShare = share.copy(rsiNotified = shouldNotify)
             handled.add(handledShare)
 
             if (shouldNotify) {

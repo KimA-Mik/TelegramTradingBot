@@ -7,5 +7,6 @@ data class UserShare(
     val name: String,
     val percent: Double,
     val futuresNotified: Boolean,
-    val indicatorsNotified: Boolean
+    val rsiNotified: Boolean,
+    val bollingerBandsNotified: Boolean
 )
