@@ -5,6 +5,8 @@ object MathUtil {
     const val RSI_HIGH = 70.0
 
     const val ORDER_BOOK_DEPTH = 20
+    const val BOLLINGER_BARS_COUNT = 20
+    const val DEFAULT_BSI_COUNT = 14
 
     //https://stackoverflow.com/questions/69980426/how-to-get-the-same-rsi-as-tradingview-in-java
     fun calculateRma(values: DoubleArray, period: Int): Double {
@@ -20,7 +22,7 @@ object MathUtil {
     }
 
 
-    fun calculateRsi(prices: DoubleArray, period: Int = 14): Double {
+    fun calculateRsi(prices: DoubleArray, period: Int = DEFAULT_BSI_COUNT): Double {
         if (prices.isEmpty()) {
             return 0.0
         }
