@@ -1,6 +1,6 @@
 package domain.analysis.model
 
-data class BollingerBandData(
+data class BollingerBandsData(
     val lower: Double,
     val middle: Double,
     val upper: Double

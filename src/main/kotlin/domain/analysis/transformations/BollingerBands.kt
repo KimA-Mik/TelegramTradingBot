@@ -1,6 +1,6 @@
 package domain.analysis.transformations
 
-import domain.analysis.model.BollingerBandData
+import domain.analysis.model.BollingerBandsData
 import domain.analysis.util.getLast
 import domain.math.MathUtil
 import org.ta4j.core.BarSeries
@@ -12,7 +12,7 @@ import org.ta4j.core.indicators.helpers.ClosePriceIndicator
 import org.ta4j.core.indicators.statistics.StandardDeviationIndicator
 
 object BollingerBands {
-    fun calculate(series: BarSeries, barsCount: Int = MathUtil.BOLLINGER_BARS_COUNT): BollingerBandData {
+    fun calculate(series: BarSeries, barsCount: Int = MathUtil.BOLLINGER_BARS_COUNT): BollingerBandsData {
         val closes = ClosePriceIndicator(series)
         val middle = BollingerBandsMiddleIndicator(SMAIndicator(closes, barsCount))
 
@@ -20,7 +20,7 @@ object BollingerBands {
         val lower = BollingerBandsLowerIndicator(middle, deviation)
         val upper = BollingerBandsUpperIndicator(middle, deviation)
 
-        return BollingerBandData(
+        return BollingerBandsData(
             lower = lower.getLast(),
             middle = middle.getLast(),
             upper = upper.getLast()
