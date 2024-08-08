@@ -1,5 +1,8 @@
 package domain.updateService
 
+import domain.analysis.mappers.toSeries
+import domain.analysis.model.BollingerBandsData
+import domain.analysis.transformations.BollingerBands
 import domain.common.TAX_MULTIPLIER
 import domain.common.getFutureSharePrice
 import domain.common.percentBetweenDoubles
@@ -179,6 +182,8 @@ class UpdateService(
         val sharesPricesCache = HashMap<String, Double>(shares.size)
         val hourlyRsiCache = HashMap<String, Double>(shares.size)
         val dailyRsiCache = HashMap<String, Double>(shares.size)
+        val hourlyBollingerBands = HashMap<String, BollingerBandsData>(shares.size)
+        val dailyBollingerBands = HashMap<String, BollingerBandsData>(shares.size)
 
         val sharesTickers = shares.map { it.ticker }
 
@@ -236,6 +241,12 @@ class UpdateService(
             dailyRsiCache[share.ticker] = MathUtil.calculateRsi(dailyPrices)
             hourlyRsiCache[share.ticker] = MathUtil.calculateRsi(hourlyPrices)
 
+            val dailySeries = dailyCandles.toSeries()
+            val hourlySeries = hourlyCandles.toSeries()
+
+            dailyBollingerBands[share.ticker] = BollingerBands.calculate(dailySeries)
+            hourlyBollingerBands[share.ticker] = BollingerBands.calculate(hourlySeries)
+
             delay(10)
         }
 
@@ -265,8 +276,10 @@ class UpdateService(
             shares = sharesPricesCache,
             sharesToFutures = sharesToFutures,
             futures = futuresPrice,
-            hourlyRsiCache = hourlyRsiCache,
-            dailyRsiCache = dailyRsiCache
+            hourlyRsi = hourlyRsiCache,
+            dailyRsi = dailyRsiCache,
+            hourlyBollingerBands = hourlyBollingerBands,
+            dailyBollingerBands = dailyBollingerBands
         )
     }
 
@@ -275,34 +288,20 @@ class UpdateService(
         val handled = mutableListOf<UserShare>()
 
         for (share in user.shares) {
-            val updateData = mutableListOf<IndicatorUpdateData>()
-            val dailyRsi = cache.dailyRsiCache[share.ticker] ?: continue
-            val hourlyRsi = cache.hourlyRsiCache[share.ticker] ?: continue
             val price = cache.shares[share.ticker] ?: continue
+            val updateData = mutableListOf<IndicatorUpdateData>()
 
-            if (dailyRsi > MathUtil.RSI_HIGH && hourlyRsi > MathUtil.RSI_HIGH) {
-                updateData.add(
-                    IndicatorUpdateData.RsiHighData(
-                        hourlyRsi = hourlyRsi,
-                        dailyRsi = dailyRsi
-                    )
-                )
-            } else if (dailyRsi < MathUtil.RSI_LOW && hourlyRsi < MathUtil.RSI_LOW) {
-                updateData.add(
-                    IndicatorUpdateData.RsiLowData(
-                        hourlyRsi = hourlyRsi,
-                        dailyRsi = dailyRsi
-                    )
-                )
+            val rsiData = handleRsiIndicator(share, cache)
+            val shouldNotifyRsi = rsiData != null
+            //TODO: Make more flexible system
+            if (shouldNotifyRsi != share.rsiNotified) {
+                val handledShare = share.copy(rsiNotified = shouldNotifyRsi)
+                handled.add(handledShare)
+
+                rsiData?.let { updateData.add(it) }
             }
 
-            val shouldNotify = updateData.isNotEmpty()
-            //TODO: Make more flexible system
-            if (shouldNotify == share.rsiNotified) continue
-            val handledShare = share.copy(rsiNotified = shouldNotify)
-            handled.add(handledShare)
-
-            if (shouldNotify) {
+            if (updateData.isNotEmpty()) {
                 val update = TelegramIndicatorUpdate(
                     userId = user.id,
                     ticker = share.ticker,
@@ -323,6 +322,24 @@ class UpdateService(
             }
         }
         database.updateUserShares(handled)
+    }
+
+    private fun handleRsiIndicator(share: UserShare, cache: Cache): IndicatorUpdateData? {
+        val dailyRsi = cache.dailyRsi[share.ticker] ?: return null
+        val hourlyRsi = cache.hourlyRsi[share.ticker] ?: return null
+
+        if (dailyRsi > MathUtil.RSI_HIGH && hourlyRsi > MathUtil.RSI_HIGH) {
+            return IndicatorUpdateData.RsiHighData(
+                hourlyRsi = hourlyRsi,
+                dailyRsi = dailyRsi
+            )
+        } else if (dailyRsi < MathUtil.RSI_LOW && hourlyRsi < MathUtil.RSI_LOW) {
+            return IndicatorUpdateData.RsiLowData(
+                hourlyRsi = hourlyRsi,
+                dailyRsi = dailyRsi
+            )
+        }
+        return null
     }
 
     private fun extractPrices(candles: List<TinkoffCandle>): DoubleArray {
