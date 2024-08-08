@@ -285,7 +285,7 @@ class UpdateService(
 
 
     private suspend fun handleIndicatorsForUser(user: UserWithFollowedShares, cache: Cache) {
-        val handled = mutableListOf<UserShare>()
+        val handled = mutableMapOf<String, UserShare>()
 
         for (share in user.shares) {
             val price = cache.shares[share.ticker] ?: continue
@@ -296,7 +296,7 @@ class UpdateService(
             //TODO: Make more flexible system
             if (shouldNotifyRsi != share.rsiNotified) {
                 val handledShare = share.copy(rsiNotified = shouldNotifyRsi)
-                handled.add(handledShare)
+                handled[share.ticker] = handledShare
 
                 rsiData?.let { updateData.add(it) }
             }
@@ -321,7 +321,7 @@ class UpdateService(
                 }
             }
         }
-        database.updateUserShares(handled)
+        database.updateUserShares(handled.values.toList())
     }
 
     private fun handleRsiIndicator(share: UserShare, cache: Cache): IndicatorUpdateData? {
