@@ -25,7 +25,7 @@ class SettingsRoot(user: User) : BotScreen(user.id) {
 
         res += "\nУведомления индикаторов по умолчаню:\n"
         res += "RSI: ${notificationsStateText(user.defaultRsiNotifications)}\n"
-        res += "Полосы Боллинджера: ${notificationsStateText(user.defaultBBNotifications)}\n"
+        res += "Полосы Боллинджера: ${notificationsStateText(user.defaultBbNotifications)}\n"
 
         return res
     }

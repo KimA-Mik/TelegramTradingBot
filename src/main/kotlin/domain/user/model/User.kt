@@ -11,5 +11,5 @@ data class User(
     val agentCode: String?,
     val agentNotifications: Boolean,
     val defaultRsiNotifications: Boolean,
-    val defaultBBNotifications: Boolean,
+    val defaultBbNotifications: Boolean,
 )

@@ -18,7 +18,7 @@ class IndicatorsSettings(user: User, messageId: Long? = null) : BotScreen(user.i
     private fun generateText(user: User): String {
         var res = "Уведомления индикаторов по умолчаню:\n"
         res += "RSI: ${notificationsStateText(user.defaultRsiNotifications)}\n"
-        res += "Полосы Боллинджера: ${notificationsStateText(user.defaultBBNotifications)}\n"
+        res += "Полосы Боллинджера: ${notificationsStateText(user.defaultBbNotifications)}\n"
 
         return res
     }
@@ -45,7 +45,7 @@ class IndicatorsSettings(user: User, messageId: Long? = null) : BotScreen(user.i
                 ),
                 listOf(
                     InlineKeyboardButton.CallbackData(
-                        SwitchBbDefault.getText(user.defaultBBNotifications),
+                        SwitchBbDefault.getText(user.defaultBbNotifications),
                         SwitchBbDefault.callbackData
                     ),
                     InlineKeyboardButton.CallbackData(

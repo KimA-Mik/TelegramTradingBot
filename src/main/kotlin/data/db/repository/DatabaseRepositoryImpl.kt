@@ -298,7 +298,7 @@ class DatabaseRepositoryImpl(
             agentCode = this[Users.agentCode],
             agentNotifications = this[Users.agentNotifications],
             defaultRsiNotifications = this[Users.defaultRsiNotifications],
-            defaultBBNotifications = this[Users.defaultBBNotifications]
+            defaultBbNotifications = this[Users.defaultBbNotifications]
         )
     }
 
@@ -311,6 +311,6 @@ class DatabaseRepositoryImpl(
         this[Users.agentCode] = user.agentCode
         this[Users.agentNotifications] = user.agentNotifications
         this[Users.defaultRsiNotifications] = user.defaultRsiNotifications
-        this[Users.defaultBBNotifications] = user.defaultBBNotifications
+        this[Users.defaultBbNotifications] = user.defaultBbNotifications
     }
 }

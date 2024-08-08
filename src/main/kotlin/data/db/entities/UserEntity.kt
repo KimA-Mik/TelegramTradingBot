@@ -16,5 +16,5 @@ object Users : Table() {
     val agentNotifications = bool("agent_notifications").default(false)
 
     val defaultRsiNotifications = bool("default_rsi_notifications").default(true)
-    val defaultBBNotifications = bool("default_bb_notifications").default(false)
+    val defaultBbNotifications = bool("default_bb_notifications").default(false)
 }
