@@ -301,6 +301,14 @@ class UpdateService(
                 rsiData?.let { updateData.add(it) }
             }
 
+            val bollingerBandsData = handleBollingerBandsIndicator(share, cache)
+            val shouldNotifyBB = bollingerBandsData != null
+            if (shouldNotifyBB != share.bollingerBandsNotified) {
+                val oldShare = handled[share.ticker] ?: share
+                handled[share.ticker] = oldShare.copy(bollingerBandsNotified = shouldNotifyBB)
+                bollingerBandsData?.let { updateData.add(it) }
+            }
+
             if (updateData.isNotEmpty()) {
                 val update = TelegramIndicatorUpdate(
                     userId = user.id,
@@ -339,6 +347,17 @@ class UpdateService(
                 dailyRsi = dailyRsi
             )
         }
+        return null
+    }
+
+    private fun handleBollingerBandsIndicator(share: UserShare, cache: Cache): IndicatorUpdateData? {
+        //todo: implement
+        return null
+
+        val hourlyBB = cache.hourlyBollingerBands[share.ticker] ?: return null
+        val dailyBB = cache.dailyBollingerBands[share.ticker] ?: return null
+        val price = cache.shares[share.ticker] ?: return null
+
         return null
     }
 
