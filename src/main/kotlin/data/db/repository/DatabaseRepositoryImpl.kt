@@ -178,7 +178,9 @@ class DatabaseRepositoryImpl(
                     UserShares.percent,
                     UserShares.notified,
                     UserShares.rsiNotified,
-                    UserShares.bollingerBandsNotified
+                    UserShares.bollingerBandsNotified,
+                    UserShares.rsiNotificationsEnabled,
+                    UserShares.bbNotificationsEnabled
                 )
                 .map { it.toFollowedShare() }
         }
@@ -231,7 +233,9 @@ class DatabaseRepositoryImpl(
                     UserShares.percent,
                     UserShares.notified,
                     UserShares.rsiNotified,
-                    UserShares.bollingerBandsNotified
+                    UserShares.bollingerBandsNotified,
+                    UserShares.rsiNotificationsEnabled,
+                    UserShares.bbNotificationsEnabled
                 )
                 .groupBy { it[Users.id] }
                 .map {
@@ -257,6 +261,8 @@ class DatabaseRepositoryImpl(
                 statement[UserShares.percent] = it.percent
                 statement[UserShares.rsiNotified] = it.rsiNotified
                 statement[UserShares.bollingerBandsNotified] = it.bollingerBandsNotified
+                statement[UserShares.rsiNotificationsEnabled] = it.rsiNotificationsEnabled
+                statement[UserShares.bbNotificationsEnabled] = it.bbNotificationsEnabled
             }
 
             try {
@@ -276,7 +282,9 @@ class DatabaseRepositoryImpl(
             percent = this[UserShares.percent],
             futuresNotified = this[UserShares.notified],
             rsiNotified = this[UserShares.rsiNotified],
-            bollingerBandsNotified = this[UserShares.bollingerBandsNotified]
+            bollingerBandsNotified = this[UserShares.bollingerBandsNotified],
+            rsiNotificationsEnabled = this[UserShares.rsiNotificationsEnabled],
+            bbNotificationsEnabled = this[UserShares.bbNotificationsEnabled],
         )
     }
 
@@ -289,6 +297,8 @@ class DatabaseRepositoryImpl(
             agentChatId = this[Users.agentChatId],
             agentCode = this[Users.agentCode],
             agentNotifications = this[Users.agentNotifications],
+            defaultRsiNotifications = this[Users.defaultRsiNotifications],
+            defaultBBNotifications = this[Users.defaultBBNotifications]
         )
     }
 
@@ -300,5 +310,7 @@ class DatabaseRepositoryImpl(
         this[Users.agentChatId] = user.agentChatId
         this[Users.agentCode] = user.agentCode
         this[Users.agentNotifications] = user.agentNotifications
+        this[Users.defaultRsiNotifications] = user.defaultRsiNotifications
+        this[Users.defaultBBNotifications] = user.defaultBBNotifications
     }
 }
