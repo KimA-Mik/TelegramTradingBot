@@ -20,13 +20,21 @@ class SettingsRoot(user: User) : BotScreen(user.id) {
         val login = user.agentChatId ?: "не определён"
         res += "Ваш логин для Agent: $login\n"
 
-        val enabled = when (user.agentNotifications) {
+        val enabled = notificationsStateText(user.agentNotifications)
+        res += "Уведомления через Agent: $enabled\n"
+
+        res += "\nУведомления индикаторов по умолчаню:\n"
+        res += "RSI: ${notificationsStateText(user.defaultRsiNotifications)}\n"
+        res += "Полосы Боллинджера: ${notificationsStateText(user.defaultBBNotifications)}\n"
+
+        return res
+    }
+
+    private fun notificationsStateText(state: Boolean): String {
+        return when (state) {
             true -> "включены"
             false -> "выключены"
         }
-        res += "Уведомления через Agent: $enabled"
-
-        return res
     }
 
     companion object {
@@ -36,7 +44,10 @@ class SettingsRoot(user: User) : BotScreen(user.id) {
                     KeyboardButton(SettingsTextModel.SettingsTextCommands.DefaultPercent.text),
                     KeyboardButton(SettingsTextModel.SettingsTextCommands.ResetPercent.text)
                 ),
-                listOf(KeyboardButton(SettingsTextModel.SettingsTextCommands.AgentSettings.text)),
+                listOf(
+                    KeyboardButton(SettingsTextModel.SettingsTextCommands.AgentSettings.text),
+                    KeyboardButton(SettingsTextModel.SettingsTextCommands.IndicatorsSettings.text)
+                ),
                 listOf(KeyboardButton(BotTextCommands.Root.text))
             ),
             resizeKeyboard = true

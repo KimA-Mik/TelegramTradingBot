@@ -8,6 +8,7 @@ import presentation.telegram.common.UNKNOWN_COMMAND
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
 import presentation.telegram.screens.SharesResetResult
+import presentation.telegram.settings.screens.IndicatorsSettings
 import presentation.telegram.settings.screens.SettingsAgent
 import presentation.telegram.settings.screens.SettingsDefaultPercent
 import presentation.telegram.settings.screens.SettingsRoot
@@ -26,6 +27,7 @@ class SettingsTextModel(
             SettingsTextCommands.DefaultPercent.text -> SettingsDefaultPercent(user.id, user.defaultPercent)
             SettingsTextCommands.ResetPercent.text -> reset(user)
             SettingsTextCommands.AgentSettings.text -> SettingsAgent(user)
+            SettingsTextCommands.IndicatorsSettings.text -> IndicatorsSettings(user)
             else -> ErrorScreen(user.id, UNKNOWN_COMMAND)
         }
 
@@ -54,6 +56,7 @@ class SettingsTextModel(
     enum class SettingsTextCommands(val text: String) {
         DefaultPercent("Стандартный процент"),
         ResetPercent("Сбросить процент"),
-        AgentSettings("Настройки Agent")
+        AgentSettings("Настройки Agent"),
+        IndicatorsSettings("Настройки индикаторов")
     }
 }
