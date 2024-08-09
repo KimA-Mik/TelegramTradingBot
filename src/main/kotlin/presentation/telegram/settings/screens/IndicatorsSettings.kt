@@ -5,10 +5,10 @@ import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import domain.user.model.User
 import presentation.telegram.screens.BotScreen
-import presentation.telegram.settings.callbackButtons.indicators.ResetBbDefault
-import presentation.telegram.settings.callbackButtons.indicators.ResetRsiDefault
-import presentation.telegram.settings.callbackButtons.indicators.SwitchBbDefault
-import presentation.telegram.settings.callbackButtons.indicators.SwitchRsiDefault
+import presentation.telegram.settings.callbackButtons.indicators.bollingerBands.ResetBbDefaultCallbackButton
+import presentation.telegram.settings.callbackButtons.indicators.bollingerBands.SwitchBbDefaultCallbackButton
+import presentation.telegram.settings.callbackButtons.indicators.rsi.ResetRsiDefaultCallbackButton
+import presentation.telegram.settings.callbackButtons.indicators.rsi.SwitchRsiDefaultCallbackButton
 
 class IndicatorsSettings(user: User, messageId: Long? = null) : BotScreen(user.id, messageId) {
     override val text = generateText(user)
@@ -35,22 +35,22 @@ class IndicatorsSettings(user: User, messageId: Long? = null) : BotScreen(user.i
             listOf(
                 listOf(
                     InlineKeyboardButton.CallbackData(
-                        SwitchRsiDefault.getText(user.defaultRsiNotifications),
-                        SwitchRsiDefault.callbackData
+                        SwitchRsiDefaultCallbackButton.getText(user.defaultRsiNotifications),
+                        SwitchRsiDefaultCallbackButton.callbackData
                     ),
                     InlineKeyboardButton.CallbackData(
-                        ResetRsiDefault.text,
-                        ResetRsiDefault.callbackData
+                        ResetRsiDefaultCallbackButton.text,
+                        ResetRsiDefaultCallbackButton.callbackData
                     )
                 ),
                 listOf(
                     InlineKeyboardButton.CallbackData(
-                        SwitchBbDefault.getText(user.defaultBbNotifications),
-                        SwitchBbDefault.callbackData
+                        SwitchBbDefaultCallbackButton.getText(user.defaultBbNotifications),
+                        SwitchBbDefaultCallbackButton.callbackData
                     ),
                     InlineKeyboardButton.CallbackData(
-                        ResetBbDefault.text,
-                        ResetBbDefault.callbackData
+                        ResetBbDefaultCallbackButton.text,
+                        ResetBbDefaultCallbackButton.callbackData
                     )
                 )
             )
