@@ -8,7 +8,15 @@ import presentation.telegram.callbackButtons.*
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
 import presentation.telegram.settings.callbackButtons.*
+import presentation.telegram.settings.callbackButtons.indicators.bollingerBands.ResetBbDefaultCallbackButton
+import presentation.telegram.settings.callbackButtons.indicators.bollingerBands.SwitchBbDefaultCallbackButton
+import presentation.telegram.settings.callbackButtons.indicators.rsi.ResetRsiDefaultCallbackButton
+import presentation.telegram.settings.callbackButtons.indicators.rsi.SwitchRsiDefaultCallbackButton
 import presentation.telegram.settings.callbackButtonsHandlers.*
+import presentation.telegram.settings.callbackButtonsHandlers.indicators.bollingerBands.ResetBbDefaultButtonHandler
+import presentation.telegram.settings.callbackButtonsHandlers.indicators.bollingerBands.SwitchBbDefaultButtonHandler
+import presentation.telegram.settings.callbackButtonsHandlers.indicators.rsi.ResetRsiDefaultButtonHandler
+import presentation.telegram.settings.callbackButtonsHandlers.indicators.rsi.SwitchRsiDefaultButtonHandler
 
 class CallbackHandler(
     editShareButtonHandler: EditShareButtonHandler,
@@ -18,14 +26,21 @@ class CallbackHandler(
     sharePercentButtonHandler: SharePercentButtonHandler,
     subscribeButtonHandler: SubscribeButtonHandler,
     unsubscribeButtonHandler: UnsubscribeButtonHandler,
+
     editDefaultPercentButtonHandler: EditDefaultPercentButtonHandler,
     disableAgentNotificationsButtonHandler: DisableAgentNotificationsButtonHandler,
     enableAgentNotificationsButtonHandler: EnableAgentNotificationsButtonHandler,
     linkAgentAccountButtonHandler: LinkAgentAccountButtonHandler,
     unlinkAgentAccountButtonHandler: UnlinkAgentAccountButtonHandler,
+
+    resetBbDefaultButtonHandler: ResetBbDefaultButtonHandler,
+    switchBbDefaultButtonHandler: SwitchBbDefaultButtonHandler,
+    resetRsiDefaultButtonHandler: ResetRsiDefaultButtonHandler,
+    switchRsiDefaultButtonHandler: SwitchRsiDefaultButtonHandler,
     private val findUser: FindUserUseCase
 ) {
     private val buttonHandlers = mapOf(
+        /* Ungrouped */
         CallbackButton.EditShare.callbackData to editShareButtonHandler,
         CallbackButton.ResetNotification.callbackData to resetNotificationButtonHandler,
         CallbackButton.SecuritiesListBack.callbackData to securitiesListBackButtonHandler,
@@ -33,11 +48,18 @@ class CallbackHandler(
         CallbackButton.SharePercent.callbackData to sharePercentButtonHandler,
         CallbackButton.Subscribe.callbackData to subscribeButtonHandler,
         CallbackButton.Unsubscribe.callbackData to unsubscribeButtonHandler,
+
+        /* Settings */
         EditDefaultPercentCallbackButton.callbackData to editDefaultPercentButtonHandler,
         DisableAgentNotificationsCallbackButton.callbackData to disableAgentNotificationsButtonHandler,
         EnableAgentNotificationsCallbackButton.callbackData to enableAgentNotificationsButtonHandler,
         LinkAgentAccountCallbackButton.callbackData to linkAgentAccountButtonHandler,
-        UnlinkAgentAccountCallbackButton.callbackData to unlinkAgentAccountButtonHandler
+        UnlinkAgentAccountCallbackButton.callbackData to unlinkAgentAccountButtonHandler,
+        /* Indicator settings */
+        ResetBbDefaultCallbackButton.callbackData to resetBbDefaultButtonHandler,
+        SwitchBbDefaultCallbackButton.callbackData to switchBbDefaultButtonHandler,
+        ResetRsiDefaultCallbackButton.callbackData to resetRsiDefaultButtonHandler,
+        SwitchRsiDefaultCallbackButton.callbackData to switchRsiDefaultButtonHandler,
     )
 
     private val _outFlow = MutableSharedFlow<BotScreen>()
