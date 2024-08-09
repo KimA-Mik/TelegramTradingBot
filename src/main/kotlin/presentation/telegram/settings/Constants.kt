@@ -8,3 +8,6 @@ const val NO_LINKED_AGENT = "Аккаунт агента не привязан"
 
 const val ENABLE_SETTING = "Включить"
 const val DISABLE_SETTING = "Выключить"
+
+const val UNABLE_TO_SWITCH_DEFAULT = "При переключении стандартного значения произошла ошибка"
+const val NO_SHARES_TO_SET = "Отсутствуют отслеживаемые бумаги"

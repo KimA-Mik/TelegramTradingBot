@@ -10,6 +10,10 @@ import presentation.telegram.CallbackHandler
 import presentation.telegram.UpdateHandler
 import presentation.telegram.callbackButtons.*
 import presentation.telegram.settings.callbackButtonsHandlers.*
+import presentation.telegram.settings.callbackButtonsHandlers.indicators.bollingerBands.ResetBbDefaultButtonHandler
+import presentation.telegram.settings.callbackButtonsHandlers.indicators.bollingerBands.SwitchBbDefaultButtonHandler
+import presentation.telegram.settings.callbackButtonsHandlers.indicators.rsi.ResetRsiDefaultButtonHandler
+import presentation.telegram.settings.callbackButtonsHandlers.indicators.rsi.SwitchRsiDefaultButtonHandler
 import presentation.telegram.settings.textModels.SettingsTextModel
 import presentation.telegram.textModels.MySecuritiesTextModel
 import presentation.telegram.textModels.RootTextModel
@@ -42,4 +46,9 @@ val presentationModule = module {
     singleOf(::EnableAgentNotificationsButtonHandler)
     singleOf(::LinkAgentAccountButtonHandler)
     singleOf(::UnlinkAgentAccountButtonHandler)
+
+    singleOf(::ResetBbDefaultButtonHandler)
+    singleOf(::SwitchBbDefaultButtonHandler)
+    singleOf(::ResetRsiDefaultButtonHandler)
+    singleOf(::SwitchRsiDefaultButtonHandler)
 }
