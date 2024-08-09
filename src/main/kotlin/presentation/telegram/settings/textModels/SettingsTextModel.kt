@@ -8,10 +8,10 @@ import presentation.telegram.common.UNKNOWN_COMMAND
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
 import presentation.telegram.screens.SharesResetResult
-import presentation.telegram.settings.screens.IndicatorsSettings
 import presentation.telegram.settings.screens.SettingsAgent
 import presentation.telegram.settings.screens.SettingsDefaultPercent
 import presentation.telegram.settings.screens.SettingsRoot
+import presentation.telegram.settings.screens.indicators.IndicatorsSettings
 import presentation.telegram.textModels.common.TextModel
 
 class SettingsTextModel(

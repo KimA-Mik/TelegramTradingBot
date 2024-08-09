@@ -6,6 +6,7 @@ import domain.user.model.User
 import presentation.common.formatAndTrim
 import presentation.telegram.BotTextCommands
 import presentation.telegram.screens.BotScreen
+import presentation.telegram.settings.stateToText
 import presentation.telegram.settings.textModels.SettingsTextModel
 
 class SettingsRoot(user: User) : BotScreen(user.id) {
@@ -20,21 +21,14 @@ class SettingsRoot(user: User) : BotScreen(user.id) {
         val login = user.agentChatId ?: "не определён"
         res += "Ваш логин для Agent: $login\n"
 
-        val enabled = notificationsStateText(user.agentNotifications)
+        val enabled = stateToText(user.agentNotifications)
         res += "Уведомления через Agent: $enabled\n"
 
         res += "\nУведомления индикаторов по умолчаню:\n"
-        res += "RSI: ${notificationsStateText(user.defaultRsiNotifications)}\n"
-        res += "Полосы Боллинджера: ${notificationsStateText(user.defaultBbNotifications)}\n"
+        res += "RSI: ${stateToText(user.defaultRsiNotifications)}\n"
+        res += "Полосы Боллинджера: ${stateToText(user.defaultBbNotifications)}\n"
 
         return res
-    }
-
-    private fun notificationsStateText(state: Boolean): String {
-        return when (state) {
-            true -> "включены"
-            false -> "выключены"
-        }
     }
 
     companion object {

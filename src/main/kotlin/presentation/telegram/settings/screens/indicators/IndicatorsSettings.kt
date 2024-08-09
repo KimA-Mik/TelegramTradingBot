@@ -1,4 +1,4 @@
-package presentation.telegram.settings.screens
+package presentation.telegram.settings.screens.indicators
 
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.ReplyMarkup

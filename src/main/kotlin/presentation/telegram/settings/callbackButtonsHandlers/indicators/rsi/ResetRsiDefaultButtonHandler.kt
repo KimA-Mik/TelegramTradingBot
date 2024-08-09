@@ -14,8 +14,11 @@ class ResetRsiDefaultButtonHandler(private val resetRsiDefault: ResetRsiDefaultU
     override suspend fun execute(user: User, messageId: Long, messageText: String, arguments: List<String>): BotScreen {
         return when (val res = resetRsiDefault(user)) {
             ResetIndicatorResult.NoShares -> ErrorScreen(user.id, NO_SHARES_TO_SET)
-            is ResetIndicatorResult.Success -> IndicatorRetestedScreen(user.id, res.newValue, IndicatorType.RSI)
+            is ResetIndicatorResult.Success -> IndicatorRetestedScreen(
+                id = user.id,
+                newValue = res.newValue,
+                indicatorType = IndicatorType.RSI
+            )
         }
-
     }
 }

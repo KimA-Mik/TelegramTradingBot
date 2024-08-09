@@ -15,9 +15,9 @@ class ResetBbDefaultButtonHandler(private val resetBbDefault: ResetBbDefaultUseC
         return when (val res = resetBbDefault(user)) {
             ResetIndicatorResult.NoShares -> ErrorScreen(user.id, NO_SHARES_TO_SET)
             is ResetIndicatorResult.Success -> IndicatorRetestedScreen(
-                user.id,
-                res.newValue,
-                IndicatorType.BOLLINGER_BANDS
+                id = user.id,
+                newValue = res.newValue,
+                indicatorType = IndicatorType.BOLLINGER_BANDS
             )
         }
     }
