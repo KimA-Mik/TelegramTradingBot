@@ -12,8 +12,7 @@ import presentation.telegram.settings.callbackButtons.indicators.rsi.SwitchRsiDe
 
 class IndicatorsSettings(user: User, messageId: Long? = null) : BotScreen(user.id, messageId) {
     override val text = generateText(user)
-    override val replyMarkup = calculateReplayMarkup(user)
-    override val parseMode = null
+    override val replyMarkup = calculateReplayMarkup()
 
     private fun generateText(user: User): String {
         var res = "Уведомления индикаторов по умолчаню:\n"
@@ -30,12 +29,12 @@ class IndicatorsSettings(user: User, messageId: Long? = null) : BotScreen(user.i
         }
     }
 
-    private fun calculateReplayMarkup(user: User): ReplyMarkup {
+    private fun calculateReplayMarkup(): ReplyMarkup {
         return InlineKeyboardMarkup.create(
             listOf(
                 listOf(
                     InlineKeyboardButton.CallbackData(
-                        SwitchRsiDefaultCallbackButton.getText(user.defaultRsiNotifications),
+                        SwitchRsiDefaultCallbackButton.text,
                         SwitchRsiDefaultCallbackButton.callbackData
                     ),
                     InlineKeyboardButton.CallbackData(
@@ -45,7 +44,7 @@ class IndicatorsSettings(user: User, messageId: Long? = null) : BotScreen(user.i
                 ),
                 listOf(
                     InlineKeyboardButton.CallbackData(
-                        SwitchBbDefaultCallbackButton.getText(user.defaultBbNotifications),
+                        SwitchBbDefaultCallbackButton.text,
                         SwitchBbDefaultCallbackButton.callbackData
                     ),
                     InlineKeyboardButton.CallbackData(

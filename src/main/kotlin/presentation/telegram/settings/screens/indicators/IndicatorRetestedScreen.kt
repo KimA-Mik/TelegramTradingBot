@@ -6,5 +6,5 @@ import presentation.telegram.settings.stateToText
 
 class IndicatorRetestedScreen(id: Long, newValue: Boolean, indicatorType: IndicatorType) : BotScreen(id) {
     override val text =
-        "${indicatorType.text}: уведомления по умолчанию ${stateToText(newValue)}"
+        "${indicatorType.text}: уведомления для всех акций ${stateToText(newValue)}"
 }
