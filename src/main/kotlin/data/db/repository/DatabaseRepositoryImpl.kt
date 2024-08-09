@@ -73,13 +73,13 @@ class DatabaseRepositoryImpl(
         }
     }
 
-    override suspend fun updateUser(user: User): User {
+    override suspend fun updateUser(user: User): User? {
         return database.transaction {
-            Users.update({ Users.id eq user.id }) {
+            val updated = Users.update({ Users.id eq user.id }) {
                 it.updateUser(user)
             }
 
-            return@transaction user
+            return@transaction if (updated > 0) user else null
         }
     }
 
