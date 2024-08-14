@@ -7,14 +7,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import presentation.telegram.callbackButtons.*
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
-import presentation.telegram.securitiesList.callbackButtons.EditShare
-import presentation.telegram.securitiesList.callbackButtons.SecuritiesListBack
-import presentation.telegram.securitiesList.callbackButtons.SecuritiesListForward
-import presentation.telegram.securitiesList.callbackButtons.SharePercent
-import presentation.telegram.securitiesList.callbackButtonsHandlers.EditShareButtonHandler
-import presentation.telegram.securitiesList.callbackButtonsHandlers.SecuritiesListBackButtonHandler
-import presentation.telegram.securitiesList.callbackButtonsHandlers.SecuritiesListForwardButtonHandler
-import presentation.telegram.securitiesList.callbackButtonsHandlers.SharePercentButtonHandler
+import presentation.telegram.securitiesList.callbackButtons.*
+import presentation.telegram.securitiesList.callbackButtonsHandlers.*
 import presentation.telegram.settings.callbackButtons.*
 import presentation.telegram.settings.callbackButtons.indicators.bollingerBands.ResetBbDefaultCallbackButton
 import presentation.telegram.settings.callbackButtons.indicators.bollingerBands.SwitchBbDefaultCallbackButton
@@ -27,20 +21,25 @@ import presentation.telegram.settings.callbackButtonsHandlers.indicators.rsi.Res
 import presentation.telegram.settings.callbackButtonsHandlers.indicators.rsi.SwitchRsiDefaultButtonHandler
 
 class CallbackHandler(
-    editShareButtonHandler: EditShareButtonHandler,
+    /* Ungrouped */
     resetNotificationButtonHandler: ResetNotificationButtonHandler,
-    securitiesListBackButtonHandler: SecuritiesListBackButtonHandler,
-    securitiesListForwardButtonHandler: SecuritiesListForwardButtonHandler,
-    sharePercentButtonHandler: SharePercentButtonHandler,
     subscribeButtonHandler: SubscribeButtonHandler,
     unsubscribeButtonHandler: UnsubscribeButtonHandler,
 
+    /* Securities List */
+    editShareButtonHandler: EditShareButtonHandler,
+    securitiesListBackButtonHandler: SecuritiesListBackButtonHandler,
+    securitiesListForwardButtonHandler: SecuritiesListForwardButtonHandler,
+    sharePercentButtonHandler: SharePercentButtonHandler,
+    switchShareIndicatorCallbackButtonHandler: SwitchShareIndicatorCallbackButtonHandler,
+
+    /* Settings */
     editDefaultPercentButtonHandler: EditDefaultPercentButtonHandler,
     disableAgentNotificationsButtonHandler: DisableAgentNotificationsButtonHandler,
     enableAgentNotificationsButtonHandler: EnableAgentNotificationsButtonHandler,
     linkAgentAccountButtonHandler: LinkAgentAccountButtonHandler,
     unlinkAgentAccountButtonHandler: UnlinkAgentAccountButtonHandler,
-
+    /* Indicator settings */
     resetBbDefaultButtonHandler: ResetBbDefaultButtonHandler,
     switchBbDefaultButtonHandler: SwitchBbDefaultButtonHandler,
     resetRsiDefaultButtonHandler: ResetRsiDefaultButtonHandler,
@@ -58,6 +57,7 @@ class CallbackHandler(
         SecuritiesListBack.callbackData to securitiesListBackButtonHandler,
         SecuritiesListForward.callbackData to securitiesListForwardButtonHandler,
         SharePercent.callbackData to sharePercentButtonHandler,
+        SwitchShareIndicatorCallbackButton.callbackData to switchShareIndicatorCallbackButtonHandler,
 
         /* Settings */
         EditDefaultPercentCallbackButton.callbackData to editDefaultPercentButtonHandler,

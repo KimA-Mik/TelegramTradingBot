@@ -11,10 +11,7 @@ import presentation.telegram.UpdateHandler
 import presentation.telegram.callbackButtons.ResetNotificationButtonHandler
 import presentation.telegram.callbackButtons.SubscribeButtonHandler
 import presentation.telegram.callbackButtons.UnsubscribeButtonHandler
-import presentation.telegram.securitiesList.callbackButtonsHandlers.EditShareButtonHandler
-import presentation.telegram.securitiesList.callbackButtonsHandlers.SecuritiesListBackButtonHandler
-import presentation.telegram.securitiesList.callbackButtonsHandlers.SecuritiesListForwardButtonHandler
-import presentation.telegram.securitiesList.callbackButtonsHandlers.SharePercentButtonHandler
+import presentation.telegram.securitiesList.callbackButtonsHandlers.*
 import presentation.telegram.securitiesList.textModels.MySecuritiesTextModel
 import presentation.telegram.settings.callbackButtonsHandlers.*
 import presentation.telegram.settings.callbackButtonsHandlers.indicators.bollingerBands.ResetBbDefaultButtonHandler
@@ -39,14 +36,16 @@ val presentationModule = module {
     singleOf(::SearchSecuritiesTextModel)
     singleOf(::SettingsTextModel)
 
-    singleOf(::EditShareButtonHandler)
     singleOf(::ResetNotificationButtonHandler)
-    singleOf(::SecuritiesListBackButtonHandler)
-    singleOf(::SecuritiesListForwardButtonHandler)
     singleOf(::SharePercentButtonHandler)
     singleOf(::SubscribeButtonHandler)
     singleOf(::UnsubscribeButtonHandler)
+
+    singleOf(::EditShareButtonHandler)
+    singleOf(::SecuritiesListBackButtonHandler)
+    singleOf(::SecuritiesListForwardButtonHandler)
     singleOf(::EditDefaultPercentButtonHandler)
+    singleOf(::SwitchShareIndicatorCallbackButtonHandler)
 
     singleOf(::DisableAgentNotificationsButtonHandler)
     singleOf(::EnableAgentNotificationsButtonHandler)

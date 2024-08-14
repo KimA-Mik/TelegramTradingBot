@@ -15,6 +15,7 @@ import domain.user.navigation.useCase.RegisterUserUseCase
 import domain.user.navigation.useCase.UserToRootUseCase
 import domain.user.repository.DatabaseRepository
 import domain.user.useCase.*
+import domain.user.useCase.indicators.SwitchShareIndicatorUseCase
 import domain.user.useCase.indicators.bollingerBands.ResetBbDefaultUseCase
 import domain.user.useCase.indicators.bollingerBands.SwitchBbDefaultUseCase
 import domain.user.useCase.indicators.rsi.ResetRsiDefaultUseCase
@@ -56,6 +57,8 @@ val domainModule = module {
     singleOf(::CreateAgentLinkRequestUseCase)
     singleOf(::LinkAgentAccountUseCase)
     singleOf(::UnlinkAgentUseCase)
+
+    singleOf(::SwitchShareIndicatorUseCase)
 
     singleOf(::ResetBbDefaultUseCase)
     singleOf(::SwitchBbDefaultUseCase)
