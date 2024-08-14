@@ -27,6 +27,7 @@ class IndicatorsUpdateScreen(
         toText += "(${price.formatAndTrim(2)}$ROUBLE_SIGN)\n"
         updateData.forEach {
             toText += IndicatorUpdateMapper.convertToText(it)
+            toText += "\n"
         }
         text = toText
     }

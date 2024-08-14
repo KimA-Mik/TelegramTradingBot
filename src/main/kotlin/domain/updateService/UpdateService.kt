@@ -351,12 +351,21 @@ class UpdateService(
     }
 
     private fun handleBollingerBandsIndicator(share: UserShare, cache: Cache): IndicatorUpdateData? {
-        //todo: implement
-        return null
-
-        val hourlyBB = cache.hourlyBollingerBands[share.ticker] ?: return null
-        val dailyBB = cache.dailyBollingerBands[share.ticker] ?: return null
+        val hourlyBb = cache.hourlyBollingerBands[share.ticker] ?: return null
+        val dailyBb = cache.dailyBollingerBands[share.ticker] ?: return null
         val price = cache.shares[share.ticker] ?: return null
+
+        if (dailyBb.lower > price && hourlyBb.lower > price) {
+            return IndicatorUpdateData.BbAboveData(
+                hourlyBb = hourlyBb,
+                dailyBb = dailyBb
+            )
+        } else if (dailyBb.upper < price && hourlyBb.upper < price) {
+            return IndicatorUpdateData.BbBelowData(
+                hourlyBb = hourlyBb,
+                dailyBb = dailyBb
+            )
+        }
 
         return null
     }
