@@ -28,7 +28,7 @@ class EditShareButtonHandler(
 
             is GetUserShareUseCase.GetUserShareResult.Success -> EditShareScreen(
                 id = user.id,
-                state = EditShareScreen.State.Share(result.share.ticker, result.share.percent)
+                state = EditShareScreen.State.Share(result.share)
             )
         }
     }

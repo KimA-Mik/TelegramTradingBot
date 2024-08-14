@@ -8,7 +8,6 @@ import presentation.telegram.screens.BotScreen
 class MySecuritiesRoot(id: Long) : BotScreen(id) {
     override val text = "Ваши акции"
     override val replyMarkup = _replayMarkup
-    override val parseMode = null
 
     companion object {
         private val _replayMarkup = KeyboardReplyMarkup(
