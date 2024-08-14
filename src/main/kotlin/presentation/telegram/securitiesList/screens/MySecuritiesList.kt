@@ -1,4 +1,4 @@
-package presentation.telegram.screens
+package presentation.telegram.securitiesList.screens
 
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.ParseMode
@@ -9,7 +9,10 @@ import presentation.common.MarkdownUtil
 import presentation.common.TinInvestUtil
 import presentation.common.formatAndTrim
 import presentation.telegram.callbackButtons.CALLBACK_BUTTON_ARGUMENT_SEPARATOR
-import presentation.telegram.callbackButtons.CallbackButton
+import presentation.telegram.screens.BotScreen
+import presentation.telegram.securitiesList.callbackButtons.EditShare
+import presentation.telegram.securitiesList.callbackButtons.SecuritiesListBack
+import presentation.telegram.securitiesList.callbackButtons.SecuritiesListForward
 
 class MySecuritiesList(
     id: Long,
@@ -52,14 +55,14 @@ class MySecuritiesList(
         val buttonsList = mutableListOf(
             listOf(
                 InlineKeyboardButton.CallbackData(
-                    CallbackButton.SecuritiesListBack.text,
-                    CallbackButton.SecuritiesListBack.callbackData +
+                    SecuritiesListBack.text,
+                    SecuritiesListBack.callbackData +
                             CALLBACK_BUTTON_ARGUMENT_SEPARATOR
                             + page.toString()
                 ),
                 InlineKeyboardButton.CallbackData(
-                    CallbackButton.SecuritiesListForward.text,
-                    CallbackButton.SecuritiesListForward.callbackData +
+                    SecuritiesListForward.text,
+                    SecuritiesListForward.callbackData +
                             CALLBACK_BUTTON_ARGUMENT_SEPARATOR
                             + page.toString()
                 )
@@ -69,8 +72,8 @@ class MySecuritiesList(
         val sharesRows = shares.map { share ->
             listOf(
                 InlineKeyboardButton.CallbackData(
-                    CallbackButton.EditShare.text + share.ticker,
-                    CallbackButton.EditShare.callbackData +
+                    EditShare.text + share.ticker,
+                    EditShare.callbackData +
                             CALLBACK_BUTTON_ARGUMENT_SEPARATOR
                             + share.ticker
                 )

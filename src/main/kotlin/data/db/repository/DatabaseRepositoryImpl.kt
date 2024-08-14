@@ -73,13 +73,13 @@ class DatabaseRepositoryImpl(
         }
     }
 
-    override suspend fun updateUser(user: User): User {
+    override suspend fun updateUser(user: User): User? {
         return database.transaction {
-            Users.update({ Users.id eq user.id }) {
+            val updated = Users.update({ Users.id eq user.id }) {
                 it.updateUser(user)
             }
 
-            return@transaction user
+            return@transaction if (updated > 0) user else null
         }
     }
 
@@ -178,31 +178,18 @@ class DatabaseRepositoryImpl(
                     UserShares.percent,
                     UserShares.notified,
                     UserShares.rsiNotified,
-                    UserShares.bollingerBandsNotified
+                    UserShares.bollingerBandsNotified,
+                    UserShares.rsiNotificationsEnabled,
+                    UserShares.bbNotificationsEnabled
                 )
                 .map { it.toFollowedShare() }
         }
     }
 
-    override suspend fun updateUserSharePercent(userId: Long, userShare: UserShare): Boolean {
+    override suspend fun updateUserShare(userShare: UserShare): Boolean {
         return database.transaction {
-            val ids = Shares
-                .join(
-                    UserShares, JoinType.INNER,
-                    onColumn = Shares.id, otherColumn = UserShares.shareId,
-                    additionalConstraint = { UserShares.userId eq userId }
-                )
-                .select(UserShares.id)
-                .where { Shares.ticker eq userShare.ticker }
-                .map { it[UserShares.id].value }
-
-            if (ids.size != 1) {
-                return@transaction false
-            }
-
-            val id = ids.first()
-            val updated = UserShares.update({ UserShares.id eq id }) {
-                it[percent] = userShare.percent
+            val updated = UserShares.update({ UserShares.id eq userShare.id }) {
+                it.updateUserShare(userShare)
             }
 
             return@transaction updated > 0
@@ -231,7 +218,9 @@ class DatabaseRepositoryImpl(
                     UserShares.percent,
                     UserShares.notified,
                     UserShares.rsiNotified,
-                    UserShares.bollingerBandsNotified
+                    UserShares.bollingerBandsNotified,
+                    UserShares.rsiNotificationsEnabled,
+                    UserShares.bbNotificationsEnabled
                 )
                 .groupBy { it[Users.id] }
                 .map {
@@ -257,6 +246,8 @@ class DatabaseRepositoryImpl(
                 statement[UserShares.percent] = it.percent
                 statement[UserShares.rsiNotified] = it.rsiNotified
                 statement[UserShares.bollingerBandsNotified] = it.bollingerBandsNotified
+                statement[UserShares.rsiNotificationsEnabled] = it.rsiNotificationsEnabled
+                statement[UserShares.bbNotificationsEnabled] = it.bbNotificationsEnabled
             }
 
             try {
@@ -276,7 +267,9 @@ class DatabaseRepositoryImpl(
             percent = this[UserShares.percent],
             futuresNotified = this[UserShares.notified],
             rsiNotified = this[UserShares.rsiNotified],
-            bollingerBandsNotified = this[UserShares.bollingerBandsNotified]
+            bollingerBandsNotified = this[UserShares.bollingerBandsNotified],
+            rsiNotificationsEnabled = this[UserShares.rsiNotificationsEnabled],
+            bbNotificationsEnabled = this[UserShares.bbNotificationsEnabled],
         )
     }
 
@@ -289,6 +282,8 @@ class DatabaseRepositoryImpl(
             agentChatId = this[Users.agentChatId],
             agentCode = this[Users.agentCode],
             agentNotifications = this[Users.agentNotifications],
+            defaultRsiNotifications = this[Users.defaultRsiNotifications],
+            defaultBbNotifications = this[Users.defaultBbNotifications]
         )
     }
 
@@ -300,5 +295,16 @@ class DatabaseRepositoryImpl(
         this[Users.agentChatId] = user.agentChatId
         this[Users.agentCode] = user.agentCode
         this[Users.agentNotifications] = user.agentNotifications
+        this[Users.defaultRsiNotifications] = user.defaultRsiNotifications
+        this[Users.defaultBbNotifications] = user.defaultBbNotifications
+    }
+
+    private fun UpdateStatement.updateUserShare(userShare: UserShare) {
+        this[UserShares.percent] = userShare.percent
+        this[UserShares.notified] = userShare.futuresNotified
+        this[UserShares.rsiNotified] = userShare.rsiNotified
+        this[UserShares.bollingerBandsNotified] = userShare.bollingerBandsNotified
+        this[UserShares.rsiNotificationsEnabled] = userShare.rsiNotificationsEnabled
+        this[UserShares.bbNotificationsEnabled] = userShare.bbNotificationsEnabled
     }
 }

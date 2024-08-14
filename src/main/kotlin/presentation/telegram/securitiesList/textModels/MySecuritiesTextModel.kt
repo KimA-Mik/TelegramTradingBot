@@ -1,4 +1,4 @@
-package presentation.telegram.textModels
+package presentation.telegram.securitiesList.textModels
 
 import domain.user.model.User
 import domain.user.useCase.GetUserSharesUseCase
@@ -8,8 +8,8 @@ import presentation.telegram.common.UNKNOWN_COMMAND
 import presentation.telegram.common.UNKNOWN_PATH
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
-import presentation.telegram.screens.MySecuritiesList
-import presentation.telegram.screens.MySecuritiesRoot
+import presentation.telegram.securitiesList.screens.MySecuritiesList
+import presentation.telegram.securitiesList.screens.MySecuritiesRoot
 import presentation.telegram.textModels.common.TextModel
 
 class MySecuritiesTextModel(
@@ -44,7 +44,7 @@ class MySecuritiesTextModel(
         }
     }
 
-    private suspend fun passExecution(
+    private fun passExecution(
         user: User,
         path: List<String>,
         command: String

@@ -6,6 +6,7 @@ import domain.user.model.User
 import presentation.common.formatAndTrim
 import presentation.telegram.BotTextCommands
 import presentation.telegram.screens.BotScreen
+import presentation.telegram.settings.stateToText
 import presentation.telegram.settings.textModels.SettingsTextModel
 
 class SettingsRoot(user: User) : BotScreen(user.id) {
@@ -20,11 +21,12 @@ class SettingsRoot(user: User) : BotScreen(user.id) {
         val login = user.agentChatId ?: "не определён"
         res += "Ваш логин для Agent: $login\n"
 
-        val enabled = when (user.agentNotifications) {
-            true -> "включены"
-            false -> "выключены"
-        }
-        res += "Уведомления через Agent: $enabled"
+        val enabled = stateToText(user.agentNotifications)
+        res += "Уведомления через Agent: $enabled\n"
+
+        res += "\nУведомления индикаторов по умолчаню:\n"
+        res += "RSI: ${stateToText(user.defaultRsiNotifications)}\n"
+        res += "Полосы Боллинджера: ${stateToText(user.defaultBbNotifications)}\n"
 
         return res
     }
@@ -36,7 +38,10 @@ class SettingsRoot(user: User) : BotScreen(user.id) {
                     KeyboardButton(SettingsTextModel.SettingsTextCommands.DefaultPercent.text),
                     KeyboardButton(SettingsTextModel.SettingsTextCommands.ResetPercent.text)
                 ),
-                listOf(KeyboardButton(SettingsTextModel.SettingsTextCommands.AgentSettings.text)),
+                listOf(
+                    KeyboardButton(SettingsTextModel.SettingsTextCommands.AgentSettings.text),
+                    KeyboardButton(SettingsTextModel.SettingsTextCommands.IndicatorsSettings.text)
+                ),
                 listOf(KeyboardButton(BotTextCommands.Root.text))
             ),
             resizeKeyboard = true

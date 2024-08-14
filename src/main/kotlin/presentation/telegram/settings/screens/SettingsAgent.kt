@@ -9,6 +9,7 @@ import presentation.telegram.settings.callbackButtons.DisableAgentNotificationsC
 import presentation.telegram.settings.callbackButtons.EnableAgentNotificationsCallbackButton
 import presentation.telegram.settings.callbackButtons.LinkAgentAccountCallbackButton
 import presentation.telegram.settings.callbackButtons.UnlinkAgentAccountCallbackButton
+import presentation.telegram.settings.stateToText
 
 class SettingsAgent(user: User, messageId: Long? = null) : BotScreen(user.id, messageId) {
     override val text = calculateText(user)
@@ -20,12 +21,7 @@ class SettingsAgent(user: User, messageId: Long? = null) : BotScreen(user.id, me
 
         val login = user.agentChatId ?: "не привящан"
         res += "Логин : $login\n"
-
-        val enabled = when (user.agentNotifications) {
-            true -> "включены"
-            false -> "выключены"
-        }
-        res += "Уведомления через Agent: $enabled"
+        res += "Уведомления через Agent: ${stateToText(user.agentNotifications)}"
 
         return res
     }

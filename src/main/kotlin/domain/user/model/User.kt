@@ -9,5 +9,7 @@ data class User(
     val defaultPercent: Double,
     val agentChatId: String?,
     val agentCode: String?,
-    val agentNotifications: Boolean
+    val agentNotifications: Boolean,
+    val defaultRsiNotifications: Boolean,
+    val defaultBbNotifications: Boolean,
 )

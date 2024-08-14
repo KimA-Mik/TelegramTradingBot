@@ -14,4 +14,7 @@ object Users : Table() {
     val agentChatId = varchar("agent_chat_id", 255).nullable().uniqueIndex()
     val agentCode = varchar("agent_code", 10).nullable()
     val agentNotifications = bool("agent_notifications").default(false)
+
+    val defaultRsiNotifications = bool("default_rsi_notifications").default(true)
+    val defaultBbNotifications = bool("default_bb_notifications").default(false)
 }
