@@ -1,5 +1,8 @@
 package domain.updateService
 
+import domain.analysis.mappers.toSeries
+import domain.analysis.model.BollingerBandsData
+import domain.analysis.transformations.BollingerBands
 import domain.common.TAX_MULTIPLIER
 import domain.common.getFutureSharePrice
 import domain.common.percentBetweenDoubles
@@ -179,6 +182,8 @@ class UpdateService(
         val sharesPricesCache = HashMap<String, Double>(shares.size)
         val hourlyRsiCache = HashMap<String, Double>(shares.size)
         val dailyRsiCache = HashMap<String, Double>(shares.size)
+        val hourlyBollingerBands = HashMap<String, BollingerBandsData>(shares.size)
+        val dailyBollingerBands = HashMap<String, BollingerBandsData>(shares.size)
 
         val sharesTickers = shares.map { it.ticker }
 
@@ -236,6 +241,12 @@ class UpdateService(
             dailyRsiCache[share.ticker] = MathUtil.calculateRsi(dailyPrices)
             hourlyRsiCache[share.ticker] = MathUtil.calculateRsi(hourlyPrices)
 
+            val dailySeries = dailyCandles.toSeries()
+            val hourlySeries = hourlyCandles.toSeries()
+
+            dailyBollingerBands[share.ticker] = BollingerBands.calculate(dailySeries)
+            hourlyBollingerBands[share.ticker] = BollingerBands.calculate(hourlySeries)
+
             delay(10)
         }
 
@@ -265,44 +276,40 @@ class UpdateService(
             shares = sharesPricesCache,
             sharesToFutures = sharesToFutures,
             futures = futuresPrice,
-            hourlyRsiCache = hourlyRsiCache,
-            dailyRsiCache = dailyRsiCache
+            hourlyRsi = hourlyRsiCache,
+            dailyRsi = dailyRsiCache,
+            hourlyBollingerBands = hourlyBollingerBands,
+            dailyBollingerBands = dailyBollingerBands
         )
     }
 
 
     private suspend fun handleIndicatorsForUser(user: UserWithFollowedShares, cache: Cache) {
-        val handled = mutableListOf<UserShare>()
+        val handled = mutableMapOf<String, UserShare>()
 
         for (share in user.shares) {
-            val updateData = mutableListOf<IndicatorUpdateData>()
-            val dailyRsi = cache.dailyRsiCache[share.ticker] ?: continue
-            val hourlyRsi = cache.hourlyRsiCache[share.ticker] ?: continue
             val price = cache.shares[share.ticker] ?: continue
+            val updateData = mutableListOf<IndicatorUpdateData>()
 
-            if (dailyRsi > MathUtil.RSI_HIGH && hourlyRsi > MathUtil.RSI_HIGH) {
-                updateData.add(
-                    IndicatorUpdateData.RsiHighData(
-                        hourlyRsi = hourlyRsi,
-                        dailyRsi = dailyRsi
-                    )
-                )
-            } else if (dailyRsi < MathUtil.RSI_LOW && hourlyRsi < MathUtil.RSI_LOW) {
-                updateData.add(
-                    IndicatorUpdateData.RsiLowData(
-                        hourlyRsi = hourlyRsi,
-                        dailyRsi = dailyRsi
-                    )
-                )
+            val rsiData = handleRsiIndicator(share, cache)
+            val shouldNotifyRsi = rsiData != null
+            //TODO: Make more flexible system
+            if (shouldNotifyRsi != share.rsiNotified) {
+                val handledShare = share.copy(rsiNotified = shouldNotifyRsi)
+                handled[share.ticker] = handledShare
+
+                rsiData?.let { updateData.add(it) }
             }
 
-            val shouldNotify = updateData.isNotEmpty()
-            //TODO: Make more flexible system
-            if (shouldNotify == share.indicatorsNotified) continue
-            val handledShare = share.copy(indicatorsNotified = shouldNotify)
-            handled.add(handledShare)
+            val bollingerBandsData = handleBollingerBandsIndicator(share, cache)
+            val shouldNotifyBB = bollingerBandsData != null
+            if (shouldNotifyBB != share.bollingerBandsNotified) {
+                val oldShare = handled[share.ticker] ?: share
+                handled[share.ticker] = oldShare.copy(bollingerBandsNotified = shouldNotifyBB)
+                bollingerBandsData?.let { updateData.add(it) }
+            }
 
-            if (shouldNotify) {
+            if (updateData.isNotEmpty()) {
                 val update = TelegramIndicatorUpdate(
                     userId = user.id,
                     ticker = share.ticker,
@@ -322,7 +329,45 @@ class UpdateService(
                 }
             }
         }
-        database.updateUserShares(handled)
+        database.updateUserShares(handled.values.toList())
+    }
+
+    private fun handleRsiIndicator(share: UserShare, cache: Cache): IndicatorUpdateData? {
+        val dailyRsi = cache.dailyRsi[share.ticker] ?: return null
+        val hourlyRsi = cache.hourlyRsi[share.ticker] ?: return null
+
+        if (dailyRsi > MathUtil.RSI_HIGH && hourlyRsi > MathUtil.RSI_HIGH) {
+            return IndicatorUpdateData.RsiHighData(
+                hourlyRsi = hourlyRsi,
+                dailyRsi = dailyRsi
+            )
+        } else if (dailyRsi < MathUtil.RSI_LOW && hourlyRsi < MathUtil.RSI_LOW) {
+            return IndicatorUpdateData.RsiLowData(
+                hourlyRsi = hourlyRsi,
+                dailyRsi = dailyRsi
+            )
+        }
+        return null
+    }
+
+    private fun handleBollingerBandsIndicator(share: UserShare, cache: Cache): IndicatorUpdateData? {
+        val hourlyBb = cache.hourlyBollingerBands[share.ticker] ?: return null
+        val dailyBb = cache.dailyBollingerBands[share.ticker] ?: return null
+        val price = cache.shares[share.ticker] ?: return null
+
+        if (dailyBb.lower > price && hourlyBb.lower > price) {
+            return IndicatorUpdateData.BbAboveData(
+                hourlyBb = hourlyBb,
+                dailyBb = dailyBb
+            )
+        } else if (dailyBb.upper < price && hourlyBb.upper < price) {
+            return IndicatorUpdateData.BbBelowData(
+                hourlyBb = hourlyBb,
+                dailyBb = dailyBb
+            )
+        }
+
+        return null
     }
 
     private fun extractPrices(candles: List<TinkoffCandle>): DoubleArray {

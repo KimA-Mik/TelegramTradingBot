@@ -177,7 +177,8 @@ class DatabaseRepositoryImpl(
                     Shares.name,
                     UserShares.percent,
                     UserShares.notified,
-                    UserShares.indicatorsNotified
+                    UserShares.rsiNotified,
+                    UserShares.bollingerBandsNotified
                 )
                 .map { it.toFollowedShare() }
         }
@@ -229,7 +230,8 @@ class DatabaseRepositoryImpl(
                     Shares.ticker,
                     UserShares.percent,
                     UserShares.notified,
-                    UserShares.indicatorsNotified
+                    UserShares.rsiNotified,
+                    UserShares.bollingerBandsNotified
                 )
                 .groupBy { it[Users.id] }
                 .map {
@@ -253,7 +255,8 @@ class DatabaseRepositoryImpl(
                 statement.addBatch(EntityID(id = it.id, UserShares))
                 statement[UserShares.notified] = it.futuresNotified
                 statement[UserShares.percent] = it.percent
-                statement[UserShares.indicatorsNotified] = it.indicatorsNotified
+                statement[UserShares.rsiNotified] = it.rsiNotified
+                statement[UserShares.bollingerBandsNotified] = it.bollingerBandsNotified
             }
 
             try {
@@ -272,7 +275,8 @@ class DatabaseRepositoryImpl(
             name = this[Shares.name],
             percent = this[UserShares.percent],
             futuresNotified = this[UserShares.notified],
-            indicatorsNotified = this[UserShares.indicatorsNotified]
+            rsiNotified = this[UserShares.rsiNotified],
+            bollingerBandsNotified = this[UserShares.bollingerBandsNotified]
         )
     }
 
