@@ -50,3 +50,17 @@ kotlin {
 application {
     mainClass.set("MainKt")
 }
+
+// https://stackoverflow.com/a/71092054
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "MainKt"
+    }
+    val dependencies = configurations
+        .runtimeClasspath
+        .get()
+        .map { zipTree(it) }
+    from(dependencies)
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
