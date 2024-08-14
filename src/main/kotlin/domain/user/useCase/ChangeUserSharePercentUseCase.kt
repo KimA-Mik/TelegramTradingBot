@@ -22,8 +22,8 @@ class ChangeUserSharePercentUseCase(
             percent = newPercent
         )
 
-        val success = repository.updateUserSharePercent(
-            userId, updatedShare
+        val success = repository.updateUserShare(
+            updatedShare
         )
 
         return when (success) {

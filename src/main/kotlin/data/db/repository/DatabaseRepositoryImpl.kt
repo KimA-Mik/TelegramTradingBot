@@ -186,25 +186,10 @@ class DatabaseRepositoryImpl(
         }
     }
 
-    override suspend fun updateUserSharePercent(userId: Long, userShare: UserShare): Boolean {
+    override suspend fun updateUserShare(userShare: UserShare): Boolean {
         return database.transaction {
-            val ids = Shares
-                .join(
-                    UserShares, JoinType.INNER,
-                    onColumn = Shares.id, otherColumn = UserShares.shareId,
-                    additionalConstraint = { UserShares.userId eq userId }
-                )
-                .select(UserShares.id)
-                .where { Shares.ticker eq userShare.ticker }
-                .map { it[UserShares.id].value }
-
-            if (ids.size != 1) {
-                return@transaction false
-            }
-
-            val id = ids.first()
-            val updated = UserShares.update({ UserShares.id eq id }) {
-                it[percent] = userShare.percent
+            val updated = UserShares.update({ UserShares.id eq userShare.id }) {
+                it.updateUserShare(userShare)
             }
 
             return@transaction updated > 0
@@ -312,5 +297,14 @@ class DatabaseRepositoryImpl(
         this[Users.agentNotifications] = user.agentNotifications
         this[Users.defaultRsiNotifications] = user.defaultRsiNotifications
         this[Users.defaultBbNotifications] = user.defaultBbNotifications
+    }
+
+    private fun UpdateStatement.updateUserShare(userShare: UserShare) {
+        this[UserShares.percent] = userShare.percent
+        this[UserShares.notified] = userShare.futuresNotified
+        this[UserShares.rsiNotified] = userShare.rsiNotified
+        this[UserShares.bollingerBandsNotified] = userShare.bollingerBandsNotified
+        this[UserShares.rsiNotificationsEnabled] = userShare.rsiNotificationsEnabled
+        this[UserShares.bbNotificationsEnabled] = userShare.bbNotificationsEnabled
     }
 }
