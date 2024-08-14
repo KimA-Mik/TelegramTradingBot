@@ -1,10 +1,12 @@
-package presentation.telegram.callbackButtons
+package presentation.telegram.securitiesList.callbackButtonsHandlers
 
 import domain.user.model.User
 import domain.user.useCase.ChangeUserSharePercentUseCase
+import presentation.telegram.callbackButtons.CallbackButtonHandler
+import presentation.telegram.callbackButtons.UNABLE_TO_CHANGE_SHARE_PERCENT
 import presentation.telegram.screens.BotScreen
-import presentation.telegram.screens.EditShareScreen
 import presentation.telegram.screens.ErrorScreen
+import presentation.telegram.securitiesList.screens.EditShareScreen
 
 class SharePercentButtonHandler(
     private val changeUserSharePercent: ChangeUserSharePercentUseCase

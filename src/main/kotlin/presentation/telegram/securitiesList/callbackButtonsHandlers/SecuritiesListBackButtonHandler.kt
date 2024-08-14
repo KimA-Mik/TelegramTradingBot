@@ -1,10 +1,12 @@
-package presentation.telegram.callbackButtons
+package presentation.telegram.securitiesList.callbackButtonsHandlers
 
 import domain.user.model.User
 import domain.user.useCase.GetUserSharesUseCase
+import presentation.telegram.callbackButtons.CallbackButtonHandler
+import presentation.telegram.callbackButtons.UNKNOWN_BUTTON_ERROR
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
-import presentation.telegram.screens.MySecuritiesList
+import presentation.telegram.securitiesList.screens.MySecuritiesList
 
 class SecuritiesListBackButtonHandler(
     private val getUserShares: GetUserSharesUseCase

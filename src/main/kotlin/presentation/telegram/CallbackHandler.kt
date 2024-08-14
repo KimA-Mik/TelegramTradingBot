@@ -7,6 +7,14 @@ import kotlinx.coroutines.flow.asSharedFlow
 import presentation.telegram.callbackButtons.*
 import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
+import presentation.telegram.securitiesList.callbackButtons.EditShare
+import presentation.telegram.securitiesList.callbackButtons.SecuritiesListBack
+import presentation.telegram.securitiesList.callbackButtons.SecuritiesListForward
+import presentation.telegram.securitiesList.callbackButtons.SharePercent
+import presentation.telegram.securitiesList.callbackButtonsHandlers.EditShareButtonHandler
+import presentation.telegram.securitiesList.callbackButtonsHandlers.SecuritiesListBackButtonHandler
+import presentation.telegram.securitiesList.callbackButtonsHandlers.SecuritiesListForwardButtonHandler
+import presentation.telegram.securitiesList.callbackButtonsHandlers.SharePercentButtonHandler
 import presentation.telegram.settings.callbackButtons.*
 import presentation.telegram.settings.callbackButtons.indicators.bollingerBands.ResetBbDefaultCallbackButton
 import presentation.telegram.settings.callbackButtons.indicators.bollingerBands.SwitchBbDefaultCallbackButton
@@ -41,13 +49,15 @@ class CallbackHandler(
 ) {
     private val buttonHandlers = mapOf(
         /* Ungrouped */
-        CallbackButton.EditShare.callbackData to editShareButtonHandler,
         CallbackButton.ResetNotification.callbackData to resetNotificationButtonHandler,
-        CallbackButton.SecuritiesListBack.callbackData to securitiesListBackButtonHandler,
-        CallbackButton.SecuritiesListForward.callbackData to securitiesListForwardButtonHandler,
-        CallbackButton.SharePercent.callbackData to sharePercentButtonHandler,
         CallbackButton.Subscribe.callbackData to subscribeButtonHandler,
         CallbackButton.Unsubscribe.callbackData to unsubscribeButtonHandler,
+
+        /* Securities List */
+        EditShare.callbackData to editShareButtonHandler,
+        SecuritiesListBack.callbackData to securitiesListBackButtonHandler,
+        SecuritiesListForward.callbackData to securitiesListForwardButtonHandler,
+        SharePercent.callbackData to sharePercentButtonHandler,
 
         /* Settings */
         EditDefaultPercentCallbackButton.callbackData to editDefaultPercentButtonHandler,

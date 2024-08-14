@@ -1,4 +1,4 @@
-package presentation.telegram.screens
+package presentation.telegram.securitiesList.screens
 
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.ParseMode
@@ -7,8 +7,9 @@ import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import presentation.common.MarkdownUtil
 import presentation.common.TinInvestUtil
 import presentation.common.formatAndTrim
-import presentation.telegram.callbackButtons.CallbackButton
 import presentation.telegram.common.NOT_SUBSCRIBED_TO_SHARE
+import presentation.telegram.screens.BotScreen
+import presentation.telegram.securitiesList.callbackButtons.SharePercent
 
 class EditShareScreen(
     id: Long,
@@ -45,22 +46,22 @@ class EditShareScreen(
         val rows = listOf(
             listOf(
                 InlineKeyboardButton.CallbackData(
-                    CallbackButton.SharePercent.getText(-1.0),
-                    CallbackButton.SharePercent.getCallbackData(state.ticker, -1.0)
+                    SharePercent.getText(-1.0),
+                    SharePercent.getCallbackData(state.ticker, -1.0)
                 ),
                 InlineKeyboardButton.CallbackData(
-                    CallbackButton.SharePercent.getText(1.0),
-                    CallbackButton.SharePercent.getCallbackData(state.ticker, 1.0)
+                    SharePercent.getText(1.0),
+                    SharePercent.getCallbackData(state.ticker, 1.0)
                 ),
             ),
             listOf(
                 InlineKeyboardButton.CallbackData(
-                    CallbackButton.SharePercent.getText(-0.1),
-                    CallbackButton.SharePercent.getCallbackData(state.ticker, -0.1)
+                    SharePercent.getText(-0.1),
+                    SharePercent.getCallbackData(state.ticker, -0.1)
                 ),
                 InlineKeyboardButton.CallbackData(
-                    CallbackButton.SharePercent.getText(0.1),
-                    CallbackButton.SharePercent.getCallbackData(state.ticker, 0.1)
+                    SharePercent.getText(0.1),
+                    SharePercent.getCallbackData(state.ticker, 0.1)
                 ),
             )
         )
