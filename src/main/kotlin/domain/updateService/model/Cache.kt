@@ -4,9 +4,9 @@ import domain.analysis.model.BollingerBandsData
 import domain.tinkoff.model.TinkoffFuture
 
 data class Cache(
-    val shares: Map<String, Double> = emptyMap(),
+    val shares: Map<String, SecurityPrice> = emptyMap(),
     val sharesToFutures: Map<String, List<TinkoffFuture>> = emptyMap(),
-    val futures: Map<String, Double> = emptyMap(),
+    val futures: Map<String, SecurityPrice> = emptyMap(),
     val hourlyRsi: Map<String, Double> = emptyMap(),
     val dailyRsi: Map<String, Double> = emptyMap(),
     val hourlyBollingerBands: Map<String, BollingerBandsData> = emptyMap(),
