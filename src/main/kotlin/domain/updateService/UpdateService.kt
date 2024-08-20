@@ -11,10 +11,7 @@ import domain.tinkoff.model.TinkoffCandle
 import domain.tinkoff.model.TinkoffShare
 import domain.tinkoff.repository.TinkoffRepository
 import domain.tinkoff.util.TinkoffFutureComparator
-import domain.updateService.model.Cache
-import domain.updateService.model.NotifyFuture
-import domain.updateService.model.NotifyShare
-import domain.updateService.model.UserWithFollowedShares
+import domain.updateService.model.*
 import domain.updateService.updates.IndicatorUpdateData
 import domain.updateService.updates.agentUpdates.AgentIndicatorUpdate
 import domain.updateService.updates.agentUpdates.AgentSharePriceInsufficientUpdate
@@ -130,15 +127,15 @@ class UpdateService(
             val futuresToNotify = mutableListOf<NotifyFuture>()
             for (future in futures) {
                 val futurePrice = cache.futures[future.ticker] ?: continue
-                val futureSlotPrice = getFutureSharePrice(sharePrice, futurePrice)
-                val percent = percentBetweenDoubles(futureSlotPrice, sharePrice)
+                val futureSlotPrice = getFutureSharePrice(sharePrice.price, futurePrice.price)
+                val percent = percentBetweenDoubles(futureSlotPrice, sharePrice.price)
                 val annualPercent = FuturesUtil.getFutureAnnualPercent(percent, future.expirationDate)
                 if (abs(annualPercent) >= share.percent) {
                     futuresToNotify.add(
                         NotifyFuture(
                             ticker = future.ticker,
                             name = future.name,
-                            price = futurePrice,
+                            price = futurePrice.price,
                             actualDifference = percent,
                             annualPercent = annualPercent,
                             annualAfterTaxes = annualPercent * TAX_MULTIPLIER,
@@ -153,7 +150,7 @@ class UpdateService(
             handled.add(share.copy(futuresNotified = shouldNotify))
             val notifyShare = NotifyShare(
                 shareTicker = share.ticker,
-                sharePrice = sharePrice,
+                sharePrice = sharePrice.price,
                 minimalDifference = share.percent,
                 futures = futuresToNotify
             )
@@ -179,7 +176,7 @@ class UpdateService(
         if (usersWithFollowedShares.isEmpty()) return null
 
         val shares = extractUniqueShares(usersWithFollowedShares)
-        val sharesPricesCache = HashMap<String, Double>(shares.size)
+        val sharesPricesCache = HashMap<String, SecurityPrice>(shares.size)
         val hourlyRsiCache = HashMap<String, Double>(shares.size)
         val dailyRsiCache = HashMap<String, Double>(shares.size)
         val hourlyBollingerBands = HashMap<String, BollingerBandsData>(shares.size)
@@ -212,9 +209,9 @@ class UpdateService(
                 continue
             }
 
-            val price = orderBook.asks.first().price * share.lot
+            val price = orderBook.asks.first().price
             if (price > 0.0) {
-                sharesPricesCache[share.ticker] = price
+                sharesPricesCache[share.ticker] = SecurityPrice(price = price, lot = share.lot)
             } else {
                 continue
             }
@@ -252,7 +249,7 @@ class UpdateService(
 
         delay(TimeUtil.SECOND_MILLIS)
 
-        val futuresPrice = mutableMapOf<String, Double>()
+        val futuresPrice = mutableMapOf<String, SecurityPrice>()
         for (future in futuresList) {
             val orderBookResource = tinkoff.getOrderBook(future.uid)
             if (orderBookResource.data == null) {
@@ -263,12 +260,12 @@ class UpdateService(
             val orderBook = orderBookResource.data
             if (orderBook.bids.isEmpty()) {
                 logger.info("Order book bids for ${future.ticker} is empty")
-                futuresPrice[future.ticker] = orderBook.lastPrice * future.lot
+                futuresPrice[future.ticker] = SecurityPrice(price = orderBook.lastPrice, future.lot)
                 continue
             }
 
-            val price = orderBook.bids.first().price * future.lot
-            if (price > 0.0) futuresPrice[future.ticker] = price
+            val price = orderBook.bids.first().price
+            if (price > 0.0) futuresPrice[future.ticker] = SecurityPrice(price = price, lot = future.lot)
             delay(10)
         }
 
@@ -313,7 +310,7 @@ class UpdateService(
                 val update = TelegramIndicatorUpdate(
                     userId = user.id,
                     ticker = share.ticker,
-                    price = price,
+                    price = price.price,
                     data = updateData
                 )
                 _updates.emit(update)
@@ -322,7 +319,7 @@ class UpdateService(
                     val agentUpdate = AgentIndicatorUpdate(
                         chatId = user.agentChatId,
                         ticker = share.ticker,
-                        price = price,
+                        price = price.price,
                         data = updateData
                     )
                     _agentUpdates.emit(agentUpdate)
@@ -353,7 +350,7 @@ class UpdateService(
     private fun handleBollingerBandsIndicator(share: UserShare, cache: Cache): IndicatorUpdateData? {
         val hourlyBb = cache.hourlyBollingerBands[share.ticker] ?: return null
         val dailyBb = cache.dailyBollingerBands[share.ticker] ?: return null
-        val price = cache.shares[share.ticker] ?: return null
+        val price = cache.shares[share.ticker]?.price ?: return null
 
         if (dailyBb.lower > price && hourlyBb.lower > price) {
             return IndicatorUpdateData.BbAboveData(
