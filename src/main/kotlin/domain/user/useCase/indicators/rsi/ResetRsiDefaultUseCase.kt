@@ -1,22 +1,16 @@
 package domain.user.useCase.indicators.rsi
 
 import domain.user.model.User
-import domain.user.repository.DatabaseRepository
+import domain.user.useCase.TransformUserSharesUseCase
 import domain.user.useCase.indicators.result.ResetIndicatorResult
 
-class ResetRsiDefaultUseCase(private val repository: DatabaseRepository) {
+class ResetRsiDefaultUseCase(private val transformUserShares: TransformUserSharesUseCase) {
     suspend operator fun invoke(user: User): ResetIndicatorResult {
-        val userShares = repository.getUserShares(user.id)
-        if (userShares.isEmpty()) return ResetIndicatorResult.NoShares
-
-        val updated = userShares.map {
-            it.copy(
-                rsiNotified = false,
-                rsiNotificationsEnabled = user.defaultRsiNotifications
-            )
+        return when (transformUserShares(user) {
+            it.copy(rsiNotified = false, rsiNotificationsEnabled = user.defaultRsiNotifications)
+        }) {
+            true -> ResetIndicatorResult.Success(user.defaultRsiNotifications)
+            false -> ResetIndicatorResult.NoShares
         }
-        repository.updateUserShares(updated)
-
-        return ResetIndicatorResult.Success(user.defaultRsiNotifications)
     }
 }
