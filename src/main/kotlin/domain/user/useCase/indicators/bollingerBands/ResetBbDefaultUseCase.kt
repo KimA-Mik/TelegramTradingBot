@@ -9,7 +9,12 @@ class ResetBbDefaultUseCase(private val repository: DatabaseRepository) {
         val userShares = repository.getUserShares(user.id)
         if (userShares.isEmpty()) return ResetIndicatorResult.NoShares
 
-        val updated = userShares.map { it.copy(bbNotificationsEnabled = user.defaultBbNotifications) }
+        val updated = userShares.map {
+            it.copy(
+                bollingerBandsNotified = false,
+                bbNotificationsEnabled = user.defaultBbNotifications
+            )
+        }
         repository.updateUserShares(updated)
 
         return ResetIndicatorResult.Success(user.defaultBbNotifications)

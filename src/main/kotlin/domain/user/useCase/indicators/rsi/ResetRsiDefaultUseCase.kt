@@ -9,7 +9,12 @@ class ResetRsiDefaultUseCase(private val repository: DatabaseRepository) {
         val userShares = repository.getUserShares(user.id)
         if (userShares.isEmpty()) return ResetIndicatorResult.NoShares
 
-        val updated = userShares.map { it.copy(rsiNotificationsEnabled = user.defaultRsiNotifications) }
+        val updated = userShares.map {
+            it.copy(
+                rsiNotified = false,
+                rsiNotificationsEnabled = user.defaultRsiNotifications
+            )
+        }
         repository.updateUserShares(updated)
 
         return ResetIndicatorResult.Success(user.defaultRsiNotifications)
