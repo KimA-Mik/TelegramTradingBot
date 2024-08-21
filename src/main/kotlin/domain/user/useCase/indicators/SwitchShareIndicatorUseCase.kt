@@ -21,8 +21,15 @@ class SwitchShareIndicatorUseCase(
         }
 
         val updated = when (indicator) {
-            Indicator.RSI -> userShare.copy(rsiNotificationsEnabled = newValue)
-            Indicator.BOLLINGER_BANDS -> userShare.copy(bbNotificationsEnabled = newValue)
+            Indicator.RSI -> userShare.copy(
+                rsiNotificationsEnabled = newValue,
+                rsiNotified = false
+            )
+
+            Indicator.BOLLINGER_BANDS -> userShare.copy(
+                bbNotificationsEnabled = newValue,
+                bollingerBandsNotified = false
+            )
         }
 
         return when (database.updateUserShare(updated)) {

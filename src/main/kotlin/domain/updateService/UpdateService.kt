@@ -291,7 +291,7 @@ class UpdateService(
             val rsiData = handleRsiIndicator(share, cache)
             val shouldNotifyRsi = rsiData != null
             //TODO: Make more flexible system
-            if (shouldNotifyRsi != share.rsiNotified) {
+            if (share.rsiNotificationsEnabled && shouldNotifyRsi != share.rsiNotified) {
                 val handledShare = share.copy(rsiNotified = shouldNotifyRsi)
                 handled[share.ticker] = handledShare
 
@@ -300,7 +300,7 @@ class UpdateService(
 
             val bollingerBandsData = handleBollingerBandsIndicator(share, cache)
             val shouldNotifyBB = bollingerBandsData != null
-            if (shouldNotifyBB != share.bollingerBandsNotified) {
+            if (share.bbNotificationsEnabled && shouldNotifyBB != share.bollingerBandsNotified) {
                 val oldShare = handled[share.ticker] ?: share
                 handled[share.ticker] = oldShare.copy(bollingerBandsNotified = shouldNotifyBB)
                 bollingerBandsData?.let { updateData.add(it) }
