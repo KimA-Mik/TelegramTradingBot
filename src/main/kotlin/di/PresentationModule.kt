@@ -2,9 +2,6 @@ package di
 
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
-import presentation.agent.AgentBotModel
-import presentation.agent.AgentEventHandler
-import presentation.agent.AgentUpdateHandler
 import presentation.telegram.BotModel
 import presentation.telegram.CallbackHandler
 import presentation.telegram.UpdateHandler
@@ -13,7 +10,7 @@ import presentation.telegram.callbackButtons.SubscribeButtonHandler
 import presentation.telegram.callbackButtons.UnsubscribeButtonHandler
 import presentation.telegram.securitiesList.callbackButtonsHandlers.*
 import presentation.telegram.securitiesList.textModels.MySecuritiesTextModel
-import presentation.telegram.settings.callbackButtonsHandlers.*
+import presentation.telegram.settings.callbackButtonsHandlers.EditDefaultPercentButtonHandler
 import presentation.telegram.settings.callbackButtonsHandlers.indicators.bollingerBands.ResetBbDefaultButtonHandler
 import presentation.telegram.settings.callbackButtonsHandlers.indicators.bollingerBands.SwitchBbDefaultButtonHandler
 import presentation.telegram.settings.callbackButtonsHandlers.indicators.rsi.ResetRsiDefaultButtonHandler
@@ -26,10 +23,6 @@ val presentationModule = module {
     singleOf(::BotModel)
     singleOf(::CallbackHandler)
     singleOf(::UpdateHandler)
-
-    singleOf(::AgentBotModel)
-    singleOf(::AgentEventHandler)
-    singleOf(::AgentUpdateHandler)
 
     singleOf(::RootTextModel)
     singleOf(::MySecuritiesTextModel)
@@ -46,11 +39,6 @@ val presentationModule = module {
     singleOf(::SecuritiesListForwardButtonHandler)
     singleOf(::EditDefaultPercentButtonHandler)
     singleOf(::SwitchShareIndicatorCallbackButtonHandler)
-
-    singleOf(::DisableAgentNotificationsButtonHandler)
-    singleOf(::EnableAgentNotificationsButtonHandler)
-    singleOf(::LinkAgentAccountButtonHandler)
-    singleOf(::UnlinkAgentAccountButtonHandler)
 
     singleOf(::ResetBbDefaultButtonHandler)
     singleOf(::SwitchBbDefaultButtonHandler)

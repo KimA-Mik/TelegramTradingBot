@@ -13,10 +13,6 @@ import domain.tinkoff.repository.TinkoffRepository
 import domain.tinkoff.util.TinkoffFutureComparator
 import domain.updateService.model.*
 import domain.updateService.updates.IndicatorUpdateData
-import domain.updateService.updates.agentUpdates.AgentIndicatorUpdate
-import domain.updateService.updates.agentUpdates.AgentSharePriceInsufficientUpdate
-import domain.updateService.updates.agentUpdates.AgentShareUpdate
-import domain.updateService.updates.agentUpdates.AgentUpdate
 import domain.updateService.updates.telegramUpdates.TelegramIndicatorUpdate
 import domain.updateService.updates.telegramUpdates.TelegramSharePriceInsufficientUpdate
 import domain.updateService.updates.telegramUpdates.TelegramShareUpdate
@@ -42,9 +38,6 @@ class UpdateService(
 ) {
     private val _updates = MutableSharedFlow<TelegramUpdate>()
     val updates = _updates.asSharedFlow()
-
-    private val _agentUpdates = MutableSharedFlow<AgentUpdate>()
-    val agentUpdates = _agentUpdates.asSharedFlow()
 
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.Default + job)
@@ -159,14 +152,6 @@ class UpdateService(
             else
                 TelegramSharePriceInsufficientUpdate(userId = user.id, share = notifyShare)
             _updates.emit(update)
-
-            if (user.agentNotifications && user.agentChatId != null) {
-                val agentUpdate = if (shouldNotify)
-                    AgentShareUpdate(chatId = user.agentChatId, share = notifyShare)
-                else
-                    AgentSharePriceInsufficientUpdate(chatId = user.agentChatId, share = notifyShare)
-                _agentUpdates.emit(agentUpdate)
-            }
         }
         logger.info("Handled ${handled.size} shares for user ${user.id}")
         database.updateUserShares(handled)
@@ -314,16 +299,6 @@ class UpdateService(
                     data = updateData
                 )
                 _updates.emit(update)
-
-                if (user.agentNotifications && user.agentChatId != null) {
-                    val agentUpdate = AgentIndicatorUpdate(
-                        chatId = user.agentChatId,
-                        ticker = share.ticker,
-                        price = price.price,
-                        data = updateData
-                    )
-                    _agentUpdates.emit(agentUpdate)
-                }
             }
         }
         database.updateUserShares(handled.values.toList())

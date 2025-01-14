@@ -19,7 +19,6 @@ dependencies {
     implementation("org.slf4j:slf4j-simple:2.0.16")
 
     implementation("ru.tinkoff.piapi:java-sdk-core:1.27")
-    implementation("ru.mail.im:bot-api:1.2.3")
 
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 

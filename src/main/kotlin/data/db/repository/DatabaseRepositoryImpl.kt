@@ -53,26 +53,6 @@ class DatabaseRepositoryImpl(
         }
     }
 
-    override suspend fun findUserByAgentChatId(chatId: String): User? {
-        return database.transaction {
-            Users
-                .selectAll()
-                .where { Users.agentChatId eq chatId }
-                .firstOrNull()
-                ?.toUser()
-        }
-    }
-
-    override suspend fun findUserByAgentCode(code: String): User? {
-        return database.transaction {
-            Users
-                .selectAll()
-                .where { Users.agentCode eq code }
-                .firstOrNull()
-                ?.toUser()
-        }
-    }
-
     override suspend fun updateUser(user: User): User? {
         return database.transaction {
             val updated = Users.update({ Users.id eq user.id }) {
@@ -209,8 +189,7 @@ class DatabaseRepositoryImpl(
                 )
                 .select(
                     Users.id,
-                    Users.agentChatId,
-                    Users.agentNotifications,
+
                     UserShares.id,
                     Shares.name,
                     Shares.uid,
@@ -226,8 +205,6 @@ class DatabaseRepositoryImpl(
                 .map {
                     UserWithFollowedShares(
                         id = it.key,
-                        agentChatId = it.value.firstOrNull()?.get(Users.agentChatId),
-                        agentNotifications = it.value.firstOrNull()?.get(Users.agentNotifications) ?: false,
                         shares = it.value.map { row ->
                             row.toFollowedShare()
                         }
@@ -279,9 +256,6 @@ class DatabaseRepositoryImpl(
             registered = this[Users.registered],
             path = this[Users.path],
             defaultPercent = this[Users.defaultPercent],
-            agentChatId = this[Users.agentChatId],
-            agentCode = this[Users.agentCode],
-            agentNotifications = this[Users.agentNotifications],
             defaultRsiNotifications = this[Users.defaultRsiNotifications],
             defaultBbNotifications = this[Users.defaultBbNotifications]
         )
@@ -292,9 +266,6 @@ class DatabaseRepositoryImpl(
         this[Users.registered] = user.registered
         this[Users.path] = user.path
         this[Users.defaultPercent] = user.defaultPercent
-        this[Users.agentChatId] = user.agentChatId
-        this[Users.agentCode] = user.agentCode
-        this[Users.agentNotifications] = user.agentNotifications
         this[Users.defaultRsiNotifications] = user.defaultRsiNotifications
         this[Users.defaultBbNotifications] = user.defaultBbNotifications
     }
