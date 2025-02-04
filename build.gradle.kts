@@ -61,5 +61,5 @@ tasks.jar {
         .map { zipTree(it) }
     from(dependencies)
 
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
