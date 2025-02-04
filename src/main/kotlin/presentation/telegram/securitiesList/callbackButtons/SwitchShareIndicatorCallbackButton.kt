@@ -7,7 +7,7 @@ import presentation.telegram.settings.ENABLE_SETTING
 import presentation.telegram.settings.IndicatorType
 
 object SwitchShareIndicatorCallbackButton : CallbackButton(
-    "Отключить уведомления через Agent", "switchShareIndicator"
+    "", "switchShareIndicator"
 ) {
     data class CallbackData(
         val ticker: String,

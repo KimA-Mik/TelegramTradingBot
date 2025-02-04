@@ -23,7 +23,6 @@ fun main() = runBlocking {
         failed = true
     }
 
-//    val agentBotApiToken = System.getenv("AGENT_BOT_TOKEN")
 
     if (failed) {
         return@runBlocking
@@ -43,14 +42,6 @@ fun main() = runBlocking {
             presentationModule
         )
     }
-
-//    agentBotApiToken?.let {
-//        val agentBot = AgentBot(
-//            token = it,
-//            model = get(AgentBotModel::class.java)
-//        )
-//        agentBot.start()
-//    }
 
     val telegramBot = TelegramBot(telegramBotApiToken, get(BotModel::class.java))
     telegramBot.run()

@@ -9,12 +9,12 @@ import presentation.telegram.screens.BotScreen
 import presentation.telegram.screens.ErrorScreen
 import presentation.telegram.securitiesList.callbackButtons.*
 import presentation.telegram.securitiesList.callbackButtonsHandlers.*
-import presentation.telegram.settings.callbackButtons.*
+import presentation.telegram.settings.callbackButtons.EditDefaultPercentCallbackButton
 import presentation.telegram.settings.callbackButtons.indicators.bollingerBands.ResetBbDefaultCallbackButton
 import presentation.telegram.settings.callbackButtons.indicators.bollingerBands.SwitchBbDefaultCallbackButton
 import presentation.telegram.settings.callbackButtons.indicators.rsi.ResetRsiDefaultCallbackButton
 import presentation.telegram.settings.callbackButtons.indicators.rsi.SwitchRsiDefaultCallbackButton
-import presentation.telegram.settings.callbackButtonsHandlers.*
+import presentation.telegram.settings.callbackButtonsHandlers.EditDefaultPercentButtonHandler
 import presentation.telegram.settings.callbackButtonsHandlers.indicators.bollingerBands.ResetBbDefaultButtonHandler
 import presentation.telegram.settings.callbackButtonsHandlers.indicators.bollingerBands.SwitchBbDefaultButtonHandler
 import presentation.telegram.settings.callbackButtonsHandlers.indicators.rsi.ResetRsiDefaultButtonHandler
@@ -35,10 +35,6 @@ class CallbackHandler(
 
     /* Settings */
     editDefaultPercentButtonHandler: EditDefaultPercentButtonHandler,
-    disableAgentNotificationsButtonHandler: DisableAgentNotificationsButtonHandler,
-    enableAgentNotificationsButtonHandler: EnableAgentNotificationsButtonHandler,
-    linkAgentAccountButtonHandler: LinkAgentAccountButtonHandler,
-    unlinkAgentAccountButtonHandler: UnlinkAgentAccountButtonHandler,
     /* Indicator settings */
     resetBbDefaultButtonHandler: ResetBbDefaultButtonHandler,
     switchBbDefaultButtonHandler: SwitchBbDefaultButtonHandler,
@@ -61,10 +57,6 @@ class CallbackHandler(
 
         /* Settings */
         EditDefaultPercentCallbackButton.callbackData to editDefaultPercentButtonHandler,
-        DisableAgentNotificationsCallbackButton.callbackData to disableAgentNotificationsButtonHandler,
-        EnableAgentNotificationsCallbackButton.callbackData to enableAgentNotificationsButtonHandler,
-        LinkAgentAccountCallbackButton.callbackData to linkAgentAccountButtonHandler,
-        UnlinkAgentAccountCallbackButton.callbackData to unlinkAgentAccountButtonHandler,
         /* Indicator settings */
         ResetBbDefaultCallbackButton.callbackData to resetBbDefaultButtonHandler,
         SwitchBbDefaultCallbackButton.callbackData to switchBbDefaultButtonHandler,

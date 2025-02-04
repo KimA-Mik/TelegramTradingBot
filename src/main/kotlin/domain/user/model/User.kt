@@ -7,9 +7,6 @@ data class User(
     val registered: LocalDateTime,
     val path: String,
     val defaultPercent: Double,
-    val agentChatId: String?,
-    val agentCode: String?,
-    val agentNotifications: Boolean,
     val defaultRsiNotifications: Boolean,
     val defaultBbNotifications: Boolean,
 )
