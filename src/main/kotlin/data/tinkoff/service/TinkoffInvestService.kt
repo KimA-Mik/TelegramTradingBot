@@ -82,7 +82,7 @@ class TinkoffInvestService(private val api: InvestApi) {
                     .tradableShares
                     .asDeferred().await()
             } catch (e: Exception) {
-                logger.error("Unable to update shares because of: ${e.message}")
+                logger.error("Unable to update shares because of: ${e.localizedMessage} (${e.cause})")
                 emptyList()
             }
 
@@ -105,7 +105,8 @@ class TinkoffInvestService(private val api: InvestApi) {
                     .tradableFutures
                     .asDeferred().await()
             } catch (e: Exception) {
-                logger.error("Unable to update futures because of: ${e.message}")
+                logger.error("Unable to update futures because of: ${e.message} (${e.cause})\n${e.stackTraceToString()}")
+
                 emptyList()
             }
 
