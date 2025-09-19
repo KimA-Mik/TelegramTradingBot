@@ -21,7 +21,6 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import ru.tinkoff.piapi.contract.v1.Future
-import ru.tinkoff.piapi.contract.v1.HistoricCandle
 import ru.tinkoff.piapi.contract.v1.LastPrice
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -87,7 +86,7 @@ class TinkoffRepositoryImpl(private val service: TinkoffInvestService) : Tinkoff
                 from = from,
                 to = to,
                 interval = interval.toCandleInterval()
-            ).map(HistoricCandle::toTinkoffCandle)
+            ).map { it.toTinkoffCandle(interval.duration) }
 
             if (candles.isEmpty()) {
                 Resource.Error("")

@@ -2,11 +2,12 @@ package data.tinkoff.mappers
 
 import domain.tinkoff.model.TinkoffCandle
 import ru.tinkoff.piapi.contract.v1.HistoricCandle
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 @OptIn(ExperimentalTime::class)
-fun HistoricCandle.toTinkoffCandle(): TinkoffCandle {
+fun HistoricCandle.toTinkoffCandle(duration: Duration): TinkoffCandle {
     return TinkoffCandle(
         open = open.toDouble(),
         high = high.toDouble(),
@@ -14,6 +15,7 @@ fun HistoricCandle.toTinkoffCandle(): TinkoffCandle {
         close = close.toDouble(),
         volume = volume,
         time = Instant.fromEpochSeconds(time.seconds, time.nanos),
-        isComplete = isComplete
+        isComplete = isComplete,
+        duration = duration
     )
 }

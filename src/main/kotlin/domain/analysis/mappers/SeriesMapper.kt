@@ -5,15 +5,15 @@ import org.ta4j.core.BarSeries
 import org.ta4j.core.BaseBarSeriesBuilder
 import org.ta4j.core.bars.TimeBarBuilder
 import kotlin.time.ExperimentalTime
+import kotlin.time.toJavaDuration
 import kotlin.time.toJavaInstant
 
 @OptIn(ExperimentalTime::class)
 fun List<TinkoffCandle>.toSeries(seriesName: String = String()): BarSeries {
     val series = BaseBarSeriesBuilder().withName(seriesName).build()
-
     this.forEach { candle ->
         val bar = TimeBarBuilder()
-            //.duration
+            .timePeriod(candle.duration.toJavaDuration())
             .endTime(candle.time.toJavaInstant())
             .openPrice(candle.open)
             .highPrice(candle.high)
