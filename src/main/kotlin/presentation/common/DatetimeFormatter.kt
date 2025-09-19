@@ -1,11 +1,12 @@
 package presentation.common
 
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 
 
 val priceDateFormat = LocalDateTime.Format {
-    dayOfMonth()
+    day(padding = Padding.ZERO)
     char('/')
     monthNumber()
 
@@ -19,7 +20,7 @@ val priceDateFormat = LocalDateTime.Format {
 }
 
 val futureDateFormat = LocalDateTime.Format {
-    dayOfMonth()
+    day(padding = Padding.ZERO)
     char('.')
     monthNumber()
     char('.')

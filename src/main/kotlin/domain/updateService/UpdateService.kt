@@ -11,7 +11,11 @@ import domain.tinkoff.model.TinkoffCandle
 import domain.tinkoff.model.TinkoffShare
 import domain.tinkoff.repository.TinkoffRepository
 import domain.tinkoff.util.TinkoffFutureComparator
-import domain.updateService.model.*
+import domain.updateService.model.Cache
+import domain.updateService.model.NotifyFuture
+import domain.updateService.model.NotifyShare
+import domain.updateService.model.SecurityPrice
+import domain.updateService.model.UserWithFollowedShares
 import domain.updateService.updates.IndicatorUpdateData
 import domain.updateService.updates.telegramUpdates.TelegramIndicatorUpdate
 import domain.updateService.updates.telegramUpdates.TelegramSharePriceInsufficientUpdate
@@ -22,15 +26,22 @@ import domain.user.repository.DatabaseRepository
 import domain.utils.DateUtil
 import domain.utils.FuturesUtil
 import domain.utils.TimeUtil
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.datetime.Clock
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.toLocalDateTime
 import org.slf4j.LoggerFactory
 import kotlin.math.abs
 import kotlin.random.Random
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 class UpdateService(
     private val database: DatabaseRepository,
@@ -58,6 +69,8 @@ class UpdateService(
     }
 
     private val weekends = setOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
+
+    @OptIn(ExperimentalTime::class)
     private suspend fun delayNonWorkingHours(
         startHour: Int,
         startMinute: Int,
@@ -106,6 +119,7 @@ class UpdateService(
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     private suspend fun handleUserFutures(
         user: UserWithFollowedShares,
         cache: Cache

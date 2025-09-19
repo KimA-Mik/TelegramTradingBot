@@ -1,7 +1,14 @@
 package domain.utils
 
-import kotlinx.datetime.*
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.daysUntil
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
+@OptIn(ExperimentalTime::class)
 object FuturesUtil {
     private val wrongDay = DayOfYear(-1, -1)
     private val codeToMonths =
@@ -84,8 +91,8 @@ object FuturesUtil {
 
         val dateOfExpiration = LocalDate(
             year = yearOfExpiration,
-            monthNumber = dayOfExpiration.month,
-            dayOfMonth = dayOfExpiration.day
+            month = dayOfExpiration.month,
+            day = dayOfExpiration.day
         ).atStartOfDayIn(DateUtil.timezoneMoscow)
 
         return from.daysUntil(dateOfExpiration, DateUtil.timezoneMoscow) + 1

@@ -1,6 +1,6 @@
 package data.db.entities
 
-import org.jetbrains.exposed.dao.id.LongIdTable
+import org.jetbrains.exposed.v1.core.dao.id.LongIdTable
 
 object UserShares : LongIdTable() {
     val percent = double("percent")

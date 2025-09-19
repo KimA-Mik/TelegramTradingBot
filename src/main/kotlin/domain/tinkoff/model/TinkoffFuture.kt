@@ -1,8 +1,9 @@
 package domain.tinkoff.model
 
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
-data class TinkoffFuture(
+data class TinkoffFuture @OptIn(ExperimentalTime::class) constructor(
     val uid: String = String(),
     val ticker: String = String(),
     val name: String = String(),

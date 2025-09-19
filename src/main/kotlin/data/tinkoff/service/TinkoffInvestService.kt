@@ -3,13 +3,24 @@ package data.tinkoff.service
 import Resource
 import domain.math.MathUtil
 import domain.utils.TimeUtil
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.future.asDeferred
-import kotlinx.datetime.Instant
-import kotlinx.datetime.toJavaInstant
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
-import ru.tinkoff.piapi.contract.v1.*
+import ru.tinkoff.piapi.contract.v1.CandleInterval
+import ru.tinkoff.piapi.contract.v1.Future
+import ru.tinkoff.piapi.contract.v1.GetOrderBookResponse
+import ru.tinkoff.piapi.contract.v1.HistoricCandle
+import ru.tinkoff.piapi.contract.v1.LastPrice
+import ru.tinkoff.piapi.contract.v1.Share
 import ru.tinkoff.piapi.core.InvestApi
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
+import kotlin.time.toJavaInstant
 
 class TinkoffInvestService(private val api: InvestApi) {
     private val logger = LoggerFactory.getLogger(this::class.java)
@@ -41,6 +52,7 @@ class TinkoffInvestService(private val api: InvestApi) {
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     suspend fun getShareClosePriceHistory(
         uid: String,
         from: Instant,

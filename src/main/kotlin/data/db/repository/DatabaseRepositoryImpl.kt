@@ -9,12 +9,22 @@ import domain.updateService.model.UserWithFollowedShares
 import domain.user.model.User
 import domain.user.model.UserShare
 import domain.user.repository.DatabaseRepository
-import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.statements.BatchUpdateStatement
-import org.jetbrains.exposed.sql.statements.UpdateStatement
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.core.JoinType
+import org.jetbrains.exposed.v1.core.ResultRow
+import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.statements.UpdateStatement
+import org.jetbrains.exposed.v1.jdbc.SchemaUtils
+import org.jetbrains.exposed.v1.jdbc.andWhere
+import org.jetbrains.exposed.v1.jdbc.batchInsert
+import org.jetbrains.exposed.v1.jdbc.deleteWhere
+import org.jetbrains.exposed.v1.jdbc.insert
+import org.jetbrains.exposed.v1.jdbc.insertAndGetId
+import org.jetbrains.exposed.v1.jdbc.select
+import org.jetbrains.exposed.v1.jdbc.selectAll
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.update
+import org.jetbrains.exposed.v1.migration.jdbc.MigrationUtils
 import org.slf4j.LoggerFactory
 
 class DatabaseRepositoryImpl(
@@ -24,12 +34,17 @@ class DatabaseRepositoryImpl(
 
     init {
         transaction {
-            SchemaUtils.create(Shares, Users, UserShares)
-
-            val migrations = SchemaUtils.addMissingColumnsStatements(Shares, Users, UserShares)
-            migrations.forEach { migration ->
-                val statement = connection.prepareStatement(migration, false)
-                statement.executeUpdate()
+            val tables = arrayOf(Shares, Users, UserShares)
+            SchemaUtils.create(*tables)
+            val missingColumnsStatements =
+                MigrationUtils.statementsRequiredForDatabaseMigration(*tables)
+            missingColumnsStatements.forEach {
+                logger.info("Executing statement: $it")
+                try {
+                    connection.prepareStatement(it, false).executeUpdate()
+                } catch (e: Exception) {
+                    logger.error(e.message)
+                }
             }
         }
     }
@@ -63,7 +78,11 @@ class DatabaseRepositoryImpl(
         }
     }
 
-    override suspend fun subscribeUserToShare(userId: Long, defaultPercent: Double, share: TinkoffShare): Boolean {
+    override suspend fun subscribeUserToShare(
+        userId: Long,
+        defaultPercent: Double,
+        share: TinkoffShare
+    ): Boolean {
         return database.transaction {
             val sharesList = Shares
                 .select(Shares.id)
@@ -144,12 +163,11 @@ class DatabaseRepositoryImpl(
 
     override suspend fun getUserShares(userId: Long): List<UserShare> {
         return database.transaction {
-            Shares
-                .join(
-                    UserShares, JoinType.INNER,
-                    onColumn = Shares.id, otherColumn = UserShares.shareId,
-                    additionalConstraint = { UserShares.userId eq userId }
-                )
+            Shares.join(
+                UserShares, JoinType.INNER,
+                onColumn = Shares.id, otherColumn = UserShares.shareId,
+                additionalConstraint = { UserShares.userId eq userId }
+            )
                 .select(
                     UserShares.id,
                     Shares.uid,
@@ -163,6 +181,7 @@ class DatabaseRepositoryImpl(
                     UserShares.bbNotificationsEnabled
                 )
                 .map { it.toFollowedShare() }
+                .toList()
         }
     }
 
@@ -201,37 +220,54 @@ class DatabaseRepositoryImpl(
                     UserShares.rsiNotificationsEnabled,
                     UserShares.bbNotificationsEnabled
                 )
-                .groupBy { it[Users.id] }
+                .groupBy(Users.id)// { it[Users.id] }
                 .map {
-                    UserWithFollowedShares(
-                        id = it.key,
-                        shares = it.value.map { row ->
-                            row.toFollowedShare()
-                        }
-                    )
+                    val result = mutableMapOf<Long, MutableList<UserShare>>()
+                    val userShare = it.toFollowedShare()
+                    val id = it[Users.id]
+                    if (!result.contains(id)) result[id] = mutableListOf(userShare)
+                    else result[id]!!.add(userShare)
+                    result
                 }
+                .map { mapEntry ->
+                    mapEntry.map {
+                        UserWithFollowedShares(
+                            id = it.key,
+                            shares = it.value
+                        )
+                    }
+                }.first()
         }
     }
 
     override suspend fun updateUserShares(userShares: List<UserShare>) {
         if (userShares.isEmpty()) return
         database.transaction {
-            val statement = BatchUpdateStatement(UserShares)
-            userShares.forEach {
-                statement.addBatch(EntityID(id = it.id, UserShares))
-                statement[UserShares.notified] = it.futuresNotified
-                statement[UserShares.percent] = it.percent
-                statement[UserShares.rsiNotified] = it.rsiNotified
-                statement[UserShares.bollingerBandsNotified] = it.bollingerBandsNotified
-                statement[UserShares.rsiNotificationsEnabled] = it.rsiNotificationsEnabled
-                statement[UserShares.bbNotificationsEnabled] = it.bbNotificationsEnabled
+            UserShares.batchInsert(userShares) {
+                this[UserShares.id] = it.id
+                this[UserShares.notified] = it.futuresNotified
+                this[UserShares.percent] = it.percent
+                this[UserShares.rsiNotified] = it.rsiNotified
+                this[UserShares.bollingerBandsNotified] = it.bollingerBandsNotified
+                this[UserShares.rsiNotificationsEnabled] = it.rsiNotificationsEnabled
+                this[UserShares.bbNotificationsEnabled] = it.bbNotificationsEnabled
             }
+//            val statement = BatchUpdateStatement(UserShares)
+//            userShares.forEach {
+//                statement.addBatch(EntityID(id = it.id, UserShares))
+//                statement[UserShares.notified] = it.futuresNotified
+//                statement[UserShares.percent] = it.percent
+//                statement[UserShares.rsiNotified] = it.rsiNotified
+//                statement[UserShares.bollingerBandsNotified] = it.bollingerBandsNotified
+//                statement[UserShares.rsiNotificationsEnabled] = it.rsiNotificationsEnabled
+//                statement[UserShares.bbNotificationsEnabled] = it.bbNotificationsEnabled
+//            }
 
-            try {
-                statement.execute(this)
-            } catch (e: Exception) {
-                logger.info(e.message)
-            }
+//            try {
+//                statement.execute(this)
+//            } catch (e: Exception) {
+//                logger.info(e.message)
+//            }
         }
     }
 

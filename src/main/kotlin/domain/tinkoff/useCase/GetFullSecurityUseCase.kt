@@ -10,8 +10,10 @@ import domain.tinkoff.repository.TinkoffRepository
 import domain.tinkoff.util.TinkoffFutureComparator
 import domain.utils.FuturesUtil
 import kotlinx.datetime.toKotlinLocalDateTime
+import kotlin.time.ExperimentalTime
 
 class GetFullSecurityUseCase(private val repository: TinkoffRepository) {
+    @OptIn(ExperimentalTime::class)
     suspend operator fun invoke(ticker: String): GetSecurityResult {
         val shareResource = repository.getSecurity(ticker.trim().uppercase())
         if (shareResource.data == null) {

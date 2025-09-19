@@ -1,9 +1,9 @@
 package data.db.entities
 
 import domain.user.common.DEFAULT_SHARE_PERCENT
-import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.javatime.CurrentDateTime
-import org.jetbrains.exposed.sql.javatime.datetime
+import org.jetbrains.exposed.v1.core.Table
+import org.jetbrains.exposed.v1.javatime.CurrentDateTime
+import org.jetbrains.exposed.v1.javatime.datetime
 
 object Users : Table() {
     val id = long("id")

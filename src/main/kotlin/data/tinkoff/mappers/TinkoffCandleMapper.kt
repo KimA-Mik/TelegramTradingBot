@@ -1,9 +1,11 @@
 package data.tinkoff.mappers
 
 import domain.tinkoff.model.TinkoffCandle
-import kotlinx.datetime.Instant
 import ru.tinkoff.piapi.contract.v1.HistoricCandle
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
+@OptIn(ExperimentalTime::class)
 fun HistoricCandle.toTinkoffCandle(): TinkoffCandle {
     return TinkoffCandle(
         open = open.toDouble(),

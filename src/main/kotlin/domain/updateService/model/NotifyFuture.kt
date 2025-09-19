@@ -1,8 +1,10 @@
 package domain.updateService.model
 
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
-data class NotifyFuture(
+
+data class NotifyFuture @OptIn(ExperimentalTime::class) constructor(
     val ticker: String,
     val name: String,
     val price: Double,

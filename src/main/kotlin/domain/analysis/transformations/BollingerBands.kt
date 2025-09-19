@@ -4,7 +4,7 @@ import domain.analysis.model.BollingerBandsData
 import domain.analysis.util.getLast
 import domain.math.MathUtil
 import org.ta4j.core.BarSeries
-import org.ta4j.core.indicators.SMAIndicator
+import org.ta4j.core.indicators.averages.SMAIndicator
 import org.ta4j.core.indicators.bollinger.BollingerBandsLowerIndicator
 import org.ta4j.core.indicators.bollinger.BollingerBandsMiddleIndicator
 import org.ta4j.core.indicators.bollinger.BollingerBandsUpperIndicator

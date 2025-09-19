@@ -1,8 +1,9 @@
 package domain.tinkoff.model
 
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
-data class TinkoffCandle(
+data class TinkoffCandle @OptIn(ExperimentalTime::class) constructor(
     val open: Double = 0.0,
     val high: Double = 0.0,
     val low: Double = 0.0,

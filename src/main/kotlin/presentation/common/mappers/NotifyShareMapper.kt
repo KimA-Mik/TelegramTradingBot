@@ -9,8 +9,10 @@ import presentation.common.TinInvestUtil
 import presentation.common.formatAndTrim
 import presentation.common.futureDateFormat
 import presentation.telegram.common.ROUBLE_SIGN
+import kotlin.time.ExperimentalTime
 
 
+@OptIn(ExperimentalTime::class)
 fun NotifyShare.toUpdateText(): String {
     var res = String()
     val inlineShareUrl = MarkdownUtil.inlineUrl(

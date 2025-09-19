@@ -1,8 +1,10 @@
 package domain.tinkoff.model
 
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
-data class TinkoffOrderBook(
+
+data class TinkoffOrderBook @OptIn(ExperimentalTime::class) constructor(
     val uid: String,
     val depth: Int,
     val bids: List<TinkoffOrder>,

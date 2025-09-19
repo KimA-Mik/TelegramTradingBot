@@ -1,8 +1,15 @@
 package domain.tinkoff.repository
 
 import Resource
-import domain.tinkoff.model.*
-import kotlinx.datetime.Instant
+import domain.tinkoff.model.SecurityType
+import domain.tinkoff.model.TinkoffCandle
+import domain.tinkoff.model.TinkoffCandleInterval
+import domain.tinkoff.model.TinkoffFuture
+import domain.tinkoff.model.TinkoffOrderBook
+import domain.tinkoff.model.TinkoffPrice
+import domain.tinkoff.model.TinkoffShare
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 interface TinkoffRepository {
     fun getSecurity(secId: String): Resource<TinkoffShare>
@@ -10,6 +17,8 @@ interface TinkoffRepository {
     suspend fun getSharesPrice(shares: List<TinkoffShare>): Resource<List<TinkoffPrice>>
     suspend fun getFuturesPrices(futures: List<TinkoffFuture>): Resource<List<TinkoffPrice>>
     fun findSecurity(ticker: String): SecurityType
+
+    @OptIn(ExperimentalTime::class)
     suspend fun getShareCandles(
         uid: String,
         from: Instant,
