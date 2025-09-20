@@ -236,7 +236,7 @@ class DatabaseRepositoryImpl(
                             shares = it.value
                         )
                     }
-                }.first()
+                }.firstOrNull() ?: emptyList()
         }
     }
 
