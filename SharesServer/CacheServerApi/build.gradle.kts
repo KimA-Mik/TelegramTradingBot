@@ -21,6 +21,6 @@ tasks.test {
     useJUnitPlatform()
 }
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(libs.versions.toolchain.get().toInt())
 }
 
