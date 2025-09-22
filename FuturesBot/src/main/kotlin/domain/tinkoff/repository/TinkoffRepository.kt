@@ -1,13 +1,7 @@
 package domain.tinkoff.repository
 
 import Resource
-import domain.tinkoff.model.SecurityType
-import domain.tinkoff.model.TinkoffCandle
-import domain.tinkoff.model.TinkoffCandleInterval
-import domain.tinkoff.model.TinkoffFuture
-import domain.tinkoff.model.TinkoffOrderBook
-import domain.tinkoff.model.TinkoffPrice
-import domain.tinkoff.model.TinkoffShare
+import domain.tinkoff.model.*
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 

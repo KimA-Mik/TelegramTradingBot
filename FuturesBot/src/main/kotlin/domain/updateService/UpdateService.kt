@@ -11,11 +11,7 @@ import domain.tinkoff.model.TinkoffCandle
 import domain.tinkoff.model.TinkoffShare
 import domain.tinkoff.repository.TinkoffRepository
 import domain.tinkoff.util.TinkoffFutureComparator
-import domain.updateService.model.Cache
-import domain.updateService.model.NotifyFuture
-import domain.updateService.model.NotifyShare
-import domain.updateService.model.SecurityPrice
-import domain.updateService.model.UserWithFollowedShares
+import domain.updateService.model.*
 import domain.updateService.updates.IndicatorUpdateData
 import domain.updateService.updates.telegramUpdates.TelegramIndicatorUpdate
 import domain.updateService.updates.telegramUpdates.TelegramSharePriceInsufficientUpdate
@@ -26,15 +22,9 @@ import domain.user.repository.DatabaseRepository
 import domain.utils.DateUtil
 import domain.utils.FuturesUtil
 import domain.utils.TimeUtil
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.toLocalDateTime
 import org.slf4j.LoggerFactory
@@ -61,8 +51,9 @@ class UpdateService(
 
     private fun run() = scope.launch {
         while (isActive) {
-            val delayTime = Random.nextFloat() * TimeUtil.MINUTE_MILLIS * 2
-            delay(TimeUtil.MINUTE_MILLIS + delayTime.toLong())
+            Random.nextFloat() * TimeUtil.MINUTE_MILLIS * 2
+//            delay(TimeUtil.MINUTE_MILLIS + delayTime.toLong())
+            delay(2000)
             checkForUpdates()
             delayNonWorkingHours(9, 50, 18, 49)
         }
