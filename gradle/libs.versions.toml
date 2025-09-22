@@ -1,0 +1,35 @@
+[versions]
+kotlin = "2.2.20"
+kotlinx-coroutines = "1.10.2"
+kotlin-telegram-bot = "6.3.0"
+slf4j = "2.0.17"
+tinkoff-piapi = "1.36"
+retrofit = "2.9.0"
+okhttp = "4.10.0"
+logging-interceptor = "5.1.0"
+koin = "4.1.0"
+exposed = "1.0.0-rc-1"
+sqlite-jdbc = "3.50.3.0"
+kotlinx-datetime = "0.7.1"
+ta4j = "0.18"
+
+[libraries]
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlin-telegram-bot = { module = "io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram", version.ref = "kotlin-telegram-bot" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
+tinkoff-piapi-java-sdk-core = { module = "ru.tinkoff.piapi:java-sdk-core", version.ref = "tinkoff-piapi" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "logging-interceptor" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
+exposed-java-time = { module = "org.jetbrains.exposed:exposed-java-time", version.ref = "exposed" }
+exposed-migration-core = { module = "org.jetbrains.exposed:exposed-migration-core", version.ref = "exposed" }
+exposed-migration-jdbc = { module = "org.jetbrains.exposed:exposed-migration-jdbc", version.ref = "exposed" }
+sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite-jdbc" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+ta4j-core = { module = "org.ta4j:ta4j-core", version.ref = "ta4j" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
