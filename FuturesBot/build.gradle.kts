@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    application
 }
 
 group = "ru.kima"
@@ -42,7 +43,10 @@ tasks.test {
 kotlin {
     jvmToolchain(21)
 }
-
+//
+//application {
+//    mainClass.set("MainKt")
+//}
 
 // https://stackoverflow.com/a/71092054
 tasks.jar {
