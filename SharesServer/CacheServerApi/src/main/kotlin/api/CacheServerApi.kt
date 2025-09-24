@@ -9,13 +9,18 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.resources.Resources
 import io.ktor.client.plugins.resources.get
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
 import ru.kima.cacheserver.api.schema.model.Future
+import ru.kima.cacheserver.api.schema.model.HistoricCandle
 import ru.kima.cacheserver.api.schema.model.Share
+import ru.kima.cacheserver.api.schema.model.requests.GetCandlesRequest
 import ru.kima.cacheserver.api.schema.model.requests.InstrumentsRequest
 
 class CacheServerApi(
@@ -40,6 +45,12 @@ class CacheServerApi(
 
     suspend fun tradableFutures(request: InstrumentsRequest): Result<List<Future>> =
         handleGetResponse(client.get(ApiResources.TradableFutures(request)))
+
+    suspend fun historicCandles(request: GetCandlesRequest): Result<List<HistoricCandle>> =
+        handleGetResponse(client.get(ApiResources.HistoricCandles()) {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        })
 
     private suspend inline fun <reified T> handleGetResponse(response: HttpResponse): Result<T> =
         try {

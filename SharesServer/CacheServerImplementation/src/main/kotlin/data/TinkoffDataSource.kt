@@ -3,15 +3,19 @@ package ru.kima.cacheserver.implementation.data
 import data.remoteservice.InstrumentsService
 import data.remoteservice.MarketDataService
 import data.remoteservice.futures
+import data.remoteservice.getCandles
 import data.remoteservice.shares
 import ru.kima.cacheserver.api.schema.instrumentsService.InstrumentExchangeType
 import ru.kima.cacheserver.api.schema.instrumentsService.InstrumentStatus
 import ru.kima.cacheserver.api.schema.model.Future
 import ru.kima.cacheserver.api.schema.model.Share
+import ru.kima.cacheserver.api.schema.model.requests.GetCandlesRequest
 import ru.kima.cacheserver.implementation.core.CachedValue
 import ru.kima.cacheserver.implementation.core.RateLimiter
 import ru.kima.cacheserver.implementation.data.mappers.toFuture
+import ru.kima.cacheserver.implementation.data.mappers.toHistoricalCandle
 import ru.kima.cacheserver.implementation.data.mappers.toShare
+import ru.kima.cacheserver.implementation.data.remoteservice.mappers.toTCandleInterval
 import ru.tinkoff.piapi.contract.v1.InstrumentsServiceGrpc
 import ru.tinkoff.piapi.contract.v1.MarketDataServiceGrpc
 import ru.ttech.piapi.core.connector.ConnectorConfiguration
@@ -19,6 +23,7 @@ import ru.ttech.piapi.core.connector.ServiceStubFactory
 import java.util.Properties
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.ExperimentalTime
 
 //Make dynamic
 private const val TINKOFF_UNARY_REQUEST_LIMIT = 50
@@ -74,4 +79,19 @@ class TinkoffDataSource(token: String) {
         instrumentStatus: InstrumentStatus,
         instrumentExchangeType: InstrumentExchangeType
     ) = futuresCache.getValue(instrumentStatus to instrumentExchangeType).getValue()
+
+    @OptIn(ExperimentalTime::class)
+    suspend fun getCandles(request: GetCandlesRequest) = rateLimiter.rateLimitedResult {
+        runCatching {
+            marketDataService.getCandles(
+                uid = request.uid,
+                from = request.from,
+                to = request.to,
+                interval = request.interval.toTCandleInterval()
+            )
+                .await()
+                .candlesList
+                .map { it.toHistoricalCandle() }
+        }
+    }
 }
