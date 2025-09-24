@@ -46,10 +46,11 @@ class TinkoffDataSource(token: String) {
     private val sharesCache =
         mutableMapOf<Pair<InstrumentStatus, InstrumentExchangeType>, CachedValue<List<Share>>>().withDefault {
             CachedValue(cacheLifetime = 12.hours) {
-                //TODO: introduce rate limiter
-                instrumentsService
-                    .shares(it.first, it.second)
-                    .await().instrumentsList.map { tinkoffShare -> tinkoffShare.toShare() }
+                rateLimiter.rateLimitedResult {
+                    return@rateLimitedResult instrumentsService
+                        .shares(it.first, it.second)
+                        .await().instrumentsList.map { tinkoffShare -> tinkoffShare.toShare() }
+                }
             }
         }
 
@@ -61,10 +62,11 @@ class TinkoffDataSource(token: String) {
     private val futuresCache =
         mutableMapOf<Pair<InstrumentStatus, InstrumentExchangeType>, CachedValue<List<Future>>>().withDefault {
             CachedValue(cacheLifetime = 12.hours) {
-                //TODO: introduce rate limiter like wrap to a flow or something
-                instrumentsService
-                    .futures(it.first, it.second)
-                    .await().instrumentsList.map { tinkoffFuture -> tinkoffFuture.toFuture() }
+                rateLimiter.rateLimitedResult {
+                    return@rateLimitedResult instrumentsService
+                        .futures(it.first, it.second)
+                        .await().instrumentsList.map { tinkoffFuture -> tinkoffFuture.toFuture() }
+                }
             }
         }
 

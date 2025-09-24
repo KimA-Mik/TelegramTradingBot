@@ -40,6 +40,30 @@ class RateLimiter(
         if (now - lastWindowFrame > rateWindow) resetRate()
     }
 
+    suspend fun <T> rateLimitedResult(action: suspend () -> T): T {
+        var res: T
+        var now = Clock.System.now()
+        if (current.load() < limit) {
+            current.exchange(current.load() + 1)
+            res = action()
+        } else {
+            while (current.load() >= limit) {
+                val timeToDelay = rateWindow - (now - lastWindowFrame)
+                if (timeToDelay.inWholeMilliseconds > 0L) {
+                    delay(timeToDelay)
+                    now = Clock.System.now()
+                } else {
+                    resetRate()
+                }
+            }
+            current.exchange(current.load() + 1)
+            res = action()
+        }
+
+        if (now - lastWindowFrame > rateWindow) resetRate()
+        return res
+    }
+
     suspend fun resetRate() {
         val now = Clock.System.now()
         if (!mutex.isLocked &&

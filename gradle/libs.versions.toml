@@ -34,6 +34,11 @@ exposed-migration-jdbc = { module = "org.jetbrains.exposed:exposed-migration-jdb
 sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite-jdbc" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 ta4j-core = { module = "org.ta4j:ta4j-core", version.ref = "ta4j" }
+ktor-client-core = { module = "io.ktor:ktor-client-core" }
+ktor-client-java = { module = "io.ktor:ktor-client-java" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging" }
+ktor-client-resources = { module = "io.ktor:ktor-client-resources" }
 ktor-server-core = { module = "io.ktor:ktor-server-core" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty" }
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation" }

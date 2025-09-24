@@ -11,6 +11,7 @@ repositories {
 }
 
 dependencies {
+    implementation(libs.kotlinx.coroutines.core)
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.content.negotiation)
@@ -27,6 +28,7 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
+
 kotlin {
     jvmToolchain(libs.versions.toolchain.get().toInt())
 }
