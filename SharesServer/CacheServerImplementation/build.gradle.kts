@@ -12,6 +12,7 @@ repositories {
 
 dependencies {
     implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.ktor.client.logging)
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.content.negotiation)
