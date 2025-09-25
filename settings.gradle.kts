@@ -10,3 +10,6 @@ plugins {
 }
 
 rootProject.name = "TelegramTradingBot"
+include(":FuturesBot")
+include(":SharesServer:CacheServerImplementation")
+include(":SharesServer:CacheServerApi")
