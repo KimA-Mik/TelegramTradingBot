@@ -10,11 +10,13 @@ import kotlinx.coroutines.future.await
 import ru.kima.cacheserver.api.schema.instrumentsService.InstrumentExchangeType
 import ru.kima.cacheserver.api.schema.instrumentsService.InstrumentStatus
 import ru.kima.cacheserver.api.schema.model.Future
+import ru.kima.cacheserver.api.schema.model.Security
 import ru.kima.cacheserver.api.schema.model.Share
 import ru.kima.cacheserver.api.schema.model.requests.GetCandlesRequest
 import ru.kima.cacheserver.api.schema.model.requests.GetOrderBookRequest
 import ru.kima.cacheserver.implementation.core.CachedValue
 import ru.kima.cacheserver.implementation.core.RateLimiter
+import ru.kima.cacheserver.implementation.core.ServerExceptions
 import ru.kima.cacheserver.implementation.data.mappers.toFuture
 import ru.kima.cacheserver.implementation.data.mappers.toHistoricalCandle
 import ru.kima.cacheserver.implementation.data.mappers.toShare
@@ -66,7 +68,15 @@ class TinkoffDataSource(token: String) {
     suspend fun shares(
         instrumentStatus: InstrumentStatus,
         instrumentExchangeType: InstrumentExchangeType
-    ) = sharesCache.getValue(instrumentStatus to instrumentExchangeType).getValue()
+    ) = accessSharesCache(instrumentStatus to instrumentExchangeType).getValue()
+
+    private fun accessSharesCache(key: Pair<InstrumentStatus, InstrumentExchangeType>): CachedValue<List<Share>> {
+        if (!sharesCache.contains(key)) {
+            sharesCache[key] = sharesCache.getValue(key)
+        }
+
+        return sharesCache.getValue(key)
+    }
 
     private val futuresCache =
         mutableMapOf<Pair<InstrumentStatus, InstrumentExchangeType>, CachedValue<List<Future>>>().withDefault {
@@ -79,10 +89,18 @@ class TinkoffDataSource(token: String) {
             }
         }
 
+    private fun accessFuturesCache(key: Pair<InstrumentStatus, InstrumentExchangeType>): CachedValue<List<Future>> {
+        if (!futuresCache.contains(key)) {
+            futuresCache[key] = futuresCache.getValue(key)
+        }
+
+        return futuresCache.getValue(key)
+    }
+
     suspend fun futures(
         instrumentStatus: InstrumentStatus,
         instrumentExchangeType: InstrumentExchangeType
-    ) = futuresCache.getValue(instrumentStatus to instrumentExchangeType).getValue()
+    ) = accessFuturesCache(instrumentStatus to instrumentExchangeType).getValue()
 
     @OptIn(ExperimentalTime::class)
     suspend fun getCandles(request: GetCandlesRequest) = rateLimiter.rateLimitedResult {
@@ -108,5 +126,24 @@ class TinkoffDataSource(token: String) {
                 .await()
                 .toOrderBook()
         }
+    }
+
+    suspend fun findSecurity(ticker: String): Result<Security> = runCatching {
+        val cleanedTicker = ticker.trim().uppercase()
+        for (instrumentStatus in InstrumentStatus.entries) {
+            for (instrumentExchangeType in InstrumentExchangeType.entries) {
+                val pair = instrumentStatus to instrumentExchangeType
+                accessSharesCache(pair)
+                    .getValue().getOrNull()
+                    ?.find { it.ticker == cleanedTicker }
+                    ?.let { return@runCatching it }
+
+                accessFuturesCache(pair)
+                    .getValue().getOrNull()
+                    ?.find { it.ticker == cleanedTicker }
+                    ?.let { return@runCatching it }
+            }
+        }
+        throw ServerExceptions.SecurityNotFoundException(ticker)
     }
 }

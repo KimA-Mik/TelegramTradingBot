@@ -10,6 +10,8 @@ import io.ktor.server.routing.RoutingCall
 import io.ktor.server.routing.RoutingRequest
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
+import ru.kima.cacheserver.api.api.ApiResources
+import ru.kima.cacheserver.api.api.FIND_SECURITY
 import ru.kima.cacheserver.api.api.HISTORIC_CANDLES
 import ru.kima.cacheserver.api.api.ORDER_BOOK
 import ru.kima.cacheserver.api.api.TRADABLE_FUTURES
@@ -20,6 +22,7 @@ import ru.kima.cacheserver.api.schema.model.requests.GetCandlesRequest
 import ru.kima.cacheserver.api.schema.model.requests.GetOrderBookRequest
 import ru.kima.cacheserver.api.schema.model.requests.InstrumentsRequest
 import ru.kima.cacheserver.api.util.enumValueOfOrNull
+import ru.kima.cacheserver.implementation.core.ServerExceptions
 import ru.kima.cacheserver.implementation.data.TinkoffDataSource
 
 fun Application.sharesRouting(
@@ -82,6 +85,26 @@ fun Application.sharesRouting(
             tinkoffDataSource.getOrderBook(request)
                 .onSuccess { call.respond(it) }
                 .onFailure { defaultOnFailure(call, it) }
+        }
+
+        get("/$FIND_SECURITY") {
+            val ticker = call.queryParameters[ApiResources.FindSecurity::ticker.name]
+            if (ticker == null) {
+                call.respond(HttpStatusCode.BadRequest)
+                return@get
+            }
+
+            tinkoffDataSource.findSecurity(ticker)
+                .onSuccess { call.respond(it) }
+                .onFailure {
+                    when (it) {
+                        is ServerExceptions.SecurityNotFoundException -> call.respond(HttpStatusCode.NotFound)
+                        else -> {
+                            call.respond(HttpStatusCode.InternalServerError)
+                            log.error(it.message)
+                        }
+                    }
+                }
         }
     }
 }

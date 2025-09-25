@@ -20,7 +20,9 @@ import kotlinx.serialization.json.Json
 import ru.kima.cacheserver.api.schema.model.Future
 import ru.kima.cacheserver.api.schema.model.HistoricCandle
 import ru.kima.cacheserver.api.schema.model.OrderBook
+import ru.kima.cacheserver.api.schema.model.Security
 import ru.kima.cacheserver.api.schema.model.Share
+import ru.kima.cacheserver.api.schema.model.requests.FindSecurityResponse
 import ru.kima.cacheserver.api.schema.model.requests.GetCandlesRequest
 import ru.kima.cacheserver.api.schema.model.requests.GetOrderBookRequest
 import ru.kima.cacheserver.api.schema.model.requests.InstrumentsRequest
@@ -59,6 +61,21 @@ class CacheServerApi(
             contentType(ContentType.Application.Json)
             setBody(request)
         })
+
+    suspend fun findSecurity(ticker: String): FindSecurityResponse = try {
+        val response = client.get(ApiResources.FindSecurity(ticker))
+        when (response.status) {
+            HttpStatusCode.OK -> when (val body = response.body<Security>()) {
+                is Share -> FindSecurityResponse.Share(body)
+                is Future -> FindSecurityResponse.Future(body)
+            }
+
+            HttpStatusCode.NotFound -> FindSecurityResponse.NotFound
+            else -> FindSecurityResponse.UnknownError(Exception(response.status.toString()))
+        }
+    } catch (e: Exception) {
+        FindSecurityResponse.UnknownError(e)
+    }
 
     private suspend inline fun <reified T> handleGetResponse(response: HttpResponse): Result<T> =
         try {

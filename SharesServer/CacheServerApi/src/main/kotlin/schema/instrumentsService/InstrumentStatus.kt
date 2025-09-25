@@ -6,11 +6,6 @@ package ru.kima.cacheserver.api.schema.instrumentsService
  */
 enum class InstrumentStatus {
     /**
-     * Значение не определено
-     */
-    INSTRUMENT_STATUS_UNSPECIFIED,
-
-    /**
      * По умолчанию — базовый список инструментов, которыми можно торговать через T-Invest API. Сейчас списки доступных бумаг в API и других интерфейсах совпадают — кроме внебиржевых бумаг, но в будущем списки могут различаться.
      */
     INSTRUMENT_STATUS_BASE,
@@ -19,5 +14,10 @@ enum class InstrumentStatus {
      * Список всех инструментов
      * */
     INSTRUMENT_STATUS_ALL,
+
+    /**
+     * Значение не определено
+     */
+    INSTRUMENT_STATUS_UNSPECIFIED,
     UNRECOGNIZED
 }

@@ -16,4 +16,7 @@ object ApiResources {
 
     @Resource("/$ORDER_BOOK")
     class OrderBook()
+
+    @Resource("/$FIND_SECURITY")
+    class FindSecurity(val ticker: String)
 }
