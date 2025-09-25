@@ -1,6 +1,7 @@
 package data.remoteservice
 
 import kotlinx.coroutines.future.asDeferred
+import ru.kima.cacheserver.api.schema.model.requests.ORDER_BOOK_DEPTH
 import ru.kima.cacheserver.implementation.data.util.toTimestamp
 import ru.tinkoff.piapi.contract.v1.CandleInterval
 import ru.tinkoff.piapi.contract.v1.GetCandlesRequest
@@ -15,7 +16,6 @@ import kotlin.time.Instant
 
 typealias MarketDataService = AsyncStubWrapper<MarketDataServiceGrpc.MarketDataServiceStub>
 
-const val ORDER_BOOK_DEPTH = 20
 
 /**
  * Цены последних сделок по инструментам.

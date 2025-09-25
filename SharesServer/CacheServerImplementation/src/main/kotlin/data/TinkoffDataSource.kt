@@ -4,17 +4,21 @@ import data.remoteservice.InstrumentsService
 import data.remoteservice.MarketDataService
 import data.remoteservice.futures
 import data.remoteservice.getCandles
+import data.remoteservice.getOrderBook
 import data.remoteservice.shares
+import kotlinx.coroutines.future.await
 import ru.kima.cacheserver.api.schema.instrumentsService.InstrumentExchangeType
 import ru.kima.cacheserver.api.schema.instrumentsService.InstrumentStatus
 import ru.kima.cacheserver.api.schema.model.Future
 import ru.kima.cacheserver.api.schema.model.Share
 import ru.kima.cacheserver.api.schema.model.requests.GetCandlesRequest
+import ru.kima.cacheserver.api.schema.model.requests.GetOrderBookRequest
 import ru.kima.cacheserver.implementation.core.CachedValue
 import ru.kima.cacheserver.implementation.core.RateLimiter
 import ru.kima.cacheserver.implementation.data.mappers.toFuture
 import ru.kima.cacheserver.implementation.data.mappers.toHistoricalCandle
 import ru.kima.cacheserver.implementation.data.mappers.toShare
+import ru.kima.cacheserver.implementation.data.remoteservice.mappers.toOrderBook
 import ru.kima.cacheserver.implementation.data.remoteservice.mappers.toTCandleInterval
 import ru.tinkoff.piapi.contract.v1.InstrumentsServiceGrpc
 import ru.tinkoff.piapi.contract.v1.MarketDataServiceGrpc
@@ -92,6 +96,17 @@ class TinkoffDataSource(token: String) {
                 .await()
                 .candlesList
                 .map { it.toHistoricalCandle() }
+        }
+    }
+
+    suspend fun getOrderBook(request: GetOrderBookRequest) = rateLimiter.rateLimitedResult {
+        runCatching {
+            marketDataService.getOrderBook(
+                uid = request.uid,
+                depth = request.depth
+            )
+                .await()
+                .toOrderBook()
         }
     }
 }

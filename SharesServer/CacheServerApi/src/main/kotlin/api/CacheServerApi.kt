@@ -19,8 +19,10 @@ import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
 import ru.kima.cacheserver.api.schema.model.Future
 import ru.kima.cacheserver.api.schema.model.HistoricCandle
+import ru.kima.cacheserver.api.schema.model.OrderBook
 import ru.kima.cacheserver.api.schema.model.Share
 import ru.kima.cacheserver.api.schema.model.requests.GetCandlesRequest
+import ru.kima.cacheserver.api.schema.model.requests.GetOrderBookRequest
 import ru.kima.cacheserver.api.schema.model.requests.InstrumentsRequest
 
 class CacheServerApi(
@@ -48,6 +50,12 @@ class CacheServerApi(
 
     suspend fun historicCandles(request: GetCandlesRequest): Result<List<HistoricCandle>> =
         handleGetResponse(client.get(ApiResources.HistoricCandles()) {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        })
+
+    suspend fun getOrderBook(request: GetOrderBookRequest): Result<OrderBook> =
+        handleGetResponse(client.get(ApiResources.OrderBook()) {
             contentType(ContentType.Application.Json)
             setBody(request)
         })

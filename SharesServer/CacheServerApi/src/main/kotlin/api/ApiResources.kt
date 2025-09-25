@@ -13,4 +13,7 @@ object ApiResources {
 
     @Resource("/$HISTORIC_CANDLES")
     class HistoricCandles()
+
+    @Resource("/$ORDER_BOOK")
+    class OrderBook()
 }
