@@ -1,0 +1,44 @@
+plugins {
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.ktor)
+    application
+}
+
+group = "ru.kima.dailytrackingbot"
+version = "unspecified"
+
+repositories {
+    mavenCentral()
+    maven(url = "https://jitpack.io")
+}
+
+dependencies {
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlin.telegram.bot)
+
+    implementation(libs.koin.core)
+    implementation(libs.exposed.core)
+    implementation(libs.exposed.dao)
+    implementation(libs.exposed.jdbc)
+    implementation(libs.exposed.java.time)
+    implementation(libs.exposed.migration.core)
+    implementation(libs.exposed.migration.jdbc)
+
+    implementation(libs.sqlite.jdbc)
+    implementation(libs.ta4j.core)
+    implementation(libs.ktor.client.logging)
+    implementation(project(":SharesServer:CacheServerApi"))
+    testImplementation(kotlin("test"))
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+kotlin {
+    jvmToolchain(libs.versions.toolchain.get().toInt())
+}
+
+application {
+    mainClass.set("$group.MainKt")
+}
