@@ -1,8 +1,9 @@
 package presentation.telegram
 
+import domain.user.usecase.FindUserUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import presentation.telegram.screens.BotScreen
+import presentation.telegram.core.screen.BotScreen
 
 class CallbackHandler(
 //    /* Ungrouped */

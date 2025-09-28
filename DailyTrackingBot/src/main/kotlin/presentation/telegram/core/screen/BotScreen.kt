@@ -1,4 +1,4 @@
-package presentation.telegram.screens
+package presentation.telegram.core.screen
 
 import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.entities.ReplyMarkup

@@ -6,8 +6,13 @@ import domain.user.usecase.PopUserUseCase
 import domain.user.usecase.RegisterUserUseCase
 import domain.user.usecase.UserToRootUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.merge
-import presentation.telegram.screens.BotScreen
+import presentation.telegram.core.DefaultCommands
+import presentation.telegram.core.RootTextModel
+import presentation.telegram.core.UiError
+import presentation.telegram.core.screen.BotScreen
+import presentation.telegram.core.screen.ErrorScreen
 
 class BotModel(
     private val rootTextModel: RootTextModel,
@@ -28,8 +33,13 @@ class BotModel(
 
     suspend fun dispatchStartMessage(sender: Long) {
         val registered = when (val result = registerUser(sender)) {
-            is Resource.Success -> Greeting(id = sender)
-            is Resource.Error -> ErrorScreen(id = sender, message = result.message ?: UNKNOWN_ERROR)
+            result.isSuccess -> {}
+            else -> ErrorScreen(
+                userId = sender,
+                error = result.exceptionOrNull()?.let { UiError.TextError(it.localizedMessage) }
+                    ?: UiError.UnknownError)
+//            is Resource.Success -> Greeting(id = sender)
+//            is Resource.Error -> ErrorScreen(id = sender, message = result.message ?: UNKNOWN_ERROR)
         }
         _outMessages.emit(registered)
         _outMessages.emit(Root(id = sender))
@@ -37,8 +47,8 @@ class BotModel(
 
     suspend fun handleTextInput(id: Long, text: String) {
         val userResource = findUser(id)
-        val user = if (userResource is Resource.Success) {
-            userResource.data!!
+        val user = if (userResource.isSuccess) {
+            userResource.getOrNull()!!
         } else {
             val screen = ErrorScreen(
                 id,
@@ -50,12 +60,12 @@ class BotModel(
 
         var path = user.path.split(PATH_SEPARATOR).drop(1)
         val screens = when (text) {
-            BotTextCommands.Root.text -> {
+            DefaultCommands.Root.text -> {
                 userToRoot(user)
                 flowOf(Root(user.id))
             }
 
-            BotTextCommands.Pop.text -> {
+            DefaultCommands.Pop.text -> {
                 if (path.isNotEmpty()) {
                     popUser(user)
                     path = path.dropLast(1)

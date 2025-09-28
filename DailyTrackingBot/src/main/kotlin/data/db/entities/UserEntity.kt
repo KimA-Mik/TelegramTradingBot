@@ -10,8 +10,15 @@ class UserEntity(id: EntityID<Long>) : LongEntity(id) {
 
     var path by Users.path
     var registered by Users.registered
+    var ticker by Users.ticker
+    var targetPrice by Users.targetPrice
+    var isActive by Users.isActive
+    var remainActive by Users.remainActive
+    var targetDeviation by Users.targetDeviations
+    var note by Users.note
+    var showNote by Users.showNote
 
     override fun toString(): String {
-        return "User(id=$id, path=$path, registered=$registered)"
+        return "User(id=$id, path=$path, registered=$registered, ticker=$ticker, targetPrice=$targetPrice, targetDeviation=$targetDeviation, isActive=$isActive, remainActive=$remainActive note=$note)"
     }
 }

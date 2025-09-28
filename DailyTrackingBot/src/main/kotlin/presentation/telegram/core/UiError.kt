@@ -1,0 +1,26 @@
+package presentation.telegram.core
+
+import com.github.kotlintelegrambot.entities.ParseMode
+import com.github.kotlintelegrambot.entities.ReplyMarkup
+
+sealed class UiError {
+    abstract fun render(): String
+    val replyMarkup: ReplyMarkup? = null
+    val parseMode: ParseMode? = null
+
+    object UnknownPath : UiError() {
+        override fun render() = "Неизвестный путь"
+    }
+
+    class UnknownCommand(val command: String) : UiError() {
+        override fun render() = "Неизвестная команда: $command"
+    }
+
+    class TextError(val text: String) : UiError() {
+        override fun render() = text
+    }
+
+    object UnknownError : UiError() {
+        override fun render() = "Неизвестная ошибка"
+    }
+}

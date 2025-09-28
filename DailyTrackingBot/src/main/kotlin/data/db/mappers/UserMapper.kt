@@ -11,5 +11,12 @@ import kotlin.time.ExperimentalTime
 fun UserEntity.toUser() = User(
     id = id.value,
     path = path,
-    registered = registered.toKotlinLocalDateTime().toInstant(TimeZone.currentSystemDefault())
+    registered = registered.toKotlinLocalDateTime().toInstant(TimeZone.currentSystemDefault()),
+    ticker = ticker,
+    targetPrice = targetPrice,
+    targetDeviation = targetDeviation,
+    isActive = isActive,
+    remainActive = remainActive,
+    note = note,
+    showNote = showNote,
 )
