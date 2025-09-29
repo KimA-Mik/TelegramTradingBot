@@ -1,13 +1,16 @@
 package presentation.telegram
 
+import kotlinx.coroutines.flow.flowOf
+import presentation.telegram.core.screen.BotScreen
+
 class UpdateHandler(
 //    service: UpdateService
 ) {
-    val outScreens = service
+    val outScreens = flowOf<BotScreen>()/*= service
         .updates
         .mapNotNull {
             updateToScreen(it)
-        }
+        }*/
 //
 //    private fun updateToScreen(update: TelegramUpdate): BotScreen {
 //        return when (update) {

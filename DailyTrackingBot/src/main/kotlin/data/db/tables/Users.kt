@@ -13,6 +13,7 @@ object Users : LongIdTable("users") {
     val targetDeviations = double(name = "target_deviations").nullable().default(null)
     val isActive = bool(name = "is_active").default(false)
     val remainActive = bool(name = "remain_active").default(false)
+    val securityConfigureSequence = bool(name = "security_configure_sequence").default(false)
     val note = varchar(name = "note", length = MAX_NOTE_LENGTH).nullable().default(null)
     val showNote = bool(name = "show_note").default(true)
 }

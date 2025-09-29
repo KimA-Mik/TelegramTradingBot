@@ -12,6 +12,7 @@ data class User @OptIn(ExperimentalTime::class) constructor(
     val targetDeviation: Double?,
     val isActive: Boolean,
     val remainActive: Boolean,
+    val securityConfigureSequence: Boolean,
     val note: String?,
     val showNote: Boolean
 )

@@ -26,6 +26,14 @@ class UserRepositoryImpl(
                 it.registered = user.registered
                     .toLocalDateTime(TimeZone.currentSystemDefault())
                     .toJavaLocalDateTime()
+                it.ticker = user.ticker
+                it.targetPrice = user.targetPrice
+                it.isActive = user.isActive
+                it.remainActive = user.remainActive
+                it.targetDeviation = user.targetDeviation
+                it.securityConfigureSequence = user.securityConfigureSequence
+                it.note = user.note
+                it.showNote = user.showNote
             }?.toUser()
         }
 

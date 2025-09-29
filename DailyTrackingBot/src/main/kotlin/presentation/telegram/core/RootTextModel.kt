@@ -4,7 +4,7 @@ import domain.user.model.User
 import domain.user.usecase.NavigateUserUseCase
 import kotlinx.coroutines.flow.flow
 import presentation.telegram.core.screen.BotScreen
-import presentation.telegram.security.SecurityTextModel
+import presentation.telegram.security.textmodel.SecurityTextModel
 
 class RootTextModel(
     private val navigateUser: NavigateUserUseCase,

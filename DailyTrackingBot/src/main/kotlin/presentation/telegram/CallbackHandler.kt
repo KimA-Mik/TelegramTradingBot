@@ -3,7 +3,11 @@ package presentation.telegram
 import domain.user.usecase.FindUserUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.emitAll
+import presentation.telegram.core.CallbackButtonHandler
+import presentation.telegram.core.UiError
 import presentation.telegram.core.screen.BotScreen
+import presentation.telegram.core.screen.ErrorScreen
 
 class CallbackHandler(
 //    /* Ungrouped */
@@ -27,7 +31,7 @@ class CallbackHandler(
 //    switchRsiDefaultButtonHandler: SwitchRsiDefaultButtonHandler,
     private val findUser: FindUserUseCase
 ) {
-    private val buttonHandlers = mapOf(
+    private val buttonHandlers = mapOf<String, CallbackButtonHandler>(
 //        /* Ungrouped */
 //        CallbackButton.ResetNotification.callbackData to resetNotificationButtonHandler,
 //        CallbackButton.Subscribe.callbackData to subscribeButtonHandler,
@@ -59,19 +63,14 @@ class CallbackHandler(
         messageText: String
     ) {
         if (userId == 0L || messageId == 0L) return
-        val user = findUser(userId).data
-
-        if (user == null) {
-            _outFlow.emit(ErrorScreen(userId, USER_NOT_FOUND_MESSAGE))
+        val user = findUser(userId).getOrElse {
+            _outFlow.emit(ErrorScreen(userId, UiError.UnregisteredUserError))
             return
         }
 
-        val parsedData = callbackData.split(CALLBACK_BUTTON_ARGUMENT_SEPARATOR)
-        val callbackCommand = parsedData.first()
-
-        buttonHandlers[callbackCommand]?.let { handler ->
-            val screen = handler.execute(user, messageId, messageText, parsedData.drop(1))
-            _outFlow.emit(screen)
+        val parseResult = CallbackButtonHandler.parseCallbackData(callbackData)
+        buttonHandlers[parseResult.command]?.let { handler ->
+            _outFlow.emitAll(handler.execute(user, messageId, messageText, parseResult.arguments))
         }
     }
 }

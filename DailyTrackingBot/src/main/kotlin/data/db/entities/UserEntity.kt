@@ -15,6 +15,7 @@ class UserEntity(id: EntityID<Long>) : LongEntity(id) {
     var isActive by Users.isActive
     var remainActive by Users.remainActive
     var targetDeviation by Users.targetDeviations
+    var securityConfigureSequence by Users.securityConfigureSequence
     var note by Users.note
     var showNote by Users.showNote
 

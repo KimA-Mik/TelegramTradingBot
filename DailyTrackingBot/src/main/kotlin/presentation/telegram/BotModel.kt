@@ -7,12 +7,15 @@ import domain.user.usecase.RegisterUserUseCase
 import domain.user.usecase.UserToRootUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.merge
 import presentation.telegram.core.DefaultCommands
 import presentation.telegram.core.RootTextModel
 import presentation.telegram.core.UiError
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.core.screen.ErrorScreen
+import presentation.telegram.core.screen.Greeting
+import presentation.telegram.core.screen.Root
 
 class BotModel(
     private val rootTextModel: RootTextModel,
@@ -32,17 +35,18 @@ class BotModel(
     )
 
     suspend fun dispatchStartMessage(sender: Long) {
-        val registered = when (val result = registerUser(sender)) {
-            result.isSuccess -> {}
-            else -> ErrorScreen(
+        val result = registerUser(sender)
+        val registered = if (result.isSuccess) {
+            Greeting(sender)
+        } else {
+            ErrorScreen(
                 userId = sender,
-                error = result.exceptionOrNull()?.let { UiError.TextError(it.localizedMessage) }
-                    ?: UiError.UnknownError)
-//            is Resource.Success -> Greeting(id = sender)
-//            is Resource.Error -> ErrorScreen(id = sender, message = result.message ?: UNKNOWN_ERROR)
+                error = result.exceptionOrNull()?.message?.let { UiError.TextError(it) } ?: UiError.UnknownError
+            )
         }
+
         _outMessages.emit(registered)
-        _outMessages.emit(Root(id = sender))
+        _outMessages.emit(Root(sender))
     }
 
     suspend fun handleTextInput(id: Long, text: String) {
@@ -50,10 +54,7 @@ class BotModel(
         val user = if (userResource.isSuccess) {
             userResource.getOrNull()!!
         } else {
-            val screen = ErrorScreen(
-                id,
-                "Похоже мне стерли память и я вас не помню, напишите команду /start, чтобы я вас записал."
-            )
+            val screen = ErrorScreen(id, UiError.UnregisteredUserError)
             _outMessages.emit(screen)
             return
         }
@@ -86,9 +87,5 @@ class BotModel(
         messageText: String
     ) {
         callbackHandler.handleCallback(callbackData, userId, messageId, messageText)
-    }
-
-    companion object {
-        private const val UNKNOWN_ERROR = "Неизвестная ошибка"
     }
 }

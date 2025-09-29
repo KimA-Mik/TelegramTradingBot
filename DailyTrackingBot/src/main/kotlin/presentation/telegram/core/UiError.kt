@@ -23,4 +23,13 @@ sealed class UiError {
     object UnknownError : UiError() {
         override fun render() = "Неизвестная ошибка"
     }
+
+    object UnregisteredUserError : UiError() {
+        override fun render() =
+            "Похоже мне стерли память и я вас не помню, напишите команду /start, чтобы я вас записал."
+    }
+
+    object BrokenCallbackButton : UiError() {
+        override fun render() = "Похоже эта кнопка сломана"
+    }
 }

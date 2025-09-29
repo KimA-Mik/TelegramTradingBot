@@ -19,4 +19,5 @@ fun UserEntity.toUser() = User(
     remainActive = remainActive,
     note = note,
     showNote = showNote,
+    securityConfigureSequence = securityConfigureSequence,
 )

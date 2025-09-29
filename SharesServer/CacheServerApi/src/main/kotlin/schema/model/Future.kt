@@ -9,7 +9,7 @@ import kotlin.time.Instant
 @SerialName("Future")
 data class Future @OptIn(ExperimentalTime::class) constructor(
     override val uid: String = String(),
-    val ticker: String = String(),
+    override val ticker: String = String(),
     val name: String = String(),
     val lot: Int = 0,
     val expirationDate: Instant

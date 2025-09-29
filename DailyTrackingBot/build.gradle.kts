@@ -27,6 +27,11 @@ dependencies {
     implementation(libs.sqlite.jdbc)
     implementation(libs.ta4j.core)
     implementation(libs.ktor.client.logging)
+
+    implementation(libs.retrofit)
+    implementation(libs.logging.interceptor)
+    implementation(libs.clikt)
+
     implementation(project(":SharesServer:CacheServerApi"))
     testImplementation(kotlin("test"))
 }
