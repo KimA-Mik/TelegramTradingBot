@@ -21,6 +21,7 @@ class Program : CliktCommand() {
     val telegramToken: String by option("-t", "--token").required().help("Telegram bot token")
     val apiUrl: String by option("-u", "--url").help("Cache server API URL")
         .default("127.0.0.1:6969")
+
     override fun run() {
         startKoin {
             modules(

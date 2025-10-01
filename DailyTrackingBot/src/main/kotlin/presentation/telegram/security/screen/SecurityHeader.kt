@@ -20,7 +20,7 @@ class SecurityHeader(id: Long) : BotScreen(id) {
     companion object {
         private val _replayMarkup = KeyboardReplyMarkup(
             listOf(
-                listOf(KeyboardButton(Command.Reconfigure.text)),
+//                listOf(KeyboardButton(Command.Reconfigure.text)),
                 listOf(
                     KeyboardButton(Command.Ticker.text),
                     KeyboardButton(Command.Price.text),
