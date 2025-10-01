@@ -40,7 +40,9 @@ class CacheServerApi(
         }
         install(Resources)
         defaultRequest {
-            url(apiUrl)
+            val defaultUrl = if (apiUrl.contains("://")) apiUrl
+            else "http://$apiUrl"
+            url(defaultUrl)
         }
     }
 

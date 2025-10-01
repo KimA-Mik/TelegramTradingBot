@@ -1,6 +1,5 @@
 package presentation.telegram.security.textmodel
 
-import domain.common.PATH_SEPARATOR
 import domain.tinkoff.usecase.FindSecurityUseCase
 import domain.user.model.User
 import domain.user.usecase.PopUserUseCase
@@ -12,9 +11,7 @@ import org.koin.java.KoinJavaComponent.inject
 import presentation.telegram.core.NavigationRoot
 import presentation.telegram.core.RootTextModel
 import presentation.telegram.core.TextModel
-import presentation.telegram.core.UiError
 import presentation.telegram.core.screen.BotScreen
-import presentation.telegram.core.screen.ErrorScreen
 import presentation.telegram.security.screen.EditTickerScreen
 import presentation.telegram.security.screen.TickerSearchResultScreen
 
@@ -36,24 +33,15 @@ class EditTickerTextModel(
             return@flow
         }
 
-        if (command == EditTickerScreen.Commands.Cancel.text) {
-            popUser(user)
-                .onFailure {
-                    emit(ErrorScreen(user.id, UiError.UnregisteredUserError))
-                    return@flow
-                }
-                .onSuccess {
-                    emitAll(rootTextModel.executeCommand(it, it.path.split(PATH_SEPARATOR), ""))
-                    return@flow
-                }
-        }
-
-        val searchResult = findSecurity(command)
+        val searchResult = runCatching { findSecurity(command) }
+            .onFailure { println(it) }
+            .getOrDefault(FindSecurityUseCase.Result.NotFound)
         emit(TickerSearchResultScreen(user.id, searchResult = searchResult))
 
         if (searchResult is FindSecurityUseCase.Result.Success) {
-            val newUser = updateTicker(user, searchResult.security.ticker)
-            emitAll(rootTextModel.executeCommand(newUser, newUser.path.split(PATH_SEPARATOR), ""))
+            var newUser = updateTicker(user, searchResult.security.ticker)
+            newUser = popUser(newUser).getOrDefault(user)
+            emitAll(rootTextModel.executeCommand(newUser, newUser.pathList, ""))
         }
     }
 }
