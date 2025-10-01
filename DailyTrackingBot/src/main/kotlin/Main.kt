@@ -12,7 +12,7 @@ import org.koin.java.KoinJavaComponent.get
 import presentation.di.presentationModule
 import presentation.telegram.BotModel
 import presentation.telegram.TelegramBot
-import java.util.*
+import java.util.Locale
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -29,7 +29,6 @@ class Program : CliktCommand() {
             )
         }
         runBlocking {
-//            val model: BotModel by inject(BotModel::class.java)
             val telegramBot = TelegramBot(telegramToken, get(BotModel::class.java))
             telegramBot.run()
         }
