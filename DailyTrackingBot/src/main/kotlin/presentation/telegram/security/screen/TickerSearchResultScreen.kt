@@ -19,48 +19,47 @@ class TickerSearchResultScreen(
     private val searchResult: FindSecurityUseCase.Result
 ) : BotScreen(userId, messageId) {
     override val text = renderText()
-    override val parseMode = ParseMode.MARKDOWN_V2
+    override val parseMode = ParseMode.MARKDOWN
     override val replyMarkup = calculateReplayMarkup()
+    override val disableWebPagePreview = true
 
-    private fun renderText(): String {
-        return when (searchResult) {
-            FindSecurityUseCase.Result.NotFound -> "Ничего не найдено"
-            is FindSecurityUseCase.Result.Suggestions -> "Точного совпадения не найдено, возможно вы имели в виду:"
-            is FindSecurityUseCase.Result.Success -> buildString {
-                append(
-                    when (searchResult.security) {
-                        is Share -> "Найдена акция "
-                        is Future -> "Найден фьючерс "
-                    }
-                )
-                append(TelegramUtil.clickableSecurity(searchResult.security))
-                searchResult.price?.let {
-                    append(" — ")
-                    append(it.formatAndTrim(2))
-                    append(ROUBLE_SIGN)
+    private fun renderText(): String = when (searchResult) {
+        FindSecurityUseCase.Result.NotFound -> "Ничего не найдено"
+        is FindSecurityUseCase.Result.Suggestions -> "Точного совпадения не найдено, возможно вы имели в виду:"
+        is FindSecurityUseCase.Result.Success -> buildString {
+            append(
+                when (searchResult.security) {
+                    is Share -> "Найдена акция "
+                    is Future -> "Найден фьючерс "
                 }
+            )
+            append(TelegramUtil.clickableSecurity(searchResult.security))
+            searchResult.price?.let {
+                append(" — ")
+                append(it.formatAndTrim(2))
+                append(ROUBLE_SIGN)
             }
         }
     }
 
-    private fun calculateReplayMarkup(): ReplyMarkup? {
-        return when (searchResult) {
-            is FindSecurityUseCase.Result.Suggestions -> InlineKeyboardMarkup.create(
-                buttons = buildList {
-                    searchResult.suggestions.forEach { ticker ->
-                        add(
-                            listOf(
-                                InlineKeyboardButton.CallbackData(
-                                    text = ticker,
-                                    callbackData = TickerSuggestionCallbackButton.getCallbackData(ticker)
+    private fun calculateReplayMarkup(): ReplyMarkup? = when (searchResult) {
+        is FindSecurityUseCase.Result.Suggestions -> InlineKeyboardMarkup.create(
+            buttons = buildList {
+                searchResult.suggestions.forEach { ticker ->
+                    add(
+                        listOf(
+                            InlineKeyboardButton.CallbackData(
+                                text = ticker,
+                                callbackData = TickerSuggestionCallbackButton.getCallbackData(
+                                    ticker
                                 )
                             )
                         )
-                    }
+                    )
                 }
-            )
+            }
+        )
 
-            else -> null
-        }
+        else -> null
     }
 }

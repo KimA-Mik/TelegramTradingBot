@@ -8,49 +8,16 @@ import presentation.telegram.core.CallbackButtonHandler
 import presentation.telegram.core.UiError
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.core.screen.ErrorScreen
+import presentation.telegram.security.callbackbutton.TickerSuggestionCallbackButton
+import presentation.telegram.security.callbackbutton.TickerSuggestionCallbackHandler
 
 class CallbackHandler(
-//    /* Ungrouped */
-//    resetNotificationButtonHandler: ResetNotificationButtonHandler,
-//    subscribeButtonHandler: SubscribeButtonHandler,
-//    unsubscribeButtonHandler: UnsubscribeButtonHandler,
-//
-//    /* Securities List */
-//    editShareButtonHandler: EditShareButtonHandler,
-//    securitiesListBackButtonHandler: SecuritiesListBackButtonHandler,
-//    securitiesListForwardButtonHandler: SecuritiesListForwardButtonHandler,
-//    sharePercentButtonHandler: SharePercentButtonHandler,
-//    switchShareIndicatorCallbackButtonHandler: SwitchShareIndicatorCallbackButtonHandler,
-//
-//    /* Settings */
-//    editDefaultPercentButtonHandler: EditDefaultPercentButtonHandler,
-//    /* Indicator settings */
-//    resetBbDefaultButtonHandler: ResetBbDefaultButtonHandler,
-//    switchBbDefaultButtonHandler: SwitchBbDefaultButtonHandler,
-//    resetRsiDefaultButtonHandler: ResetRsiDefaultButtonHandler,
-//    switchRsiDefaultButtonHandler: SwitchRsiDefaultButtonHandler,
+    /* Security screen */
+    tickerSuggestionCallbackHandler: TickerSuggestionCallbackHandler,
     private val findUser: FindUserUseCase
 ) {
     private val buttonHandlers = mapOf<String, CallbackButtonHandler>(
-//        /* Ungrouped */
-//        CallbackButton.ResetNotification.callbackData to resetNotificationButtonHandler,
-//        CallbackButton.Subscribe.callbackData to subscribeButtonHandler,
-//        CallbackButton.Unsubscribe.callbackData to unsubscribeButtonHandler,
-//
-//        /* Securities List */
-//        EditShare.callbackData to editShareButtonHandler,
-//        SecuritiesListBack.callbackData to securitiesListBackButtonHandler,
-//        SecuritiesListForward.callbackData to securitiesListForwardButtonHandler,
-//        SharePercent.callbackData to sharePercentButtonHandler,
-//        SwitchShareIndicatorCallbackButton.callbackData to switchShareIndicatorCallbackButtonHandler,
-//
-//        /* Settings */
-//        EditDefaultPercentCallbackButton.callbackData to editDefaultPercentButtonHandler,
-//        /* Indicator settings */
-//        ResetBbDefaultCallbackButton.callbackData to resetBbDefaultButtonHandler,
-//        SwitchBbDefaultCallbackButton.callbackData to switchBbDefaultButtonHandler,
-//        ResetRsiDefaultCallbackButton.callbackData to resetRsiDefaultButtonHandler,
-//        SwitchRsiDefaultCallbackButton.callbackData to switchRsiDefaultButtonHandler,
+        TickerSuggestionCallbackButton.callbackData to tickerSuggestionCallbackHandler
     )
 
     private val _outFlow = MutableSharedFlow<BotScreen>()

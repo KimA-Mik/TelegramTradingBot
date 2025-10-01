@@ -28,7 +28,8 @@ class SecurityHeader(id: Long) : BotScreen(id) {
                     KeyboardButton(Command.Notes.text)
                 ),
                 listOf(KeyboardButton(DefaultCommands.Pop.text)),
-            )
+            ),
+            resizeKeyboard = true
         )
     }
 }

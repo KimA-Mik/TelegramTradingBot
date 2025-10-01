@@ -13,7 +13,8 @@ class EditTickerScreen(userId: Long) : BotScreen(userId) {
         private val _replyMarkup = KeyboardReplyMarkup(
             listOf(
                 listOf(KeyboardButton(DefaultCommands.Pop.text))
-            )
+            ),
+            resizeKeyboard = true
         )
     }
 }

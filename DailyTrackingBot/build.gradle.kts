@@ -29,6 +29,7 @@ dependencies {
     implementation(libs.ta4j.core)
     implementation(libs.ktor.client.logging)
 
+    implementation(libs.okhttp)
     implementation(libs.retrofit)
     implementation(libs.logging.interceptor)
     implementation(libs.clikt)
