@@ -23,3 +23,5 @@ fun Double.formatAndTrim(
     .trimEnd('0')
     .trimEnd('.')
     .trimEnd(',')
+
+fun String.parseToDouble() = replace(',', '.').toDouble()
