@@ -41,7 +41,8 @@ class BotModel(
         } else {
             ErrorScreen(
                 userId = sender,
-                error = result.exceptionOrNull()?.message?.let { UiError.TextError(it) } ?: UiError.UnknownError
+                error = result.exceptionOrNull()?.message?.let { UiError.TextError(it) }
+                    ?: UiError.UnknownError
             )
         }
 
@@ -58,6 +59,7 @@ class BotModel(
             _outMessages.emit(screen)
             return
         }
+        println("path: ${user.path}")
 
         var path = user.path.split(PATH_SEPARATOR).drop(1)
         val screens = when (text) {
@@ -67,11 +69,14 @@ class BotModel(
             }
 
             DefaultCommands.Pop.text -> {
+                var poppedUser = user
                 if (path.isNotEmpty()) {
-                    popUser(user)
-                    path = path.dropLast(1)
+                    popUser(user).onSuccess {
+                        poppedUser = it
+                        path = path.dropLast(1)
+                    }
                 }
-                rootTextModel.executeCommand(user, path, String())
+                rootTextModel.executeCommand(poppedUser, path, "")
             }
 
             else -> rootTextModel.executeCommand(user, path, text)

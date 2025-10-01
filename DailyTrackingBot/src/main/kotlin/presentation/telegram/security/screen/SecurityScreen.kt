@@ -12,8 +12,7 @@ class SecurityScreen(
     private val lastPrice: Double?,
     messageId: Long? = null
 ) : BotScreen(user.id, messageId) {
-    override val text: String
-        get() = TODO("Not yet implemented")
+    override val text = security?.ticker ?: "Нет"
     override val replyMarkup: ReplyMarkup?
         get() = super.replyMarkup
     override val parseMode = ParseMode.MARKDOWN
