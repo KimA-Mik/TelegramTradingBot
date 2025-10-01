@@ -23,6 +23,7 @@ dependencies {
     implementation(libs.exposed.java.time)
     implementation(libs.exposed.migration.core)
     implementation(libs.exposed.migration.jdbc)
+    implementation(libs.exposed.kotlin.datetime)
 
     implementation(libs.sqlite.jdbc)
     implementation(libs.ta4j.core)

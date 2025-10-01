@@ -2,8 +2,8 @@ package data.db.tables
 
 import domain.common.MAX_NOTE_LENGTH
 import org.jetbrains.exposed.v1.core.dao.id.LongIdTable
-import org.jetbrains.exposed.v1.javatime.CurrentDateTime
-import org.jetbrains.exposed.v1.javatime.datetime
+import org.jetbrains.exposed.v1.datetime.CurrentDateTime
+import org.jetbrains.exposed.v1.datetime.datetime
 
 object Users : LongIdTable("users") {
     val path = varchar(name = "path", length = 256).default("")
