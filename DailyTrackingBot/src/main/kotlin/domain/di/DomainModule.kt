@@ -18,6 +18,7 @@ fun domainModule() = module {
     singleOf(::RegisterUserUseCase)
     singleOf(::StartSecurityConfigureSequenceUseCase)
     singleOf(::UpdateExpectedPriceUseCase)
+    singleOf(::UpdateNoteUseCase)
     singleOf(::UpdatePercentUseCase)
     singleOf(::UpdateTickerUseCase)
     singleOf(::UserToRootUseCase)
