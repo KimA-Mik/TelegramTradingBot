@@ -20,6 +20,7 @@ fun domainModule() = module {
     singleOf(::UpdateExpectedPriceUseCase)
     singleOf(::UpdateNoteUseCase)
     singleOf(::UpdatePercentUseCase)
+    singleOf(::UpdateShowNoteUseCase)
     singleOf(::UpdateTickerUseCase)
     singleOf(::UserToRootUseCase)
 }

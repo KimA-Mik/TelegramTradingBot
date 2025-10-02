@@ -2,14 +2,14 @@ package presentation.telegram.security.callbackbutton
 
 import presentation.telegram.core.CallbackButton
 
-data object TickerSuggestionCallbackButton : CallbackButton(callbackData = "tickerSuggestion") {
-    fun getCallbackData(ticker: String) = callbackData + QUERY_SEPARATOR + ticker
-    fun parseCallbackQuery(arguments: List<String>): CallbackQuery? {
+data object TickerSuggestionCallbackButton : CallbackButton(callbackName = "ticker_suggestion") {
+    fun getCallbackData(ticker: String) = callbackName + QUERY_SEPARATOR + ticker
+    fun parseCallbackData(arguments: List<String>): CallbackData? {
         arguments.firstOrNull()?.let {
-            return CallbackQuery(it)
+            return CallbackData(it)
         }
         return null
     }
 
-    data class CallbackQuery(val ticker: String)
+    data class CallbackData(val ticker: String)
 }

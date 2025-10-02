@@ -7,11 +7,8 @@ import presentation.telegram.CallbackHandler
 import presentation.telegram.UpdateHandler
 import presentation.telegram.core.RootTextModel
 import presentation.telegram.security.callbackbutton.TickerSuggestionCallbackHandler
-import presentation.telegram.security.textmodel.EditNoteTextModel
-import presentation.telegram.security.textmodel.EditPercentTextModel
-import presentation.telegram.security.textmodel.EditPriceTextModel
-import presentation.telegram.security.textmodel.EditTickerTextModel
-import presentation.telegram.security.textmodel.SecurityTextModel
+import presentation.telegram.security.callbackbutton.ToggleShowNoteCallbackHandler
+import presentation.telegram.security.textmodel.*
 
 fun presentationModule() = module {
     singleOf(::BotModel)
@@ -22,6 +19,7 @@ fun presentationModule() = module {
     //Security
 
     singleOf(::TickerSuggestionCallbackHandler)
+    singleOf(::ToggleShowNoteCallbackHandler)
 
     singleOf(::EditNoteTextModel)
     singleOf(::EditPercentTextModel)

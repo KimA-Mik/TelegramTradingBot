@@ -10,14 +10,18 @@ import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.core.screen.ErrorScreen
 import presentation.telegram.security.callbackbutton.TickerSuggestionCallbackButton
 import presentation.telegram.security.callbackbutton.TickerSuggestionCallbackHandler
+import presentation.telegram.security.callbackbutton.ToggleShowNoteCallbackButton
+import presentation.telegram.security.callbackbutton.ToggleShowNoteCallbackHandler
 
 class CallbackHandler(
     /* Security screen */
     tickerSuggestionCallbackHandler: TickerSuggestionCallbackHandler,
+    toggleShowNoteCallbackHandler: ToggleShowNoteCallbackHandler,
     private val findUser: FindUserUseCase
 ) {
     private val buttonHandlers = mapOf<String, CallbackButtonHandler>(
-        TickerSuggestionCallbackButton.callbackData to tickerSuggestionCallbackHandler
+        TickerSuggestionCallbackButton.callbackName to tickerSuggestionCallbackHandler,
+        ToggleShowNoteCallbackButton.callbackName to toggleShowNoteCallbackHandler
     )
 
     private val _outFlow = MutableSharedFlow<BotScreen>()

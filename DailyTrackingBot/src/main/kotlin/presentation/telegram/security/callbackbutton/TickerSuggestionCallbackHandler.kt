@@ -27,7 +27,7 @@ class TickerSuggestionCallbackHandler(
         messageText: String,
         arguments: List<String>
     ): Flow<BotScreen> = flow {
-        val callbackData = TickerSuggestionCallbackButton.parseCallbackQuery(arguments)
+        val callbackData = TickerSuggestionCallbackButton.parseCallbackData(arguments)
         if (callbackData == null) {
             emit(ErrorScreen(user.id, UiError.BrokenCallbackButton))
             return@flow

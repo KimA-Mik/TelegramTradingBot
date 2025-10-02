@@ -8,10 +8,7 @@ object TelegramUtil {
     fun copiableText(text: String) = "`$text`"
 
     fun clickableSecurity(security: Security) = MarkdownUtil.inlineUrl(
-        text = when (security) {
-            is Future -> security.ticker
-            is Share -> security.ticker
-        },
+        text = security.ticker,
         url = when (security) {
             is Future -> TinInvestUtil.futureUrl(security.ticker)
             is Share -> TinInvestUtil.shareUrl(security.ticker)
