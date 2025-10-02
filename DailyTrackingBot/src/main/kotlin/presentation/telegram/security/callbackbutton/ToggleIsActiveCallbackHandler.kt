@@ -1,7 +1,7 @@
 package presentation.telegram.security.callbackbutton
 
 import domain.user.model.User
-import domain.user.usecase.UpdateShowNoteUseCase
+import domain.user.usecase.UpdateIsActiveUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import presentation.telegram.core.CallbackButtonHandler
@@ -9,8 +9,8 @@ import presentation.telegram.core.UiError
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.core.screen.ErrorScreen
 
-class ToggleShowNoteCallbackHandler(
-    private val updateShowNote: UpdateShowNoteUseCase,
+class ToggleIsActiveCallbackHandler(
+    private val updateIsActive: UpdateIsActiveUseCase,
     private val securityScreenUpdateUserHandler: SecurityScreenUpdateUserHandler
 ) : CallbackButtonHandler {
     override suspend fun execute(
@@ -19,15 +19,14 @@ class ToggleShowNoteCallbackHandler(
         messageText: String,
         arguments: List<String>
     ): Flow<BotScreen> = flow {
-        val callbackData = ToggleShowNoteCallbackButton.parseCallbackData(arguments)
+        val callbackData = ToggleIsActiveCallbackButton.parseCallbackData(arguments)
         if (callbackData == null) {
             emit(ErrorScreen(user.id, UiError.BrokenCallbackButton))
             return@flow
         }
 
-        val newScreen = securityScreenUpdateUserHandler.handle(user, messageId) {
-            updateShowNote(user, callbackData.newValue)
-        }
-        emit(newScreen)
+        securityScreenUpdateUserHandler.handle(user, messageId) {
+            updateIsActive(user, callbackData.newValue)
+        }.let { emit(it) }
     }
 }

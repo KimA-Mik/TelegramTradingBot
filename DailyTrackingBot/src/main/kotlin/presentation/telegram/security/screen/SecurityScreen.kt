@@ -2,11 +2,12 @@ package presentation.telegram.security.screen
 
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.ParseMode
-import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import domain.common.ROUBLE_SIGN
 import domain.common.formatAndTrim
 import domain.user.model.User
 import presentation.telegram.core.screen.BotScreen
+import presentation.telegram.security.callbackbutton.ToggleIsActiveCallbackButton
+import presentation.telegram.security.callbackbutton.ToggleRemainActiveCallbackButton
 import presentation.telegram.security.callbackbutton.ToggleShowNoteCallbackButton
 import presentation.util.TelegramUtil
 import ru.kima.cacheserver.api.schema.model.Future
@@ -75,10 +76,13 @@ class SecurityScreen(
     private fun calculateReplayMarkup() = InlineKeyboardMarkup.create(
         listOf(
             listOf(
-                InlineKeyboardButton.CallbackData(
-                    ToggleShowNoteCallbackButton.getText(user.showNote),
-                    ToggleShowNoteCallbackButton.getCallbackData(user.showNote)
-                )
+                ToggleIsActiveCallbackButton.getCallbackData(user.isActive),
+            ),
+            listOf(
+                ToggleRemainActiveCallbackButton.getCallbackData(user.remainActive)
+            ),
+            listOf(
+                ToggleShowNoteCallbackButton.getCallbackData(user.showNote)
             )
         )
     )

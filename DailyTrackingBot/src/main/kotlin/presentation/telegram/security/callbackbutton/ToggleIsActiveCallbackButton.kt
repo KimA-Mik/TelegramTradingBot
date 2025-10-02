@@ -3,9 +3,9 @@ package presentation.telegram.security.callbackbutton
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import presentation.telegram.core.CallbackButton
 
-object ToggleShowNoteCallbackButton : CallbackButton("toggle_show_note") {
+object ToggleIsActiveCallbackButton : CallbackButton("toggle_is_active") {
     fun getCallbackData(currentValue: Boolean) = InlineKeyboardButton.CallbackData(
-        text = if (currentValue) "Скрыть заметку" else "Показать заметку",
+        text = if (currentValue) "Отключить уведомления" else "Включить уведомления",
         callbackData = callbackName + QUERY_SEPARATOR + !currentValue
     )
 

@@ -8,19 +8,20 @@ import presentation.telegram.core.CallbackButtonHandler
 import presentation.telegram.core.UiError
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.core.screen.ErrorScreen
-import presentation.telegram.security.callbackbutton.TickerSuggestionCallbackButton
-import presentation.telegram.security.callbackbutton.TickerSuggestionCallbackHandler
-import presentation.telegram.security.callbackbutton.ToggleShowNoteCallbackButton
-import presentation.telegram.security.callbackbutton.ToggleShowNoteCallbackHandler
+import presentation.telegram.security.callbackbutton.*
 
 class CallbackHandler(
     /* Security screen */
     tickerSuggestionCallbackHandler: TickerSuggestionCallbackHandler,
+    toggleIsActiveCallbackHandler: ToggleIsActiveCallbackHandler,
+    toggleRemainActiveCallbackHandler: ToggleRemainActiveCallbackHandler,
     toggleShowNoteCallbackHandler: ToggleShowNoteCallbackHandler,
     private val findUser: FindUserUseCase
 ) {
-    private val buttonHandlers = mapOf<String, CallbackButtonHandler>(
+    private val buttonHandlers = mapOf(
         TickerSuggestionCallbackButton.callbackName to tickerSuggestionCallbackHandler,
+        ToggleIsActiveCallbackButton.callbackName to toggleIsActiveCallbackHandler,
+        ToggleRemainActiveCallbackButton.callbackName to toggleRemainActiveCallbackHandler,
         ToggleShowNoteCallbackButton.callbackName to toggleShowNoteCallbackHandler
     )
 
