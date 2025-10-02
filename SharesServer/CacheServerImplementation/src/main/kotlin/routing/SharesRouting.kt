@@ -1,24 +1,15 @@
 package ru.kima.cacheserver.implementation.routing
 
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.Application
-import io.ktor.server.application.log
-import io.ktor.server.request.receive
-import io.ktor.server.response.respond
-import io.ktor.server.response.respondText
-import io.ktor.server.routing.RoutingCall
-import io.ktor.server.routing.RoutingRequest
-import io.ktor.server.routing.get
-import io.ktor.server.routing.routing
-import ru.kima.cacheserver.api.api.ApiResources
-import ru.kima.cacheserver.api.api.FIND_SECURITY
-import ru.kima.cacheserver.api.api.HISTORIC_CANDLES
-import ru.kima.cacheserver.api.api.ORDER_BOOK
-import ru.kima.cacheserver.api.api.TRADABLE_FUTURES
-import ru.kima.cacheserver.api.api.TRADABLE_SHARES
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import ru.kima.cacheserver.api.api.*
 import ru.kima.cacheserver.api.schema.instrumentsService.InstrumentExchangeType
 import ru.kima.cacheserver.api.schema.instrumentsService.InstrumentStatus
 import ru.kima.cacheserver.api.schema.model.requests.GetCandlesRequest
+import ru.kima.cacheserver.api.schema.model.requests.GetLastPricesRequest
 import ru.kima.cacheserver.api.schema.model.requests.GetOrderBookRequest
 import ru.kima.cacheserver.api.schema.model.requests.InstrumentsRequest
 import ru.kima.cacheserver.api.util.enumValueOfOrNull
@@ -105,6 +96,18 @@ fun Application.sharesRouting(
                         }
                     }
                 }
+        }
+
+        get("/$LAST_PRICES") {
+            val request = runCatching { call.receive<GetLastPricesRequest>() }
+                .getOrElse {
+                    call.respond(HttpStatusCode.BadRequest)
+                    return@get
+                }
+
+            tinkoffDataSource.getLastPrices(request)
+                .onSuccess { call.respond(it) }
+                .onFailure { defaultOnFailure(call, it) }
         }
     }
 }

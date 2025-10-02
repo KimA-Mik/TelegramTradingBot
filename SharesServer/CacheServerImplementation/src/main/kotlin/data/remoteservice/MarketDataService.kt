@@ -3,12 +3,7 @@ package data.remoteservice
 import kotlinx.coroutines.future.asDeferred
 import ru.kima.cacheserver.api.schema.model.requests.ORDER_BOOK_DEPTH
 import ru.kima.cacheserver.implementation.data.util.toTimestamp
-import ru.tinkoff.piapi.contract.v1.CandleInterval
-import ru.tinkoff.piapi.contract.v1.GetCandlesRequest
-import ru.tinkoff.piapi.contract.v1.GetLastPricesRequest
-import ru.tinkoff.piapi.contract.v1.GetOrderBookRequest
-import ru.tinkoff.piapi.contract.v1.GetOrderBookResponse
-import ru.tinkoff.piapi.contract.v1.MarketDataServiceGrpc
+import ru.tinkoff.piapi.contract.v1.*
 import ru.ttech.piapi.core.connector.AsyncStubWrapper
 import java.util.concurrent.CompletableFuture
 import kotlin.time.ExperimentalTime
@@ -22,10 +17,14 @@ typealias MarketDataService = AsyncStubWrapper<MarketDataServiceGrpc.MarketDataS
  * @see <a href="https://developer.tbank.ru/invest/services/quotes/marketdata#getlastprices">Reference</a>
  */
 fun MarketDataService.getLastPrices(
-    instrumentIds: List<String>
+    instrumentIds: List<String>,
+    instrumentStatus: InstrumentStatus,
+    lastPriceType: LastPriceType,
 ) = callAsyncMethod { stub, observer ->
     val builder = GetLastPricesRequest.newBuilder()
     instrumentIds.forEach { builder.addInstrumentId(it) }
+    builder.setInstrumentStatus(instrumentStatus)
+    builder.setLastPriceType(lastPriceType)
 
     stub.getLastPrices(builder.build(), observer)
 }.asDeferred()
