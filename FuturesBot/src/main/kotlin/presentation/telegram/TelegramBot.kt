@@ -5,15 +5,10 @@ import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.callbackQuery
 import com.github.kotlintelegrambot.dispatcher.command
-import com.github.kotlintelegrambot.dispatcher.message
 import com.github.kotlintelegrambot.dispatcher.telegramError
 import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class TelegramBot(
     private val botToken: String,
@@ -34,7 +29,6 @@ class TelegramBot(
             token = botToken
             dispatch {
                 command("start") {
-                    println("start from ${message.chat.id}")
                     model.dispatchStartMessage(message.chat.id)
                     update.consume()
                 }
@@ -47,10 +41,6 @@ class TelegramBot(
 
                 text {
                     model.handleTextInput(message.chat.id, text)
-                }
-
-                message {
-                    println(this)
                 }
 
                 callbackQuery {

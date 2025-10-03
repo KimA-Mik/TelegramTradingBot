@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import org.koin.java.KoinJavaComponent.inject
+import org.slf4j.LoggerFactory
 import presentation.telegram.core.NavigationRoot
 import presentation.telegram.core.RootTextModel
 import presentation.telegram.core.TextModel
@@ -20,6 +21,7 @@ class EditTickerTextModel(
     private val findSecurity: FindSecurityUseCase,
     private val updateTicker: UpdateTickerUseCase
 ) : TextModel {
+    private val logger = LoggerFactory.getLogger(this::class.java)
     override val node = NavigationRoot.Security.EditTicker
     private val rootTextModel: RootTextModel by inject(RootTextModel::class.java)
 
@@ -34,7 +36,7 @@ class EditTickerTextModel(
         }
 
         val searchResult = runCatching { findSecurity(command) }
-            .onFailure { println(it) }
+            .onFailure { logger.error(it.message) }
             .getOrDefault(FindSecurityUseCase.Result.NotFound)
         emit(TickerSearchResultScreen(user.id, searchResult = searchResult))
 

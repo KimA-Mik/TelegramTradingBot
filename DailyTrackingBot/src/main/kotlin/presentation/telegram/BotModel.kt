@@ -59,7 +59,6 @@ class BotModel(
             _outMessages.emit(screen)
             return
         }
-        println("path: ${user.path}")
 
         var path = user.path.split(PATH_SEPARATOR).drop(1)
         val screens = when (text) {
