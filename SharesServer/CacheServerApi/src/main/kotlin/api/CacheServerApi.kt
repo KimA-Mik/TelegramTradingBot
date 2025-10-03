@@ -13,8 +13,12 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
+import ru.kima.cacheserver.api.schema.marketdataService.CandleInterval
 import ru.kima.cacheserver.api.schema.model.*
 import ru.kima.cacheserver.api.schema.model.requests.*
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 class CacheServerApi(
     private val apiUrl: String,
@@ -46,6 +50,21 @@ class CacheServerApi(
             contentType(ContentType.Application.Json)
             setBody(request)
         })
+
+    /** Запрашивает свечи для заданного инструмента и интервала, используя максимальное количество свечей `(limit)` для этого интервала. */
+    @OptIn(ExperimentalTime::class)
+    suspend fun getMaxAmountOfHistoricCandles(
+        uid: String, interval: CandleInterval,
+        to: Instant = Clock.System.now()
+    ): Result<List<HistoricCandle>> = historicCandles(
+        GetCandlesRequest(
+            uid = uid,
+            from = to - interval.duration * (interval.limit - 1),
+            to = to,
+            interval = interval,
+            candleSource = GetCandlesRequest.CandleSource.EXCHANGE
+        )
+    )
 
     suspend fun getOrderBook(request: GetOrderBookRequest): Result<OrderBook> =
         handleGetResponse(client.get(ApiResources.OrderBook()) {

@@ -38,13 +38,15 @@ fun MarketDataService.getCandles(
     uid: String,
     from: Instant,
     to: Instant,
-    interval: CandleInterval
+    interval: CandleInterval,
+    candleSource: GetCandlesRequest.CandleSource,
 ) = callAsyncMethod { stub, observer ->
     val builder = GetCandlesRequest.newBuilder()
         .setInstrumentId(uid)
         .setFrom(from.toTimestamp())
         .setTo(to.toTimestamp())
         .setInterval(interval)
+        .setCandleSourceType(candleSource)
 
     stub.getCandles(builder.build(), observer)
 }.asDeferred()

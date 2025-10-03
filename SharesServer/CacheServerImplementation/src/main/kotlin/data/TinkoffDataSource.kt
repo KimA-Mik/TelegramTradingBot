@@ -1,11 +1,7 @@
 package ru.kima.cacheserver.implementation.data
 
-import data.remoteservice.InstrumentsService
-import data.remoteservice.MarketDataService
-import data.remoteservice.futures
-import data.remoteservice.getCandles
-import data.remoteservice.getOrderBook
-import data.remoteservice.shares
+import data.remoteservice.*
+import data.remoteservice.mappers.toTInstrumentStatus
 import kotlinx.coroutines.future.await
 import ru.kima.cacheserver.api.schema.instrumentsService.InstrumentExchangeType
 import ru.kima.cacheserver.api.schema.instrumentsService.InstrumentStatus
@@ -13,20 +9,24 @@ import ru.kima.cacheserver.api.schema.model.Future
 import ru.kima.cacheserver.api.schema.model.Security
 import ru.kima.cacheserver.api.schema.model.Share
 import ru.kima.cacheserver.api.schema.model.requests.GetCandlesRequest
+import ru.kima.cacheserver.api.schema.model.requests.GetLastPricesRequest
 import ru.kima.cacheserver.api.schema.model.requests.GetOrderBookRequest
 import ru.kima.cacheserver.implementation.core.CachedValue
 import ru.kima.cacheserver.implementation.core.RateLimiter
 import ru.kima.cacheserver.implementation.core.ServerExceptions
 import ru.kima.cacheserver.implementation.data.mappers.toFuture
 import ru.kima.cacheserver.implementation.data.mappers.toHistoricalCandle
+import ru.kima.cacheserver.implementation.data.mappers.toLastPrice
 import ru.kima.cacheserver.implementation.data.mappers.toShare
 import ru.kima.cacheserver.implementation.data.remoteservice.mappers.toOrderBook
 import ru.kima.cacheserver.implementation.data.remoteservice.mappers.toTCandleInterval
+import ru.kima.cacheserver.implementation.data.remoteservice.mappers.toTCandleSource
+import ru.kima.cacheserver.implementation.data.remoteservice.mappers.toTPriceType
 import ru.tinkoff.piapi.contract.v1.InstrumentsServiceGrpc
 import ru.tinkoff.piapi.contract.v1.MarketDataServiceGrpc
 import ru.ttech.piapi.core.connector.ConnectorConfiguration
 import ru.ttech.piapi.core.connector.ServiceStubFactory
-import java.util.Properties
+import java.util.*
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
@@ -109,7 +109,8 @@ class TinkoffDataSource(token: String) {
                 uid = request.uid,
                 from = request.from,
                 to = request.to,
-                interval = request.interval.toTCandleInterval()
+                interval = request.interval.toTCandleInterval(),
+                candleSource = request.candleSource.toTCandleSource(),
             )
                 .await()
                 .candlesList
@@ -145,5 +146,16 @@ class TinkoffDataSource(token: String) {
             }
         }
         throw ServerExceptions.SecurityNotFoundException(ticker)
+    }
+
+    suspend fun getLastPrices(request: GetLastPricesRequest) = runCatching {
+        marketDataService.getLastPrices(
+            instrumentIds = request.uids,
+            instrumentStatus = request.instrumentStatus.toTInstrumentStatus(),
+            lastPriceType = request.lastPriceType.toTPriceType()
+        )
+            .await()
+            .lastPricesList
+            .map { it.toLastPrice() }
     }
 }
