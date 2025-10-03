@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
-    application
 }
 
 group = "ru.kima.dailytrackingbot"
@@ -47,5 +46,5 @@ kotlin {
 }
 
 application {
-    mainClass.set("$group.MainKt")
+    mainClass.set("MainKt")
 }
