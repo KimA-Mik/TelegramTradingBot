@@ -5,6 +5,7 @@ import domain.user.model.User
 import domain.user.repository.UserRepository
 import domain.util.DateUtil
 import domain.util.MathUtil
+import domain.util.TimeUtil
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -16,6 +17,7 @@ import ru.kima.cacheserver.api.api.CacheServerApi
 import ru.kima.cacheserver.api.schema.model.Security
 import ru.kima.cacheserver.api.schema.model.requests.GetLastPricesRequest
 import ru.kima.cacheserver.api.schema.model.requests.InstrumentsRequest
+import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -38,10 +40,8 @@ class UpdateService(
 
     private fun run() = scope.launch {
         while (isActive) {
-//            val delayTime = Random.nextFloat() * TimeUtil.MINUTE_MILLIS
-//            delay(TimeUtil.MINUTE_MILLIS + delayTime.toLong())
-
-            delay(500)
+            val delayTime = Random.nextFloat() * 30f * TimeUtil.SECOND_MILLIS
+            delay(30 * TimeUtil.SECOND_MILLIS + delayTime.toLong())
             checkForUpdates()
             resetUsers()
             delayNonWorkingHours(9, 50, 19, 10)
