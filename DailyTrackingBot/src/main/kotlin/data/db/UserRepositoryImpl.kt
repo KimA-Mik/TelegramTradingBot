@@ -10,6 +10,7 @@ import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.migration.jdbc.MigrationUtils
 import org.slf4j.LoggerFactory
 import java.sql.Connection
 import kotlin.time.Clock
@@ -25,16 +26,16 @@ class UserRepositoryImpl(
         transaction {
             val tables = arrayOf(Users)
             SchemaUtils.create(*tables)
-//            val missingColumnsStatements =
-//                MigrationUtils.statementsRequiredForDatabaseMigration(*tables)
-//            missingColumnsStatements.forEach {
-//                logger.info("Executing statement: $it")
-//                try {
-//                    connection.prepareStatement(it, true).executeUpdate()
-//                } catch (e: Exception) {
-//                    logger.error(e.message)
-//                }
-//            }
+            val missingColumnsStatements =
+                MigrationUtils.statementsRequiredForDatabaseMigration(*tables)
+            missingColumnsStatements.forEach {
+                logger.info("Executing statement: $it")
+                try {
+                    connection.prepareStatement(it, true).executeUpdate()
+                } catch (e: Exception) {
+                    logger.error(e.message)
+                }
+            }
         }
     }
 
@@ -63,6 +64,11 @@ class UserRepositoryImpl(
                 it.securityConfigureSequence = user.securityConfigureSequence
                 it.note = user.note
                 it.showNote = user.showNote
+                it.shouldNotify = user.shouldNotify
             }?.toUser()
         }
+
+    override suspend fun getAllUsers(): List<User> = databaseConnector.transaction {
+        UserEntity.all().map { it.toUser() }
+    }
 }

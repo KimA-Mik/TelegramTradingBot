@@ -8,11 +8,8 @@ import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.telegramError
 import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import org.slf4j.LoggerFactory
 
 
 class TelegramBot(
@@ -22,13 +19,14 @@ class TelegramBot(
     private lateinit var botJob: Job
     private lateinit var telegramBot: Bot
     private lateinit var mainScope: CoroutineScope
+    private val logger = LoggerFactory.getLogger(this::class.java)
 
     suspend fun run() = coroutineScope {
         mainScope = this
         initBot(mainScope)
     }
 
-    private suspend fun initBot(scope: CoroutineScope) {
+    private fun initBot(scope: CoroutineScope) {
         println("Starting bot")
         telegramBot = bot {
             token = botToken
@@ -76,7 +74,9 @@ class TelegramBot(
                         parseMode = screen.parseMode,
                         disableWebPagePreview = screen.disableWebPagePreview,
                         replyMarkup = screen.replyMarkup
-                    )
+                    ).second?.let { error ->
+                        logger.error("Failed to edit message $it for user ${screen.id}: $error")
+                    }
 
                     return@collect
                 }
@@ -87,7 +87,9 @@ class TelegramBot(
                     parseMode = screen.parseMode,
                     disableWebPagePreview = screen.disableWebPagePreview,
                     replyMarkup = screen.replyMarkup
-                )
+                ).onError { error ->
+                    logger.error("Failed to send message to user ${screen.id}: $error")
+                }
             }
         }
     }

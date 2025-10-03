@@ -1,37 +1,23 @@
 package presentation.telegram
 
-import kotlinx.coroutines.flow.flowOf
+import domain.updateservice.TelegramUpdate
+import domain.updateservice.UpdateService
+import kotlinx.coroutines.flow.mapNotNull
 import presentation.telegram.core.screen.BotScreen
+import presentation.telegram.security.screen.PriceAlertScreen
 
 class UpdateHandler(
-//    service: UpdateService
+    service: UpdateService
 ) {
-    val outScreens = flowOf<BotScreen>()/*= service
+    val outScreens = service
         .updates
         .mapNotNull {
             updateToScreen(it)
-        }*/
-//
-//    private fun updateToScreen(update: TelegramUpdate): BotScreen {
-//        return when (update) {
-//            is TelegramShareUpdate -> FuturePriceUpdate(
-//                userId = update.userId,
-//                state = FuturePriceUpdate.State.ShowUpdate(
-//                    share = update.share
-//                )
-//            )
-//
-//            is TelegramSharePriceInsufficientUpdate -> FuturePriceInsufficientUpdate(
-//                userId = update.userId,
-//                share = update.share
-//            )
-//
-//            is TelegramIndicatorUpdate -> IndicatorsUpdateScreen(
-//                userId = update.userId,
-//                ticker = update.ticker,
-//                price = update.price,
-//                updateData = update.data
-//            )
-//        }
-//    }
+        }
+
+    private fun updateToScreen(update: TelegramUpdate): BotScreen {
+        return when (update) {
+            is TelegramUpdate.PriceAlert -> PriceAlertScreen(update)
+        }
+    }
 }
