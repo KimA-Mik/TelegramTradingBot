@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.ktor)
 }
 
 group = "ru.kima.cacheserver.implementation"
@@ -35,25 +34,16 @@ kotlin {
 }
 
 // https://stackoverflow.com/a/71092054
-//tasks.jar {
-//    manifest {
-//        attributes["Main-Class"] = "MainKt"
-//    }
-//    val dependencies = configurations
-//        .runtimeClasspath
-//        .get()
-//        .map { zipTree(it) }
-//    from(dependencies)
-//
-//    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-//}
+tasks.jar {
+    dependsOn(":SharesServer:CacheServerApi:jar")
+    manifest {
+        attributes["Main-Class"] = "ru.kima.cacheserver.implementation.MainKt"
+    }
+    val dependencies = configurations
+        .runtimeClasspath
+        .get()
+        .map { zipTree(it) }
+    from(dependencies)
 
-application {
-    mainClass.set("ru.kima.cacheserver.implementation.MainKt")
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
-
-//ktor {
-//    fatJar {
-//        archiveFileName.set("CacheServer.jar")
-//    }
-//}
