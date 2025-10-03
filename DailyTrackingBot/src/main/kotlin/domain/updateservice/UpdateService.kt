@@ -44,7 +44,7 @@ class UpdateService(
             delay(30 * TimeUtil.SECOND_MILLIS + delayTime.toLong())
             checkForUpdates()
             resetUsers()
-            delayNonWorkingHours(9, 50, 19, 10)
+            delayNonWorkingHours(9, 50, 23, 59)
         }
     }
 
@@ -168,7 +168,7 @@ class UpdateService(
     @OptIn(ExperimentalTime::class)
     suspend fun resetUsers() {
         val currentTime = Clock.System.now().toLocalDateTime(DateUtil.timezoneMoscow).time
-        if (currentTime < LocalTime(19, 0)) return
+        if (currentTime < LocalTime(23, 50)) return
 
         val users = repository.getAllUsers()
         for (user in users) {
