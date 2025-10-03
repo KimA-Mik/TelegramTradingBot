@@ -8,5 +8,6 @@ class UpdateShowNoteUseCase(
     private val repository: UserRepository
 ) {
     @OptIn(ExperimentalTime::class)
-    suspend operator fun invoke(user: User, newValue: Boolean) = repository.updateUser(user.copy(showNote = newValue))
+    suspend operator fun invoke(user: User, newValue: Boolean) =
+        repository.updateUser(user.copy(showNote = newValue, shouldNotify = true))
 }

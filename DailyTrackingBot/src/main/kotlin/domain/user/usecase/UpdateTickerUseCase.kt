@@ -29,6 +29,6 @@ class UpdateTickerUseCase(
 //        } else {
 //            user.path
 //        }
-        return repository.updateUser(result.copy(ticker = ticker /*,path = newPath*/)) ?: user
+        return repository.updateUser(result.copy(ticker = ticker, shouldNotify = true /*,path = newPath*/)) ?: user
     }
 }

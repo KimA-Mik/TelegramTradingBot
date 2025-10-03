@@ -16,4 +16,5 @@ object Users : LongIdTable("users") {
     val securityConfigureSequence = bool(name = "security_configure_sequence").default(false)
     val note = varchar(name = "note", length = MAX_NOTE_LENGTH).nullable().default(null)
     val showNote = bool(name = "show_note").default(true)
+    val shouldNotify = bool(name = "should_notify").default(true)
 }
