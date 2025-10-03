@@ -28,14 +28,20 @@ class SecurityScreen(
     private fun renderText(): String = buildString {
         append("Бумага: ")
         when (security) {
-            is Future -> appendLine("Фьючерс \"${security.name}\" (${TelegramUtil.clickableSecurity(security)})")
-            is Share -> appendLine("Акция \"${security.name}\" (${TelegramUtil.clickableSecurity(security)})")
+            is Future -> append("Фьючерс \"${security.name}\" (${TelegramUtil.clickableSecurity(security)})")
+            is Share -> append("Акция \"${security.name}\" (${TelegramUtil.clickableSecurity(security)})")
             null -> appendLine("не выбрана")
         }
 
-        append("Текущая отслеживаемая ценa: ")
         if (lastPrice != null) {
-            append("*${lastPrice.formatAndTrim(2)}$ROUBLE_SIGN*")
+            appendLine(" по ${lastPrice.formatAndTrim(2)}$ROUBLE_SIGN")
+        } else {
+            appendLine()
+        }
+
+        append("Текущая отслеживаемая ценa: ")
+        if (user.targetPrice != null) {
+            append("*${user.targetPrice.formatAndTrim(2)}$ROUBLE_SIGN*")
         } else {
             append("не установлена")
         }
