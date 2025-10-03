@@ -8,7 +8,8 @@ import org.jetbrains.exposed.v1.jdbc.transactions.experimental.newSuspendedTrans
 import java.sql.Connection
 
 class DatabaseConnector {
-    private val connection: Database = Database.connect("jdbc:sqlite:data.db", "org.sqlite.JDBC")
+    private val connection: Database =
+        Database.connect("jdbc:sqlite:DailyTrackingBotData.db", "org.sqlite.JDBC")
 
     init {
         TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE

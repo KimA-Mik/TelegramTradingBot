@@ -1,6 +1,6 @@
 package ru.kima.cacheserver.api.api
 
-import io.ktor.resources.Resource
+import io.ktor.resources.*
 import ru.kima.cacheserver.api.schema.model.requests.InstrumentsRequest
 
 @Suppress("UNUSED")
@@ -19,4 +19,7 @@ object ApiResources {
 
     @Resource("/$FIND_SECURITY")
     class FindSecurity(val ticker: String)
+
+    @Resource("/$LAST_PRICES")
+    class LastPrices()
 }

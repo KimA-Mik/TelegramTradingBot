@@ -1,31 +1,24 @@
 package ru.kima.cacheserver.api.api
 
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.engine.java.Java
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logging
-import io.ktor.client.plugins.resources.Resources
-import io.ktor.client.plugins.resources.get
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
-import io.ktor.serialization.kotlinx.json.json
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.java.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
+import io.ktor.client.plugins.resources.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
-import ru.kima.cacheserver.api.schema.model.Future
-import ru.kima.cacheserver.api.schema.model.HistoricCandle
-import ru.kima.cacheserver.api.schema.model.OrderBook
-import ru.kima.cacheserver.api.schema.model.Security
-import ru.kima.cacheserver.api.schema.model.Share
-import ru.kima.cacheserver.api.schema.model.requests.FindSecurityResponse
-import ru.kima.cacheserver.api.schema.model.requests.GetCandlesRequest
-import ru.kima.cacheserver.api.schema.model.requests.GetOrderBookRequest
-import ru.kima.cacheserver.api.schema.model.requests.InstrumentsRequest
+import ru.kima.cacheserver.api.schema.marketdataService.CandleInterval
+import ru.kima.cacheserver.api.schema.model.*
+import ru.kima.cacheserver.api.schema.model.requests.*
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 class CacheServerApi(
     private val apiUrl: String,
@@ -40,7 +33,9 @@ class CacheServerApi(
         }
         install(Resources)
         defaultRequest {
-            url(apiUrl)
+            val defaultUrl = if (apiUrl.contains("://")) apiUrl
+            else "http://$apiUrl"
+            url(defaultUrl)
         }
     }
 
@@ -55,6 +50,21 @@ class CacheServerApi(
             contentType(ContentType.Application.Json)
             setBody(request)
         })
+
+    /** Запрашивает свечи для заданного инструмента и интервала, используя максимальное количество свечей `(limit)` для этого интервала. */
+    @OptIn(ExperimentalTime::class)
+    suspend fun getMaxAmountOfHistoricCandles(
+        uid: String, interval: CandleInterval,
+        to: Instant = Clock.System.now()
+    ): Result<List<HistoricCandle>> = historicCandles(
+        GetCandlesRequest(
+            uid = uid,
+            from = to - interval.duration * (interval.limit - 1),
+            to = to,
+            interval = interval,
+            candleSource = GetCandlesRequest.CandleSource.EXCHANGE
+        )
+    )
 
     suspend fun getOrderBook(request: GetOrderBookRequest): Result<OrderBook> =
         handleGetResponse(client.get(ApiResources.OrderBook()) {
@@ -76,6 +86,12 @@ class CacheServerApi(
     } catch (e: Exception) {
         FindSecurityResponse.UnknownError(e)
     }
+
+    suspend fun lastPrices(request: GetLastPricesRequest): Result<List<LastPrice>> =
+        handleGetResponse(client.get(ApiResources.LastPrices()) {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        })
 
     private suspend inline fun <reified T> handleGetResponse(response: HttpResponse): Result<T> =
         try {

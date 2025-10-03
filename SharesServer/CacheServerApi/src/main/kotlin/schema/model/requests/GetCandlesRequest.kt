@@ -10,5 +10,18 @@ data class GetCandlesRequest @OptIn(ExperimentalTime::class) constructor(
     val uid: String,
     val from: Instant,
     val to: Instant,
-    val interval: CandleInterval
-)
+    val interval: CandleInterval,
+    val candleSource: CandleSource
+) {
+    enum class CandleSource {
+        /** Все свечи.*/
+        UNSPECIFIED,
+
+        /** Биржевые свечи (торговые сессии).*/
+        EXCHANGE,
+
+        /** Все свечи с учетом торговли по выходным.*/
+        INCLUDE_WEEKEND,
+        UNRECOGNIZED
+    }
+}

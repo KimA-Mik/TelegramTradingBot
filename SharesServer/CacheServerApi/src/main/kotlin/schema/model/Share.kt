@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @SerialName("Share")
 data class Share(
     override val uid: String = String(),
-    val ticker: String = String(),
+    override val ticker: String = String(),
     val name: String = String(),
     val lot: Int = 0
 ) : Security()
