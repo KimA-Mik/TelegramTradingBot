@@ -31,14 +31,18 @@ class IndicatorsCache(
 
         // RSI
         val rsiPeriod = 14
+        val min15Close = ClosePriceIndicator(seriesResult.min15)
         val hourlyClose = ClosePriceIndicator(seriesResult.hourly)
         val dailyClose = ClosePriceIndicator(seriesResult.daily)
+        val min15RsiInd = RSIIndicator(min15Close, rsiPeriod)
         val hourlyRsiInd = RSIIndicator(hourlyClose, rsiPeriod)
         val dailyRsiInd = RSIIndicator(dailyClose, rsiPeriod)
 
         return CacheEntry(
+            min15Rsi = min15RsiInd.lastDouble(),
             hourlyRsi = hourlyRsiInd.lastDouble(),
             dailyRsi = dailyRsiInd.lastDouble(),
+            min15bb = BollingerBands.calculate(seriesResult.min15),
             hourlyBb = BollingerBands.calculate(seriesResult.hourly),
             dailyBb = BollingerBands.calculate(seriesResult.daily),
         )
@@ -53,15 +57,23 @@ class IndicatorsCache(
         val hourly = cacheServerApi.getMaxAmountOfHistoricCandles(uid, interval)
             .getOrElse { return Result.failure(it) }
             .toSeries(interval.duration, "hourly")
+
         interval = CandleInterval.CANDLE_INTERVAL_DAY
         val daily = cacheServerApi.getMaxAmountOfHistoricCandles(uid, interval)
             .getOrElse { return Result.failure(it) }
             .toSeries(interval.duration, "daily")
-        return Result.success(InitialSeries(hourly, daily))
+
+        interval = CandleInterval.CANDLE_INTERVAL_15_MIN
+        val min15 = cacheServerApi.getMaxAmountOfHistoricCandles(uid, interval)
+            .getOrElse { return Result.failure(it) }
+            .toSeries(interval.duration, "15min")
+
+        return Result.success(InitialSeries(hourly, daily, min15))
     }
 
     private data class InitialSeries(
         val hourly: BarSeries,
-        val daily: BarSeries
+        val daily: BarSeries,
+        val min15: BarSeries
     )
 }

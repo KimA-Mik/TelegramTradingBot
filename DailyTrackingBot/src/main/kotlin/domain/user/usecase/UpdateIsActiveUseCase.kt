@@ -9,5 +9,5 @@ class UpdateIsActiveUseCase(
 ) {
     @OptIn(ExperimentalTime::class)
     suspend operator fun invoke(user: User, newValue: Boolean) =
-        repository.updateUser(user.copy(isActive = newValue, shouldNotify = true))
+        repository.updateUser(user.copy(isActive = newValue, shouldNotify = true, shouldNotifyRsi = true))
 }

@@ -12,4 +12,12 @@ sealed class TelegramUpdate(val userId: Long) {
         val currentDeviation: Double,
         val indicators: CacheEntry?
     ) : TelegramUpdate(user.id)
+
+    data class RsiAlert(
+        val user: User,
+        val security: Security,
+        val currentPrice: Double,
+        val currentRsi: Double,
+        val indicators: CacheEntry?
+    ) : TelegramUpdate(user.id)
 }

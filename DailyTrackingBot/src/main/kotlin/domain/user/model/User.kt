@@ -17,6 +17,7 @@ data class User @OptIn(ExperimentalTime::class) constructor(
     val note: String?,
     val showNote: Boolean,
     val shouldNotify: Boolean,
+    val shouldNotifyRsi: Boolean
 ) {
     val pathList by lazy { path.split(PATH_SEPARATOR).drop(1) }
 }

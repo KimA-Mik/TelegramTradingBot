@@ -48,7 +48,7 @@ class UpdateService(
         }
     }
 
-    private val weekends = setOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
+    private val weekends = setOf<DayOfWeek>(/*DayOfWeek.SATURDAY, DayOfWeek.SUNDAY*/)
 
     @OptIn(ExperimentalTime::class)
     private suspend fun delayNonWorkingHours(
@@ -125,9 +125,8 @@ class UpdateService(
 
             val currentDeviation = MathUtil.absolutePercentageDifference(lastPrice, user.targetPrice)
             val shouldNotify = currentDeviation < user.targetDeviation
+            val indicators = indicatorsCache[security.uid]
             if (shouldNotify && user.shouldNotify) {
-                val indicators = indicatorsCache[security.uid]
-
                 _updates.emit(
                     TelegramUpdate.PriceAlert(
                         user = user,
@@ -141,6 +140,25 @@ class UpdateService(
                 repository.updateUser(user.copy(shouldNotify = false))
             } else if (!shouldNotify && !user.shouldNotify) {
                 repository.updateUser(user.copy(shouldNotify = true))
+            }
+
+            if (indicators == null) continue
+            val rsi = indicators.min15Rsi
+            val shouldNotifyRsi = rsi < MathUtil.RSI_LOW || rsi > MathUtil.RSI_HIGH
+            if (shouldNotifyRsi && user.shouldNotifyRsi) {
+                _updates.emit(
+                    TelegramUpdate.RsiAlert(
+                        user = user,
+                        security = security,
+                        currentPrice = lastPrice,
+                        currentRsi = rsi,
+                        indicators = indicators
+                    )
+                )
+
+                repository.updateUser(user.copy(shouldNotifyRsi = false))
+            } else if (!shouldNotifyRsi && !user.shouldNotifyRsi) {
+                repository.updateUser(user.copy(shouldNotifyRsi = true))
             }
         }
     }

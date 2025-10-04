@@ -19,5 +19,6 @@ fun UserEntity.toUser() = User(
     note = note,
     showNote = showNote,
     securityConfigureSequence = securityConfigureSequence,
-    shouldNotify = shouldNotify
+    shouldNotify = shouldNotify,
+    shouldNotifyRsi = shouldNotifyRsi
 )

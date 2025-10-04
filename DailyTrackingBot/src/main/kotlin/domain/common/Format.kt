@@ -1,6 +1,15 @@
 package domain.common
 
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import java.util.*
+
+private val df = DecimalFormat(
+    "#,##0.##",
+    DecimalFormatSymbols(Locale.Builder().setLanguage("ru").setRegion("RU").build())
+)
+
+fun Double.formatToRu(): String = df.format(this)
 
 fun Double.format(
     length: Int,

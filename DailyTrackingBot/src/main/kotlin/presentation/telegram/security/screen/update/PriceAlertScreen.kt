@@ -1,8 +1,8 @@
-package presentation.telegram.security.screen
+package presentation.telegram.security.screen.update
 
 import com.github.kotlintelegrambot.entities.ParseMode
 import domain.common.ROUBLE_SIGN
-import domain.common.formatAndTrim
+import domain.common.formatToRu
 import domain.updateservice.TelegramUpdate
 import presentation.telegram.core.screen.BotScreen
 import presentation.util.TelegramUtil
@@ -22,18 +22,21 @@ class PriceAlertScreen(
             is Future -> appendLine("*Фьючерс:* ${TelegramUtil.clickableSecurity(update.security)} — (${update.security.name})")
             is Share -> appendLine("*Акция:* ${TelegramUtil.clickableSecurity(update.security)} — (${update.security.name})")
         }
-        appendLine("*Текущая цена:* ${update.currentPrice.formatAndTrim(2)}$ROUBLE_SIGN")
-        appendLine("*Целевая цена:* ${update.user.targetPrice?.formatAndTrim(2) ?: 0.0}$ROUBLE_SIGN")
-        appendLine("*Отклонение:* ${update.currentDeviation.formatAndTrim(2)}%")
+        appendLine("*Текущая цена:* ${update.currentPrice.formatToRu()}${ROUBLE_SIGN}")
+        appendLine("*Целевая цена:* ${update.user.targetPrice?.formatToRu() ?: 0.0}${ROUBLE_SIGN}")
+        appendLine("*Отклонение:* ${update.currentDeviation.formatToRu()}%")
         update.indicators?.let { ind ->
             appendLine()
             appendLine("*Индикаторы:*")
-            appendLine("*RSI (1ч):* ${ind.hourlyRsi.formatAndTrim(2)}")
-            appendLine("*RSI (1д):* ${ind.dailyRsi.formatAndTrim(2)}")
-            append("*BB (1ч):* верхняя: ${ind.hourlyBb.upper.formatAndTrim(2)}, ")
-            appendLine("нижняя: ${ind.hourlyBb.lower.formatAndTrim(2)}")
-            append("*BB (1д):* верхняя: ${ind.dailyBb.upper.formatAndTrim(2)}, ")
-            appendLine("нижняя: ${ind.dailyBb.lower.formatAndTrim(2)}")
+            appendLine("*RSI (15м):* ${ind.min15Rsi.formatToRu()}")
+            appendLine("*RSI (1ч):* ${ind.hourlyRsi.formatToRu()}")
+            appendLine("*RSI (1д):* ${ind.dailyRsi.formatToRu()}")
+            append("*BB (15м):* верхняя: ${ind.min15bb.upper.formatToRu()}, ")
+            appendLine("нижняя: ${ind.min15bb.lower.formatToRu()}")
+            append("*BB (1ч):* верхняя: ${ind.hourlyBb.upper.formatToRu()}, ")
+            appendLine("нижняя: ${ind.hourlyBb.lower.formatToRu()}")
+            append("*BB (1д):* верхняя: ${ind.dailyBb.upper.formatToRu()}, ")
+            appendLine("нижняя: ${ind.dailyBb.lower.formatToRu()}")
         }
         update.user.note?.takeIf { it.isNotBlank() }?.let {
             appendLine()
