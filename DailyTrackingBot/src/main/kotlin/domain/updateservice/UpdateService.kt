@@ -48,7 +48,7 @@ class UpdateService(
         }
     }
 
-    private val weekends = setOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
+    private val weekends = setOf<DayOfWeek>(/*DayOfWeek.SATURDAY, DayOfWeek.SUNDAY*/)
 
     @OptIn(ExperimentalTime::class)
     private suspend fun delayNonWorkingHours(
