@@ -19,6 +19,7 @@ class UserEntity(id: EntityID<Long>) : LongEntity(id) {
     var note by Users.note
     var showNote by Users.showNote
     var shouldNotify by Users.shouldNotify
+    var shouldNotifyRsi by Users.shouldNotifyRsi
 
     override fun toString(): String {
         return "User(id=$id, path=$path, registered=$registered, ticker=$ticker, targetPrice=$targetPrice, targetDeviation=$targetDeviation, isActive=$isActive, remainActive=$remainActive note=$note)"

@@ -11,6 +11,6 @@ class UpdateExpectedPriceUseCase(
     @OptIn(ExperimentalTime::class)
     suspend operator fun invoke(user: User, inputNumber: String): Result<User> = runCatching {
         val number = inputNumber.parseToDouble()
-        repository.updateUser(user.copy(targetPrice = number, shouldNotify = true))!!
+        repository.updateUser(user.copy(targetPrice = number, shouldNotify = true, shouldNotifyRsi = true))!!
     }
 }

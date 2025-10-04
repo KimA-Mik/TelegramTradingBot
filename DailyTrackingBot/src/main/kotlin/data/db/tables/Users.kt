@@ -17,4 +17,5 @@ object Users : LongIdTable("users") {
     val note = varchar(name = "note", length = MAX_NOTE_LENGTH).nullable().default(null)
     val showNote = bool(name = "show_note").default(true)
     val shouldNotify = bool(name = "should_notify").default(true)
+    val shouldNotifyRsi = bool(name = "should_notify_rsi").default(true)
 }

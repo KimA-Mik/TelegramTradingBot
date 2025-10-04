@@ -39,7 +39,8 @@ class UpdateTickerUseCase(
                 ticker = ticker,
                 targetPrice = newPrice,
                 targetDeviation = targetDeviation,
-                shouldNotify = true
+                shouldNotify = true,
+                shouldNotifyRsi = true
                 /*,path = newPath*/
             )
         ) ?: user
