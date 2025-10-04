@@ -35,7 +35,7 @@ class TickerSuggestionCallbackHandler(
 
         when (val res = findSecurity(callbackData.ticker)) {
             is FindSecurityUseCase.Result.Success -> {
-                val newUser = updateTicker(user, callbackData.ticker)
+                val newUser = updateTicker(user, ticker = res.security.ticker, res.price)
                 emit(
                     TickerSearchResultScreen(
                         userId = user.id,

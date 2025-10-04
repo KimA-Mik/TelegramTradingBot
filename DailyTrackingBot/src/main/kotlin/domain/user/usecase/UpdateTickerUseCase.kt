@@ -7,8 +7,13 @@ import kotlin.time.ExperimentalTime
 class UpdateTickerUseCase(
     private val repository: UserRepository,
 ) {
+    //TODO: maybe searching should be here
     @OptIn(ExperimentalTime::class)
-    suspend operator fun invoke(user: User, ticker: String): User {
+    suspend operator fun invoke(
+        user: User, ticker: String,
+        newPrice: Double?,
+        targetDeviation: Double? = 0.1
+    ): User {
         var result = user
 //        val newPath = if (user.securityConfigureSequence) {
 //            val destinations = user.path.split(PATH_SEPARATOR)
@@ -29,6 +34,14 @@ class UpdateTickerUseCase(
 //        } else {
 //            user.path
 //        }
-        return repository.updateUser(result.copy(ticker = ticker, shouldNotify = true /*,path = newPath*/)) ?: user
+        return repository.updateUser(
+            result.copy(
+                ticker = ticker,
+                targetPrice = newPrice,
+                targetDeviation = targetDeviation,
+                shouldNotify = true
+                /*,path = newPath*/
+            )
+        ) ?: user
     }
 }

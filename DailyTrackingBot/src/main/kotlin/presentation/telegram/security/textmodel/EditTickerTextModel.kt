@@ -41,7 +41,7 @@ class EditTickerTextModel(
         emit(TickerSearchResultScreen(user.id, searchResult = searchResult))
 
         if (searchResult is FindSecurityUseCase.Result.Success) {
-            var newUser = updateTicker(user, searchResult.security.ticker)
+            var newUser = updateTicker(user, searchResult.security.ticker, searchResult.price)
             newUser = popUser(newUser).getOrDefault(user)
             emitAll(rootTextModel.executeCommand(newUser, newUser.pathList, ""))
         }
