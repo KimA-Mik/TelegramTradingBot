@@ -3,7 +3,7 @@ package presentation.telegram.security.screen
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.ParseMode
 import domain.common.ROUBLE_SIGN
-import domain.common.formatAndTrim
+import domain.common.formatToRu
 import domain.user.model.User
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.security.callbackbutton.ToggleIsActiveCallbackButton
@@ -34,14 +34,14 @@ class SecurityScreen(
         }
 
         if (lastPrice != null) {
-            appendLine(" по ${lastPrice.formatAndTrim(2)}$ROUBLE_SIGN")
+            appendLine(" по ${lastPrice.formatToRu()}$ROUBLE_SIGN")
         } else {
             appendLine()
         }
 
         append("Текущая отслеживаемая ценa: ")
         if (user.targetPrice != null) {
-            append("*${user.targetPrice.formatAndTrim(2)}$ROUBLE_SIGN*")
+            append("*${user.targetPrice.formatToRu()}$ROUBLE_SIGN*")
         } else {
             append("не установлена")
         }
@@ -50,7 +50,7 @@ class SecurityScreen(
             append(", отклонение не установлено")
         } else {
             append(" с отклонением ")
-            append("*${user.targetDeviation.formatAndTrim(2)}%*")
+            append("*${user.targetDeviation.formatToRu()}%*")
         }
 
         append('\n')

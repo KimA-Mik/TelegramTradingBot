@@ -5,7 +5,7 @@ import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import domain.common.ROUBLE_SIGN
-import domain.common.formatAndTrim
+import domain.common.formatToRu
 import domain.tinkoff.usecase.FindSecurityUseCase
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.security.callbackbutton.TickerSuggestionCallbackButton
@@ -36,7 +36,7 @@ class TickerSearchResultScreen(
             append(TelegramUtil.clickableSecurity(searchResult.security))
             searchResult.price?.let {
                 append(" — ")
-                append(it.formatAndTrim(2))
+                append(it.formatToRu())
                 append(ROUBLE_SIGN)
             }
         }
