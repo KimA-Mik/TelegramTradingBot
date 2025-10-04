@@ -32,7 +32,7 @@ class EditPercentTextModel(
         }
 
         val res = updatePercent(user, command)
-        emit(EditPercentResultScreen(user.id, res.getOrNull()?.targetPrice))
+        emit(EditPercentResultScreen(user.id, res.getOrNull()?.targetDeviation))
         res.onSuccess { newUser ->
             popUser(newUser).onSuccess {
                 emitAll(rootTextModel.executeCommand(it, it.pathList, ""))
