@@ -116,6 +116,7 @@ class UpdateService(
         val lastPrices = cacheServerApi.lastPrices(GetLastPricesRequest.default(uids))
             .getOrElse { return }.associateBy { it.uid }
         for (user in users) {
+            var currentUser = user
             if (!user.isActive) continue
             if (user.ticker == null) continue
             if (user.targetPrice == null) continue
@@ -137,15 +138,15 @@ class UpdateService(
                     )
                 )
 
-                repository.updateUser(user.copy(shouldNotify = false))
-            } else if (!shouldNotify && !user.shouldNotify) {
-                repository.updateUser(user.copy(shouldNotify = true))
+                currentUser = repository.updateUser(currentUser.copy(shouldNotify = false)) ?: continue
+            } else if (!shouldNotify && !currentUser.shouldNotify) {
+                currentUser = repository.updateUser(currentUser.copy(shouldNotify = true)) ?: continue
             }
 
             if (indicators == null) continue
             val rsi = indicators.min15Rsi
-            val shouldNotifyRsi = rsi < MathUtil.RSI_LOW || rsi > MathUtil.RSI_HIGH
-            if (shouldNotifyRsi && user.shouldNotifyRsi) {
+            val shouldNotifyRsi = rsi <= MathUtil.RSI_LOW || rsi >= MathUtil.RSI_HIGH
+            if (shouldNotifyRsi && currentUser.shouldNotifyRsi) {
                 _updates.emit(
                     TelegramUpdate.RsiAlert(
                         user = user,
@@ -156,9 +157,9 @@ class UpdateService(
                     )
                 )
 
-                repository.updateUser(user.copy(shouldNotifyRsi = false))
-            } else if (!shouldNotifyRsi && !user.shouldNotifyRsi) {
-                repository.updateUser(user.copy(shouldNotifyRsi = true))
+                currentUser = repository.updateUser(currentUser.copy(shouldNotifyRsi = false)) ?: continue
+            } else if (!shouldNotifyRsi && !currentUser.shouldNotifyRsi) {
+                currentUser = repository.updateUser(currentUser.copy(shouldNotifyRsi = true)) ?: continue
             }
         }
     }
