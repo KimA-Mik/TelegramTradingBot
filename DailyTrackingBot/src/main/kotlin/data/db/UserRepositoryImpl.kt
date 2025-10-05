@@ -65,6 +65,7 @@ class UserRepositoryImpl(
                 it.note = user.note
                 it.showNote = user.showNote
                 it.shouldNotify = user.shouldNotify
+                it.shouldNotifyRsi = user.shouldNotifyRsi
             }?.toUser()
         }
 
