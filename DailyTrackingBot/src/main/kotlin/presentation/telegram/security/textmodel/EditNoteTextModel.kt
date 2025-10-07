@@ -20,7 +20,7 @@ class EditNoteTextModel(
     private val popUser: PopUserUseCase,
     private val updateNote: UpdateNoteUseCase
 ) : TextModel {
-    override val node = NavigationRoot.Security.EditNote
+    override val node = NavigationRoot.SecurityList.EditNote
     private val rootTextModel: RootTextModel by inject(RootTextModel::class.java)
 
     override fun executeCommand(

@@ -1,4 +1,4 @@
-package presentation.telegram.security.screen
+package presentation.telegram.security.search.screen
 
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.ParseMode
@@ -8,7 +8,9 @@ import domain.common.ROUBLE_SIGN
 import domain.common.formatToRu
 import domain.tinkoff.usecase.FindSecurityUseCase
 import presentation.telegram.core.screen.BotScreen
-import presentation.telegram.security.callbackbutton.TickerSuggestionCallbackButton
+import presentation.telegram.security.search.callbackbutton.SubscribeToSecurityCallbackButton
+import presentation.telegram.security.search.callbackbutton.TickerSuggestionCallbackButton
+import presentation.telegram.security.search.callbackbutton.UnsubscribeFromSecurityCallbackButton
 import presentation.util.TelegramUtil
 import ru.kima.cacheserver.api.schema.model.Future
 import ru.kima.cacheserver.api.schema.model.Share
@@ -50,14 +52,25 @@ class TickerSearchResultScreen(
                         listOf(
                             InlineKeyboardButton.CallbackData(
                                 text = ticker,
-                                callbackData = TickerSuggestionCallbackButton.getCallbackData(
-                                    ticker
-                                )
+                                callbackData = TickerSuggestionCallbackButton.getCallbackData(ticker)
                             )
                         )
                     )
                 }
             }
+        )
+
+        is FindSecurityUseCase.Result.Success -> InlineKeyboardMarkup.create(
+            listOf(
+                if (searchResult.subscribed) InlineKeyboardButton.CallbackData(
+                    text = UnsubscribeFromSecurityCallbackButton.TEXT,
+                    callbackData = UnsubscribeFromSecurityCallbackButton.getCallbackData(searchResult.security.ticker)
+                )
+                else InlineKeyboardButton.CallbackData(
+                    text = SubscribeToSecurityCallbackButton.TEXT,
+                    callbackData = SubscribeToSecurityCallbackButton.getCallbackData(searchResult.security.ticker)
+                )
+            )
         )
 
         else -> null

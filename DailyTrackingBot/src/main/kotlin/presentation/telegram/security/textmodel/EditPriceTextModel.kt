@@ -18,7 +18,7 @@ class EditPriceTextModel(
     private val updateExpectedPrice: UpdateExpectedPriceUseCase,
     private val popUser: PopUserUseCase
 ) : TextModel {
-    override val node = NavigationRoot.Security.EditPrice
+    override val node = NavigationRoot.SecurityList.EditPrice
     private val rootTextModel: RootTextModel by inject(RootTextModel::class.java)
 
     override fun executeCommand(

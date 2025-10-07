@@ -9,17 +9,25 @@ import presentation.telegram.core.UiError
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.core.screen.ErrorScreen
 import presentation.telegram.security.callbackbutton.*
+import presentation.telegram.security.search.callbackbutton.*
 
 class CallbackHandler(
-    /* Security screen */
+    /* Ticker search screen */
     tickerSuggestionCallbackHandler: TickerSuggestionCallbackHandler,
+    subscribeToSecurityCallbackHandler: SubscribeToSecurityCallbackHandler,
+    unsubscribeFromSecurityCallbackHandler: UnsubscribeFromSecurityCallbackHandler,
+    /* Security screen */
     toggleIsActiveCallbackHandler: ToggleIsActiveCallbackHandler,
     toggleRemainActiveCallbackHandler: ToggleRemainActiveCallbackHandler,
     toggleShowNoteCallbackHandler: ToggleShowNoteCallbackHandler,
     private val findUser: FindUserUseCase
 ) {
     private val buttonHandlers = mapOf(
+        /* Ticker search screen */
         TickerSuggestionCallbackButton.callbackName to tickerSuggestionCallbackHandler,
+        SubscribeToSecurityCallbackButton.callbackName to subscribeToSecurityCallbackHandler,
+        UnsubscribeFromSecurityCallbackButton.callbackName to unsubscribeFromSecurityCallbackHandler,
+        /* Security screen */
         ToggleIsActiveCallbackButton.callbackName to toggleIsActiveCallbackHandler,
         ToggleRemainActiveCallbackButton.callbackName to toggleRemainActiveCallbackHandler,
         ToggleShowNoteCallbackButton.callbackName to toggleShowNoteCallbackHandler

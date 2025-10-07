@@ -6,7 +6,7 @@ import presentation.telegram.core.UiError
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.core.screen.ErrorScreen
 import presentation.telegram.security.screen.SecurityScreen
-import presentation.telegram.security.screen.TickerSearchResultScreen
+import presentation.telegram.security.search.screen.TickerSearchResultScreen
 
 class SecurityScreenUpdateUserHandler(
     private val findSecurity: FindSecurityUseCase

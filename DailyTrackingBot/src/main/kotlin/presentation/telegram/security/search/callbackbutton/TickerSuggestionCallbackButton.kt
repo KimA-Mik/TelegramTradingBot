@@ -1,4 +1,4 @@
-package presentation.telegram.security.callbackbutton
+package presentation.telegram.security.search.callbackbutton
 
 import presentation.telegram.core.CallbackButton
 

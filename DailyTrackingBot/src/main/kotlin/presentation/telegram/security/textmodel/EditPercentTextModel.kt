@@ -18,7 +18,7 @@ class EditPercentTextModel(
     private val updatePercent: UpdatePercentUseCase,
     private val popUser: PopUserUseCase,
 ) : TextModel {
-    override val node = NavigationRoot.Security.EditPercentage
+    override val node = NavigationRoot.SecurityList.EditPercentage
     private val rootTextModel: RootTextModel by inject(RootTextModel::class.java)
 
     override fun executeCommand(

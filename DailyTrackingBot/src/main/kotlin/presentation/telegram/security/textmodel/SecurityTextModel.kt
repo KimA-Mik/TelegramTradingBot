@@ -3,7 +3,6 @@ package presentation.telegram.security.textmodel
 import domain.common.PATH_SEPARATOR
 import domain.user.model.User
 import domain.user.usecase.NavigateUserUseCase
-import domain.user.usecase.StartSecurityConfigureSequenceUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -15,6 +14,7 @@ import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.core.screen.ErrorScreen
 import presentation.telegram.security.screen.SecurityHeader
 import presentation.telegram.security.screen.SecurityScreen
+import presentation.telegram.security.search.textmodel.SearchSecurityTextModel
 import ru.kima.cacheserver.api.api.CacheServerApi
 import ru.kima.cacheserver.api.schema.model.requests.FindSecurityResponse
 import ru.kima.cacheserver.api.schema.model.requests.GetOrderBookRequest
@@ -22,13 +22,12 @@ import ru.kima.cacheserver.api.schema.model.requests.GetOrderBookRequest
 class SecurityTextModel(
     private val api: CacheServerApi,
     private val navigateUser: NavigateUserUseCase,
-    private val startSecurityConfigureSequence: StartSecurityConfigureSequenceUseCase,
     editPriceTextModel: EditPriceTextModel,
     editPercentTextModel: EditPercentTextModel,
-    editTickerTextModel: EditTickerTextModel,
+    editTickerTextModel: SearchSecurityTextModel,
     editNoteTextModel: EditNoteTextModel
 ) : TextModel {
-    override val node = NavigationRoot.Security
+    override val node = NavigationRoot.SecurityList
     private val textModels = mapOf(
         editNoteTextModel.node.destination to editNoteTextModel,
         editPercentTextModel.node.destination to editPercentTextModel,

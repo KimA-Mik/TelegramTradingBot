@@ -1,4 +1,4 @@
-package presentation.telegram.security.textmodel
+package presentation.telegram.security.search.textmodel
 
 import domain.tinkoff.usecase.FindSecurityUseCase
 import domain.user.model.User
@@ -7,23 +7,23 @@ import domain.user.usecase.UpdateTickerUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import org.koin.java.KoinJavaComponent.inject
+import org.koin.java.KoinJavaComponent
 import org.slf4j.LoggerFactory
 import presentation.telegram.core.NavigationRoot
 import presentation.telegram.core.RootTextModel
 import presentation.telegram.core.TextModel
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.security.screen.EditTickerScreen
-import presentation.telegram.security.screen.TickerSearchResultScreen
+import presentation.telegram.security.search.screen.TickerSearchResultScreen
 
-class EditTickerTextModel(
+class SearchSecurityTextModel(
     private val popUser: PopUserUseCase,
     private val findSecurity: FindSecurityUseCase,
     private val updateTicker: UpdateTickerUseCase
 ) : TextModel {
+    override val node = NavigationRoot.SecuritySearch
     private val logger = LoggerFactory.getLogger(this::class.java)
-    override val node = NavigationRoot.Security.EditTicker
-    private val rootTextModel: RootTextModel by inject(RootTextModel::class.java)
+    private val rootTextModel: RootTextModel by KoinJavaComponent.inject(RootTextModel::class.java)
 
     override fun executeCommand(
         user: User,
@@ -35,7 +35,7 @@ class EditTickerTextModel(
             return@flow
         }
 
-        val searchResult = runCatching { findSecurity(command) }
+        val searchResult = runCatching { findSecurity(user.id, command) }
             .onFailure { logger.error(it.message) }
             .getOrDefault(FindSecurityUseCase.Result.NotFound)
         emit(TickerSearchResultScreen(user.id, searchResult = searchResult))

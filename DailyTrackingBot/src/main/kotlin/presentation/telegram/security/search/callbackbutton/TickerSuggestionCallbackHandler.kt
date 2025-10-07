@@ -1,4 +1,4 @@
-package presentation.telegram.security.callbackbutton
+package presentation.telegram.security.search.callbackbutton
 
 import domain.tinkoff.usecase.FindSecurityUseCase
 import domain.user.model.User
@@ -13,7 +13,7 @@ import presentation.telegram.core.RootTextModel
 import presentation.telegram.core.UiError
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.core.screen.ErrorScreen
-import presentation.telegram.security.screen.TickerSearchResultScreen
+import presentation.telegram.security.search.screen.TickerSearchResultScreen
 
 class TickerSuggestionCallbackHandler(
     private val popUser: PopUserUseCase,
@@ -44,7 +44,7 @@ class TickerSuggestionCallbackHandler(
                     )
                 )
 
-                if (newUser.pathList.lastOrNull() == NavigationRoot.Security.EditTicker.destination) {
+                if (newUser.pathList.lastOrNull() == NavigationRoot.SecurityList.EditTicker.destination) {
                     popUser(newUser).onSuccess {
                         emitAll(rootTextModel.executeCommand(it, it.pathList, ""))
                     }

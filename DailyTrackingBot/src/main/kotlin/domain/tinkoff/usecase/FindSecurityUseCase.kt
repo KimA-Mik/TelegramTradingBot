@@ -1,5 +1,6 @@
 package domain.tinkoff.usecase
 
+import domain.user.repository.UserRepository
 import domain.util.levenshtein
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -9,20 +10,26 @@ import ru.kima.cacheserver.api.schema.model.requests.FindSecurityResponse
 import ru.kima.cacheserver.api.schema.model.requests.GetOrderBookRequest
 import ru.kima.cacheserver.api.schema.model.requests.InstrumentsRequest
 
-class FindSecurityUseCase(private val api: CacheServerApi) {
-    suspend operator fun invoke(ticker: String): Result {
+class FindSecurityUseCase(
+    private val api: CacheServerApi,
+    private val repository: UserRepository
+) {
+    suspend operator fun invoke(userId: Long, ticker: String): Result {
         val normalizedTicker = ticker.trim().uppercase()
         return when (val res = api.findSecurity(normalizedTicker)) {
-            is FindSecurityResponse.Share -> handleSecurity(res.share)
-            is FindSecurityResponse.Future -> handleSecurity(res.future)
+            is FindSecurityResponse.Share -> handleSecurity(userId, res.share)
+            is FindSecurityResponse.Future -> handleSecurity(userId, res.future)
             else -> findSuggestions(normalizedTicker)
         }
     }
 
-
-    private suspend fun handleSecurity(security: Security): Result {
+    private suspend fun handleSecurity(userId: Long, security: Security): Result {
         val orderBook = api.getOrderBook(GetOrderBookRequest(security.uid))
-        return Result.Success(security, orderBook.getOrNull()?.lastPrice)
+        val fullUser = repository.findFullUserById(userId)
+        return Result.Success(
+            security = security, price = orderBook.getOrNull()?.lastPrice,
+            subscribed = fullUser?.securities?.any { it.uid == security.uid } == true
+        )
     }
 
     private suspend fun findSuggestions(ticker: String): Result = coroutineScope {
@@ -49,7 +56,7 @@ class FindSecurityUseCase(private val api: CacheServerApi) {
     }
 
     sealed interface Result {
-        data class Success(val security: Security, val price: Double?) : Result
+        data class Success(val security: Security, val price: Double?, val subscribed: Boolean) : Result
         data class Suggestions(val suggestions: List<String>) : Result
         data object NotFound : Result
     }
