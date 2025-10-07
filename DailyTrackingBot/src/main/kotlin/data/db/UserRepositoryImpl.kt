@@ -1,12 +1,20 @@
 package data.db
 
+import data.db.entities.SecurityEntity
 import data.db.entities.UserEntity
+import data.db.mappers.toFullUser
+import data.db.mappers.toTrackingSecurity
 import data.db.mappers.toUser
+import data.db.tables.Securities
 import data.db.tables.Users
+import domain.user.model.FullUser
+import domain.user.model.TrackingSecurity
 import domain.user.model.User
 import domain.user.repository.UserRepository
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.exposed.v1.dao.load
+import org.jetbrains.exposed.v1.dao.with
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -24,7 +32,7 @@ class UserRepositoryImpl(
     init {
         TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
         transaction {
-            val tables = arrayOf(Users)
+            val tables = arrayOf(Users, Securities)
             SchemaUtils.create(*tables)
             val missingColumnsStatements =
                 MigrationUtils.statementsRequiredForDatabaseMigration(*tables)
@@ -56,20 +64,61 @@ class UserRepositoryImpl(
             UserEntity.findByIdAndUpdate(user.id) {
                 it.path = user.path
                 it.registered = user.registered.toLocalDateTime(TimeZone.currentSystemDefault())
-                it.ticker = user.ticker
-                it.targetPrice = user.targetPrice
-                it.isActive = user.isActive
-                it.remainActive = user.remainActive
-                it.targetDeviation = user.targetDeviation
-                it.securityConfigureSequence = user.securityConfigureSequence
-                it.note = user.note
-                it.showNote = user.showNote
-                it.shouldNotify = user.shouldNotify
-                it.shouldNotifyRsi = user.shouldNotifyRsi
             }?.toUser()
         }
 
     override suspend fun getAllUsers(): List<User> = databaseConnector.transaction {
         UserEntity.all().map { it.toUser() }
+    }
+
+    override suspend fun findFullUserById(id: Long): FullUser? = databaseConnector.transaction {
+        UserEntity.findById(id)
+            ?.load(UserEntity::securities)
+            ?.toFullUser()
+    }
+
+    override suspend fun getFullUsers(): List<FullUser> = databaseConnector.transaction {
+        UserEntity.all()
+            .with(UserEntity::securities)
+            .map { it.toFullUser() }
+    }
+
+    override suspend fun createTrackingSecurity(
+        user: User, security: TrackingSecurity
+    ): Result<TrackingSecurity> = databaseConnector.transactionCatching {
+        SecurityEntity.new {
+            this.user = UserEntity[user.id]
+            ticker = security.ticker
+            uid = security.uid
+            targetPrice = security.targetPrice
+            targetDeviation = security.targetDeviation
+            isActive = security.isActive
+            remainActive = security.remainActive
+            note = security.note
+            showNote = security.showNote
+            shouldNotify = security.shouldNotify
+            shouldNotifyRsi = security.shouldNotifyRsi
+        }.toTrackingSecurity()
+    }
+
+    override suspend fun updateTrackingSecurity(security: TrackingSecurity) = databaseConnector.transactionCatching {
+        SecurityEntity.findByIdAndUpdate(security.id) {
+            it.ticker = security.ticker
+            it.uid = security.uid
+            it.targetPrice = security.targetPrice
+            it.targetDeviation = security.targetDeviation
+            it.isActive = security.isActive
+            it.remainActive = security.remainActive
+            it.note = security.note
+            it.showNote = security.showNote
+            it.shouldNotify = security.shouldNotify
+            it.shouldNotifyRsi = security.shouldNotifyRsi
+        }!!.toTrackingSecurity()
+    }
+
+    override suspend fun deleteTrackingSecurity(id: Long) {
+        databaseConnector.transaction {
+            SecurityEntity.findById(id)?.delete()
+        }
     }
 }
