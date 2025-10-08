@@ -13,7 +13,7 @@ import presentation.telegram.core.NavigationRoot
 import presentation.telegram.core.RootTextModel
 import presentation.telegram.core.TextModel
 import presentation.telegram.core.screen.BotScreen
-import presentation.telegram.security.screen.EditTickerScreen
+import presentation.telegram.security.search.screen.SearchecurityScreen
 import presentation.telegram.security.search.screen.TickerSearchResultScreen
 
 class SearchSecurityTextModel(
@@ -31,7 +31,7 @@ class SearchSecurityTextModel(
         command: String
     ): Flow<BotScreen> = flow {
         if (command.isBlank()) {
-            emit(EditTickerScreen(user.id))
+            emit(SearchecurityScreen(user.id))
             return@flow
         }
 

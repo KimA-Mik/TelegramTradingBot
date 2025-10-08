@@ -1,6 +1,7 @@
 package domain.user.usecase
 
 import domain.tinkoff.usecase.FindSecurityUseCase
+import domain.user.mappers.type
 import domain.user.model.TrackingSecurity
 import domain.user.model.User
 import domain.user.repository.UserRepository
@@ -20,6 +21,7 @@ class SubscribeToSecurityUseCase(
             user, TrackingSecurity.default(
                 ticker = securityResult.security.ticker,
                 uid = securityResult.security.uid,
+                type = securityResult.security.type,
                 targetPrice = securityResult.price ?: 0.0,
             )
         )

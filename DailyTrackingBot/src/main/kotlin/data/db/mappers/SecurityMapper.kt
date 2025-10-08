@@ -6,6 +6,7 @@ import domain.user.model.TrackingSecurity
 fun SecurityEntity.toTrackingSecurity() = TrackingSecurity(
     id = id.value,
     ticker = ticker,
+    name = name,
     uid = uid,
     targetPrice = targetPrice,
     targetDeviation = targetDeviation,
@@ -15,4 +16,5 @@ fun SecurityEntity.toTrackingSecurity() = TrackingSecurity(
     showNote = showNote,
     shouldNotify = shouldNotify,
     shouldNotifyRsi = shouldNotifyRsi,
+    type = type
 )

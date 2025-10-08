@@ -16,6 +16,7 @@ fun domainModule() = module {
 
     //User
     singleOf(::FindUserUseCase)
+    singleOf(::GetUserTrackingSecuritiesUseCase)
     singleOf(::NavigateUserUseCase)
     singleOf(::PopUserUseCase)
     singleOf(::RegisterUserUseCase)

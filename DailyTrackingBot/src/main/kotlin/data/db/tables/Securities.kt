@@ -1,11 +1,13 @@
 package data.db.tables
 
 import domain.common.MAX_NOTE_LENGTH
+import domain.user.model.SecurityType
 import org.jetbrains.exposed.v1.core.dao.id.LongIdTable
 
 object Securities : LongIdTable("security") {
     val user = reference("user_id", Users)
     val ticker = varchar(name = "ticker", length = 32)
+    val name = varchar(name = "name", length = 128)
     val uid = varchar(name = "uid", length = 32)
     val targetPrice = double(name = "target_rice").nullable().default(null)
     val targetDeviations = double(name = "target_deviations").nullable().default(null)
@@ -15,5 +17,6 @@ object Securities : LongIdTable("security") {
     val showNote = bool(name = "show_note").default(true)
     val shouldNotify = bool(name = "should_notify").default(true)
     val shouldNotifyRsi = bool(name = "should_notify_rsi").default(true)
+    val type = enumerationByName(name = "type", length = 16, klass = SecurityType::class)
 }
 

@@ -19,5 +19,12 @@ abstract class BotScreen(val id: Long, val messageId: Long? = null) {
             ),
             resizeKeyboard = true
         )
+
+        val rootReplayMarkup = KeyboardReplyMarkup(
+            listOf(
+                listOf(KeyboardButton(DefaultCommands.Root.text)),
+            ),
+            resizeKeyboard = true
+        )
     }
 }

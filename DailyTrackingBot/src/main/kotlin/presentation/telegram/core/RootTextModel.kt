@@ -6,22 +6,22 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import presentation.telegram.core.screen.ErrorScreen
 import presentation.telegram.core.screen.Root
+import presentation.telegram.security.list.textmodel.SecurityListTextModel
 import presentation.telegram.security.search.textmodel.SearchSecurityTextModel
-import presentation.telegram.security.textmodel.SecurityTextModel
 
 class RootTextModel(
     private val navigateUser: NavigateUserUseCase,
-    securityTextModel: SecurityTextModel,
+    securityListTextModel: SecurityListTextModel,
     searchSecurityTextModel: SearchSecurityTextModel,
 ) : TextModel {
     override val node = NavigationRoot
     private val textModels = mapOf<String, TextModel>(
         NavigationRoot.SecuritySearch.destination to searchSecurityTextModel,
-        NavigationRoot.SecurityList.destination to securityTextModel
+        NavigationRoot.SecurityList.destination to securityListTextModel
     )
     private val navigationCommands = mapOf<String, TextModel>(
         Root.Commands.Search.text to searchSecurityTextModel,
-        Root.Commands.Security.text to securityTextModel
+        Root.Commands.Security.text to securityListTextModel
     )
 
     override fun executeCommand(user: User, path: List<String>, command: String) = flow {

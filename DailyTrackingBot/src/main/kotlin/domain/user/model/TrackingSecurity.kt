@@ -3,6 +3,7 @@ package domain.user.model
 data class TrackingSecurity(
     val id: Long,
     val ticker: String,
+    val name: String,
     val uid: String,
     val targetPrice: Double?,
     val targetDeviation: Double?,
@@ -11,12 +12,16 @@ data class TrackingSecurity(
     val note: String?,
     val showNote: Boolean,
     val shouldNotify: Boolean,
-    val shouldNotifyRsi: Boolean
+    val shouldNotifyRsi: Boolean,
+    val type: SecurityType
 ) {
+
     companion object {
         fun default(
             ticker: String,
+            name: String,
             uid: String,
+            type: SecurityType,
             id: Long = 0L,
             targetPrice: Double = 0.0,
             targetDeviation: Double = 0.1,
@@ -29,6 +34,7 @@ data class TrackingSecurity(
         ) = TrackingSecurity(
             id = id,
             ticker = ticker,
+            name = name,
             uid = uid,
             targetPrice = targetPrice,
             targetDeviation = targetDeviation,
@@ -37,7 +43,8 @@ data class TrackingSecurity(
             note = note,
             showNote = showNote,
             shouldNotify = shouldNotify,
-            shouldNotifyRsi = shouldNotifyRsi
+            shouldNotifyRsi = shouldNotifyRsi,
+            type = type
         )
     }
 }

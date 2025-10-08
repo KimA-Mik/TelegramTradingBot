@@ -89,6 +89,7 @@ class UserRepositoryImpl(
         SecurityEntity.new {
             this.user = UserEntity[user.id]
             ticker = security.ticker
+            name = security.name
             uid = security.uid
             targetPrice = security.targetPrice
             targetDeviation = security.targetDeviation
@@ -98,12 +99,14 @@ class UserRepositoryImpl(
             showNote = security.showNote
             shouldNotify = security.shouldNotify
             shouldNotifyRsi = security.shouldNotifyRsi
+            type = security.type
         }.toTrackingSecurity()
     }
 
     override suspend fun updateTrackingSecurity(security: TrackingSecurity) = databaseConnector.transactionCatching {
         SecurityEntity.findByIdAndUpdate(security.id) {
             it.ticker = security.ticker
+            it.name = security.name
             it.uid = security.uid
             it.targetPrice = security.targetPrice
             it.targetDeviation = security.targetDeviation
@@ -113,6 +116,7 @@ class UserRepositoryImpl(
             it.showNote = security.showNote
             it.shouldNotify = security.shouldNotify
             it.shouldNotifyRsi = security.shouldNotifyRsi
+            it.type = security.type
         }!!.toTrackingSecurity()
     }
 

@@ -8,7 +8,8 @@ import presentation.telegram.core.CallbackButtonHandler
 import presentation.telegram.core.UiError
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.core.screen.ErrorScreen
-import presentation.telegram.security.callbackbutton.*
+import presentation.telegram.security.edit.callbackbutton.*
+import presentation.telegram.security.list.callbackbutton.*
 import presentation.telegram.security.search.callbackbutton.*
 
 class CallbackHandler(
@@ -20,6 +21,10 @@ class CallbackHandler(
     toggleIsActiveCallbackHandler: ToggleIsActiveCallbackHandler,
     toggleRemainActiveCallbackHandler: ToggleRemainActiveCallbackHandler,
     toggleShowNoteCallbackHandler: ToggleShowNoteCallbackHandler,
+    /* Security list screen */
+    editSecurityCallbackButtonHandler: EditSecurityCallbackButtonHandler,
+    securitiesListBackwardCallbackButtonHandler: SecuritiesListBackwardCallbackButtonHandler,
+    securitiesListForwardCallbackButtonHandler: SecuritiesListForwardCallbackButtonHandler,
     private val findUser: FindUserUseCase
 ) {
     private val buttonHandlers = mapOf(
@@ -30,7 +35,11 @@ class CallbackHandler(
         /* Security screen */
         ToggleIsActiveCallbackButton.callbackName to toggleIsActiveCallbackHandler,
         ToggleRemainActiveCallbackButton.callbackName to toggleRemainActiveCallbackHandler,
-        ToggleShowNoteCallbackButton.callbackName to toggleShowNoteCallbackHandler
+        ToggleShowNoteCallbackButton.callbackName to toggleShowNoteCallbackHandler,
+        /* Security list screen */
+        EditSecurityCallbackButton.callbackName to editSecurityCallbackButtonHandler,
+        SecuritiesListBackwardCallbackButton.callbackName to securitiesListBackwardCallbackButtonHandler,
+        SecuritiesListForwardCallbackButton.callbackName to securitiesListForwardCallbackButtonHandler
     )
 
     private val _outFlow = MutableSharedFlow<BotScreen>()
