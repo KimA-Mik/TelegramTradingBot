@@ -40,30 +40,28 @@ class SecurityListTextModel(
         path: List<String>,
         command: String
     ): Flow<BotScreen> = flow {
-        if (command.isBlank()) {
-            val screen = when (val securitiesResult = getUserTrackingSecurities(user.id, page = 1)) {
-                GetUserTrackingSecuritiesUseCase.GetUserSharesResult.NotFound -> SecurityListScreen(
-                    userId = user.id,
-                    securities = emptyList(),
-                )
-
-                is GetUserTrackingSecuritiesUseCase.GetUserSharesResult.Success -> SecurityListScreen(
-                    userId = user.id,
-                    securities = securitiesResult.securities,
-                    page = securitiesResult.page,
-                    pageSize = securitiesResult.pageSize,
-                    totalPages = securitiesResult.totalPages
-                )
-            }
-
-            emit(SecurityListHeader(user.id))
-            emit(screen)
-            return@flow
-        }
-
-
         if (path.isEmpty()) {
-            emitAll(command(user, command))
+            if (command.isBlank()) {
+                val screen = when (val securitiesResult = getUserTrackingSecurities(user.id, page = 1)) {
+                    GetUserTrackingSecuritiesUseCase.GetUserSharesResult.NotFound -> SecurityListScreen(
+                        userId = user.id,
+                        securities = emptyList(),
+                    )
+
+                    is GetUserTrackingSecuritiesUseCase.GetUserSharesResult.Success -> SecurityListScreen(
+                        userId = user.id,
+                        securities = securitiesResult.securities,
+                        page = securitiesResult.page,
+                        pageSize = securitiesResult.pageSize,
+                        totalPages = securitiesResult.totalPages
+                    )
+                }
+
+                emit(SecurityListHeader(user.id))
+                emit(screen)
+            } else {
+                emitAll(command(user, command))
+            }
         } else {
             emitAll(passExecution(user, path, command))
         }
