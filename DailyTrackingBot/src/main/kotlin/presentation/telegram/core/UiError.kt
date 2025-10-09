@@ -13,7 +13,12 @@ sealed class UiError {
     }
 
     class UnknownCommand(val command: String) : UiError() {
-        override fun render() = "Неизвестная команда: $command"
+        override fun render() =
+            "Неизвестная команда: $command, eсли потерялись нажмите /$HOME_COMMAND, чтобы вернуться в главное меню"
+
+        companion object {
+            const val HOME_COMMAND: String = "Home"
+        }
     }
 
     class TextError(val text: String) : UiError() {
