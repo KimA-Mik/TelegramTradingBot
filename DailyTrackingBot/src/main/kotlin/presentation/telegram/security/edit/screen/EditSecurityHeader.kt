@@ -6,7 +6,7 @@ import presentation.telegram.core.DefaultCommands
 import presentation.telegram.core.screen.BotScreen
 
 class EditSecurityHeader(id: Long) : BotScreen(id) {
-    override val text = "Ваши бумаги:"
+    override val text = "Ваши бумага:"
     override val replyMarkup = _replayMarkup
 
     enum class Command(val text: String) {

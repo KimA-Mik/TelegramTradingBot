@@ -10,7 +10,6 @@ import presentation.telegram.core.UiError
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.core.screen.ErrorScreen
 import presentation.telegram.security.edit.screen.EditSecurityHeader
-import presentation.telegram.security.list.screen.SecurityListHeader
 import presentation.telegram.security.list.screen.SecurityScreen
 import ru.kima.cacheserver.api.api.CacheServerApi
 import ru.kima.cacheserver.api.schema.model.requests.FindSecurityResponse
@@ -73,7 +72,7 @@ class EditSecurityTextModel(
             return
         }
         val lastPrice = security.let { api.getOrderBook(GetOrderBookRequest(it.uid)).getOrNull()?.lastPrice }
-        emit(SecurityListHeader(user.id))
+        emit(EditSecurityHeader(user.id))
         emit(SecurityScreen(user, security, lastPrice))
 
     }
