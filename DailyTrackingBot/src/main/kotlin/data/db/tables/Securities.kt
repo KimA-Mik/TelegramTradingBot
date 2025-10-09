@@ -8,7 +8,7 @@ object Securities : LongIdTable("security") {
     val user = reference("user_id", Users)
     val ticker = varchar(name = "ticker", length = 32)
     val name = varchar(name = "name", length = 128)
-    val uid = varchar(name = "uid", length = 32)
+    val uid = varchar(name = "uid", length = 64)
     val targetPrice = double(name = "target_rice")
     val targetDeviations = double(name = "target_deviations")
     val isActive = bool(name = "is_active").default(false)
