@@ -13,6 +13,7 @@ import presentation.telegram.core.TextModel
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.security.edit.screen.EditPriceResultScreen
 import presentation.telegram.security.edit.screen.EditPriceScreen
+import presentation.telegram.security.edit.util.getTickerInEditScreen
 
 class EditPriceTextModel(
     private val updateExpectedPrice: UpdateExpectedPriceUseCase,
@@ -31,10 +32,12 @@ class EditPriceTextModel(
             return@flow
         }
 
-        val res = updateExpectedPrice(user, command)
-        emit(EditPriceResultScreen(user.id, res.getOrNull()?.targetPrice))
-        res.onSuccess { newUser ->
-            popUser(newUser).onSuccess {
+        val res = user.getTickerInEditScreen()?.let {
+            updateExpectedPrice(user, it, command)
+        }
+        emit(EditPriceResultScreen(user.id, res?.targetPrice))
+        res?.let {
+            popUser(user).onSuccess {
                 emitAll(rootTextModel.executeCommand(it, it.pathList, ""))
             }
         }

@@ -13,5 +13,6 @@ interface UserRepository {
     suspend fun getFullUsers(): List<FullUser>
     suspend fun createTrackingSecurity(user: User, security: TrackingSecurity): Result<TrackingSecurity>
     suspend fun updateTrackingSecurity(security: TrackingSecurity): Result<TrackingSecurity>
+    suspend fun updateTrackingSecurities(securities: List<TrackingSecurity>): Result<List<TrackingSecurity>>
     suspend fun deleteTrackingSecurity(id: Long)
 }

@@ -4,10 +4,9 @@ import com.github.kotlintelegrambot.entities.ParseMode
 import domain.common.ROUBLE_SIGN
 import domain.common.formatToRu
 import domain.updateservice.TelegramUpdate
+import domain.user.model.SecurityType
 import presentation.telegram.core.screen.BotScreen
 import presentation.util.TelegramUtil
-import ru.kima.cacheserver.api.schema.model.Future
-import ru.kima.cacheserver.api.schema.model.Share
 
 class RsiAlertScreen(
     private val update: TelegramUpdate.RsiAlert
@@ -19,9 +18,9 @@ class RsiAlertScreen(
     private fun renderText() = buildString {
         appendLine("*Сработал сигнал по RSI(15м)!*")
         appendLine()
-        when (update.security) {
-            is Future -> appendLine("*Фьючерс:* ${TelegramUtil.clickableSecurity(update.security)} — (${update.security.name})")
-            is Share -> appendLine("*Акция:* ${TelegramUtil.clickableSecurity(update.security)} — (${update.security.name})")
+        when (update.security.type) {
+            SecurityType.FUTURE -> appendLine("*Фьючерс:* ${TelegramUtil.clickableTrackingSecurity(update.security)} — (${update.security.name})")
+            SecurityType.SHARE -> appendLine("*Акция:* ${TelegramUtil.clickableTrackingSecurity(update.security)} — (${update.security.name})")
         }
         appendLine("*Текущая цена:* ${update.currentPrice.formatToRu()}$ROUBLE_SIGN")
         appendLine("*Текущий RSI:* ${update.currentRsi.formatToRu()}")
@@ -37,7 +36,7 @@ class RsiAlertScreen(
             append("*BB (1д):* верхняя: ${ind.dailyBb.upper.formatToRu()}, ")
             appendLine("нижняя: ${ind.dailyBb.lower.formatToRu()}")
         }
-        update.user.note?.takeIf { it.isNotBlank() }?.let {
+        update.security.note?.takeIf { it.isNotBlank() }?.let {
             appendLine()
             append("Заметка: ")
             append(it)

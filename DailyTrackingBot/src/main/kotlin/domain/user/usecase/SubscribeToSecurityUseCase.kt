@@ -21,6 +21,7 @@ class SubscribeToSecurityUseCase(
             user, TrackingSecurity.default(
                 ticker = securityResult.security.ticker,
                 uid = securityResult.security.uid,
+                name = securityResult.security.name,
                 type = securityResult.security.type,
                 targetPrice = securityResult.price ?: 0.0,
             )

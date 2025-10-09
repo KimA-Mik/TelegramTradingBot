@@ -26,7 +26,7 @@ class ToggleIsActiveCallbackHandler(
         }
 
         securityScreenUpdateUserHandler.handle(user, messageId) {
-            updateIsActive(user, callbackData.newValue)
+            updateIsActive(user, callbackData.ticker, callbackData.newValue)
         }.let { emit(it) }
     }
 }

@@ -26,7 +26,7 @@ class ToggleRemainActiveCallbackHandler(
         }
 
         val newScreen = securityScreenUpdateUserHandler.handle(user, messageId) {
-            updateRemainActive(user, callbackData.newValue)
+            updateRemainActive(user, callbackData.ticker, callbackData.newValue)
         }
         emit(newScreen)
     }

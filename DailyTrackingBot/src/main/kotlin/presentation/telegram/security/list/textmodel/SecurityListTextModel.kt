@@ -12,14 +12,14 @@ import presentation.telegram.core.TextModel
 import presentation.telegram.core.UiError
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.core.screen.ErrorScreen
+import presentation.telegram.security.edit.textmodel.EditSecurityTextModel
 import presentation.telegram.security.list.screen.SecurityHeader
 import presentation.telegram.security.list.screen.SecurityListScreen
-import ru.kima.cacheserver.api.api.CacheServerApi
 
 class SecurityListTextModel(
-    private val api: CacheServerApi,
     private val navigateUser: NavigateUserUseCase,
-    private val getUserTrackingSecurities: GetUserTrackingSecuritiesUseCase
+    private val getUserTrackingSecurities: GetUserTrackingSecuritiesUseCase,
+    private val editSecurityTextModel: EditSecurityTextModel
 ) : TextModel {
     override val node = NavigationRoot.SecurityList
     private val textModels = mapOf<String, TextModel>(
@@ -73,14 +73,15 @@ class SecurityListTextModel(
         user: User,
         path: List<String>,
         command: String
-    ) = flow {
+    ) = editSecurityTextModel.executeCommand(user, path.drop(1), command) /* flow {
+        editSecurityTextModel.executeCommand(user, path.drop(1), command)
         val nextScreen = path.first()
         textModels[nextScreen]?.let {
             emitAll(it.executeCommand(user = user, path = path.drop(1), command = command))
             return@flow
         }
         emit(ErrorScreen(user.id, UiError.UnknownPath))
-    }
+    } */
 
     private suspend fun command(user: User, command: String): Flow<BotScreen> {
         return flowOf(ErrorScreen(user.id, UiError.UnknownCommand(command)))

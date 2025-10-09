@@ -15,6 +15,7 @@ import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.core.screen.ErrorScreen
 import presentation.telegram.security.edit.screen.EditNoteResultScreen
 import presentation.telegram.security.edit.screen.EditNoteScreen
+import presentation.telegram.security.edit.util.getTickerInEditScreen
 
 class EditNoteTextModel(
     private val popUser: PopUserUseCase,
@@ -46,14 +47,16 @@ class EditNoteTextModel(
             }
         }
 
-        val updatedUser = updateNote(user, note)
-        if (updatedUser == null) {
+        val updatedSecurity = user.getTickerInEditScreen()?.let {
+            updateNote(user, it, note)
+        }
+        if (updatedSecurity == null) {
             emit(ErrorScreen(user.id, UiError.UnregisteredUserError))
             return@flow
         }
 
         emit(EditNoteResultScreen(user.id, result))
-        popUser(updatedUser)
+        popUser(user)
             .onSuccess { emitAll(rootTextModel.executeCommand(it, it.pathList, "")) }
             .onFailure { emit(ErrorScreen(user.id, UiError.UnregisteredUserError)) }
     }

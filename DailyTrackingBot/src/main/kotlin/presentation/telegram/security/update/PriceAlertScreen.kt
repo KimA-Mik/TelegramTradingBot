@@ -4,10 +4,9 @@ import com.github.kotlintelegrambot.entities.ParseMode
 import domain.common.ROUBLE_SIGN
 import domain.common.formatToRu
 import domain.updateservice.TelegramUpdate
+import domain.user.model.SecurityType
 import presentation.telegram.core.screen.BotScreen
 import presentation.util.TelegramUtil
-import ru.kima.cacheserver.api.schema.model.Future
-import ru.kima.cacheserver.api.schema.model.Share
 
 class PriceAlertScreen(
     private val update: TelegramUpdate.PriceAlert
@@ -18,12 +17,12 @@ class PriceAlertScreen(
     private fun renderText() = buildString {
         appendLine("*Сработал ценовой сигнал!*")
         appendLine()
-        when (update.security) {
-            is Future -> appendLine("*Фьючерс:* ${TelegramUtil.clickableSecurity(update.security)} — (${update.security.name})")
-            is Share -> appendLine("*Акция:* ${TelegramUtil.clickableSecurity(update.security)} — (${update.security.name})")
+        when (update.security.type) {
+            SecurityType.SHARE -> appendLine("*Акция:* ${TelegramUtil.clickableTrackingSecurity(update.security)} — (${update.security.name})")
+            SecurityType.FUTURE -> appendLine("*Фьючерс:* ${TelegramUtil.clickableTrackingSecurity(update.security)} — (${update.security.name})")
         }
         appendLine("*Текущая цена:* ${update.currentPrice.formatToRu()}${ROUBLE_SIGN}")
-        appendLine("*Целевая цена:* ${update.user.targetPrice?.formatToRu() ?: 0.0}${ROUBLE_SIGN}")
+        appendLine("*Целевая цена:* ${update.security.targetPrice.formatToRu()}${ROUBLE_SIGN}")
         appendLine("*Отклонение:* ${update.currentDeviation.formatToRu()}%")
         update.indicators?.let { ind ->
             appendLine()
@@ -38,7 +37,7 @@ class PriceAlertScreen(
             append("*BB (1д):* верхняя: ${ind.dailyBb.upper.formatToRu()}, ")
             appendLine("нижняя: ${ind.dailyBb.lower.formatToRu()}")
         }
-        update.user.note?.takeIf { it.isNotBlank() }?.let {
+        update.security.note?.takeIf { it.isNotBlank() }?.let {
             appendLine()
             append("Заметка: ")
             append(it)

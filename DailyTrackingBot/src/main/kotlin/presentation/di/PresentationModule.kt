@@ -13,6 +13,7 @@ import presentation.telegram.security.edit.callbackbutton.ToggleShowNoteCallback
 import presentation.telegram.security.edit.textmodel.EditNoteTextModel
 import presentation.telegram.security.edit.textmodel.EditPercentTextModel
 import presentation.telegram.security.edit.textmodel.EditPriceTextModel
+import presentation.telegram.security.edit.textmodel.EditSecurityTextModel
 import presentation.telegram.security.list.callbackbutton.EditSecurityCallbackButtonHandler
 import presentation.telegram.security.list.callbackbutton.SecuritiesListBackwardCallbackButtonHandler
 import presentation.telegram.security.list.callbackbutton.SecuritiesListForwardCallbackButtonHandler
@@ -48,6 +49,7 @@ fun presentationModule() = module {
     singleOf(::ToggleRemainActiveCallbackHandler)
     singleOf(::ToggleShowNoteCallbackHandler)
 
+    singleOf(::EditSecurityTextModel)
     singleOf(::EditNoteTextModel)
     singleOf(::EditPercentTextModel)
     singleOf(::EditPriceTextModel)

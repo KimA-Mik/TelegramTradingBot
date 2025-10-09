@@ -13,6 +13,7 @@ import presentation.telegram.core.TextModel
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.security.edit.screen.EditPercentResultScreen
 import presentation.telegram.security.edit.screen.EditPercentScreen
+import presentation.telegram.security.edit.util.getTickerInEditScreen
 
 class EditPercentTextModel(
     private val updatePercent: UpdatePercentUseCase,
@@ -31,10 +32,13 @@ class EditPercentTextModel(
             return@flow
         }
 
-        val res = updatePercent(user, command)
-        emit(EditPercentResultScreen(user.id, res.getOrNull()?.targetDeviation))
-        res.onSuccess { newUser ->
-            popUser(newUser).onSuccess {
+        val res = user.getTickerInEditScreen()?.let {
+            updatePercent(user, it, command)
+        }
+        emit(EditPercentResultScreen(user.id, res?.targetDeviation))
+
+        res?.let {
+            popUser(user).onSuccess {
                 emitAll(rootTextModel.executeCommand(it, it.pathList, ""))
             }
         }

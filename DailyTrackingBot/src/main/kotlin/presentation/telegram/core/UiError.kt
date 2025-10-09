@@ -32,4 +32,12 @@ sealed class UiError {
     object BrokenCallbackButton : UiError() {
         override fun render() = "Похоже эта кнопка сломана"
     }
+
+    class UnsubscribedToSecurity(val ticker: String) : UiError() {
+        override fun render() = "Вы не подписаны на $ticker"
+    }
+
+    object UnableToLoadSecurity : UiError() {
+        override fun render() = "Не удалось загрузить информацию о ценной бумаге"
+    }
 }

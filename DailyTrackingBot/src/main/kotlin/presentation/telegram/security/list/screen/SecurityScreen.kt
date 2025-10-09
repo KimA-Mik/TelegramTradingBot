@@ -4,19 +4,19 @@ import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.ParseMode
 import domain.common.ROUBLE_SIGN
 import domain.common.formatToRu
+import domain.user.model.SecurityType.FUTURE
+import domain.user.model.SecurityType.SHARE
+import domain.user.model.TrackingSecurity
 import domain.user.model.User
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.security.edit.callbackbutton.ToggleIsActiveCallbackButton
 import presentation.telegram.security.edit.callbackbutton.ToggleRemainActiveCallbackButton
 import presentation.telegram.security.edit.callbackbutton.ToggleShowNoteCallbackButton
 import presentation.util.TelegramUtil
-import ru.kima.cacheserver.api.schema.model.Future
-import ru.kima.cacheserver.api.schema.model.Security
-import ru.kima.cacheserver.api.schema.model.Share
 
 class SecurityScreen(
     private val user: User,
-    private val security: Security?,
+    private val security: TrackingSecurity?,
     private val lastPrice: Double?,
     messageId: Long? = null
 ) : BotScreen(user.id, messageId) {
@@ -26,11 +26,15 @@ class SecurityScreen(
     override val disableWebPagePreview = true
 
     private fun renderText(): String = buildString {
+        if (security == null) {
+            append("Бумага не найдена в базе.")
+            return@buildString
+        }
+
         append("Бумага: ")
-        when (security) {
-            is Future -> append("Фьючерс \"${security.name}\" (${TelegramUtil.clickableSecurity(security)})")
-            is Share -> append("Акция \"${security.name}\" (${TelegramUtil.clickableSecurity(security)})")
-            null -> appendLine("не выбрана")
+        when (security.type) {
+            FUTURE -> append("Фьючерс \"${security.name}\" (${TelegramUtil.clickableTrackingSecurity(security)})")
+            SHARE -> append("Акция \"${security.name}\" (${TelegramUtil.clickableTrackingSecurity(security)})")
         }
 
         if (lastPrice != null) {
@@ -40,55 +44,48 @@ class SecurityScreen(
         }
 
         append("Текущая отслеживаемая ценa: ")
-        if (user.targetPrice != null) {
-            append("*${user.targetPrice.formatToRu()}$ROUBLE_SIGN*")
-        } else {
-            append("не установлена")
-        }
+        append("*${security.targetPrice.formatToRu()}$ROUBLE_SIGN*")
 
-        if (user.targetDeviation == null) {
-            append(", отклонение не установлено")
-        } else {
-            append(" с отклонением ")
-            append("*${user.targetDeviation.formatToRu()}%*")
-        }
+        append(" с отклонением ")
+        append("*${security.targetDeviation.formatToRu()}%*")
 
         append('\n')
         append("Отслеживание: ")
-        if (user.isActive) {
+        if (security.isActive) {
             appendLine("*включено*")
         } else {
             appendLine("*выключено*")
         }
 
         append("Поддержание отслеживания активным: ")
-        if (user.remainActive) {
+        if (security.remainActive) {
             appendLine("*включено*")
         } else {
             appendLine("*выключено*")
         }
 
-        if (user.showNote) {
+        if (security.showNote) {
             append('\n')
             append("Заметка: ")
-            if (user.note == null) {
+            if (security.note == null) {
                 append("не установлена")
             } else {
-                append(user.note)
+                append(security.note)
             }
         }
     }
 
-    private fun calculateReplayMarkup() = InlineKeyboardMarkup.create(
+    private fun calculateReplayMarkup() = if (security == null) null
+    else InlineKeyboardMarkup.create(
         listOf(
             listOf(
-                ToggleIsActiveCallbackButton.getCallbackData(user.isActive),
+                ToggleIsActiveCallbackButton.getCallbackData(security.ticker, security.isActive),
             ),
             listOf(
-                ToggleRemainActiveCallbackButton.getCallbackData(user.remainActive)
+                ToggleRemainActiveCallbackButton.getCallbackData(security.ticker, security.remainActive)
             ),
             listOf(
-                ToggleShowNoteCallbackButton.getCallbackData(user.showNote)
+                ToggleShowNoteCallbackButton.getCallbackData(security.ticker, security.showNote)
             )
         )
     )

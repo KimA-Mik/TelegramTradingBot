@@ -26,7 +26,7 @@ class ToggleShowNoteCallbackHandler(
         }
 
         val newScreen = securityScreenUpdateUserHandler.handle(user, messageId) {
-            updateShowNote(user, callbackData.newValue)
+            updateShowNote(user, callbackData.ticker, callbackData.newValue)
         }
         emit(newScreen)
     }

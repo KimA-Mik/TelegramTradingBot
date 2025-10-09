@@ -1,22 +1,24 @@
 package presentation.telegram.security.edit.textmodel
 
 import domain.user.model.User
+import domain.user.repository.UserRepository
 import domain.user.usecase.NavigateUserUseCase
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.*
 import presentation.telegram.core.NavigationRoot
 import presentation.telegram.core.TextModel
 import presentation.telegram.core.UiError
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.core.screen.ErrorScreen
+import presentation.telegram.security.list.screen.SecurityHeader
+import presentation.telegram.security.list.screen.SecurityScreen
 import ru.kima.cacheserver.api.api.CacheServerApi
 import ru.kima.cacheserver.api.schema.model.requests.FindSecurityResponse
+import ru.kima.cacheserver.api.schema.model.requests.GetOrderBookRequest
 
 class EditSecurityTextModel(
     private val api: CacheServerApi,
     private val navigateUser: NavigateUserUseCase,
+    private val repository: UserRepository,
     editPriceTextModel: EditPriceTextModel,
     editPercentTextModel: EditPercentTextModel,
     editNoteTextModel: EditNoteTextModel
@@ -28,10 +30,9 @@ class EditSecurityTextModel(
         editPriceTextModel.node.destination to editPriceTextModel
     )
     private val navigationCommands = mapOf<String, TextModel>(
-//        SecurityHeader.Command.Notes.text to editNoteTextModel,
-//        SecurityHeader.Command.Price.text to editPriceTextModel,
-//        SecurityHeader.Command.Percent.text to editPercentTextModel,
-//        SecurityHeader.Command.Ticker.text to editTickerTextModel,
+        SecurityHeader.Command.Notes.text to editNoteTextModel,
+        SecurityHeader.Command.Price.text to editPriceTextModel,
+        SecurityHeader.Command.Percent.text to editPercentTextModel,
     )
 
     override fun executeCommand(
@@ -39,26 +40,41 @@ class EditSecurityTextModel(
         path: List<String>,
         command: String
     ): Flow<BotScreen> = flow {
-        if (command.isBlank()) {
-            val security = user.ticker?.let { ticker ->
-                when (val res = api.findSecurity(ticker)) {
-                    is FindSecurityResponse.Share -> res.share
-                    is FindSecurityResponse.Future -> res.future
-                    else -> null
-                }
-            }
-            val lastPrice = security?.let { api.getOrderBook(GetOrderBookRequest(it.uid)).getOrNull()?.lastPrice }
-            emit(SecurityHeader(user.id))
-            emit(SecurityScreen(user, security, lastPrice))
-            return@flow
-        }
-
-
         if (path.isEmpty()) {
-            emitAll(command(user, command))
+            if (command.isBlank()) {
+                emitScreens(user)
+            } else {
+                emitAll(command(user, command))
+            }
         } else {
             emitAll(passExecution(user, path, command))
         }
+    }
+
+    private suspend fun FlowCollector<BotScreen>.emitScreens(
+        user: User
+    ) {
+        val fullUser = repository.findFullUserById(user.id)
+        if (fullUser == null) {
+            emit(ErrorScreen(user.id, UiError.UnregisteredUserError))
+            return
+        }
+
+        val ticker = user.pathList.last()
+        val security = fullUser.securities.firstOrNull { it.ticker == ticker }
+        if (security == null) {
+            val result = api.findSecurity(ticker)
+            if (result is FindSecurityResponse.Share || result is FindSecurityResponse.Future) {
+                emit(ErrorScreen(user.id, UiError.UnsubscribedToSecurity(ticker)))
+            } else {
+                emit(ErrorScreen(user.id, UiError.UnableToLoadSecurity))
+            }
+            return
+        }
+        val lastPrice = security.let { api.getOrderBook(GetOrderBookRequest(it.uid)).getOrNull()?.lastPrice }
+        emit(SecurityHeader(user.id))
+        emit(SecurityScreen(user, security, lastPrice))
+
     }
 
     private fun passExecution(

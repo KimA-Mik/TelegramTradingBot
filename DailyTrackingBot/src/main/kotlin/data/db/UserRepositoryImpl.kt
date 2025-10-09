@@ -105,19 +105,48 @@ class UserRepositoryImpl(
 
     override suspend fun updateTrackingSecurity(security: TrackingSecurity) = databaseConnector.transactionCatching {
         SecurityEntity.findByIdAndUpdate(security.id) {
-            it.ticker = security.ticker
-            it.name = security.name
-            it.uid = security.uid
-            it.targetPrice = security.targetPrice
-            it.targetDeviation = security.targetDeviation
-            it.isActive = security.isActive
-            it.remainActive = security.remainActive
-            it.note = security.note
-            it.showNote = security.showNote
-            it.shouldNotify = security.shouldNotify
-            it.shouldNotifyRsi = security.shouldNotifyRsi
-            it.type = security.type
+            updateSecurity(it, security)
+//            it.ticker = security.ticker
+//            it.name = security.name
+//            it.uid = security.uid
+//            it.targetPrice = security.targetPrice
+//            it.targetDeviation = security.targetDeviation
+//            it.isActive = security.isActive
+//            it.remainActive = security.remainActive
+//            it.note = security.note
+//            it.showNote = security.showNote
+//            it.shouldNotify = security.shouldNotify
+//            it.shouldNotifyRsi = security.shouldNotifyRsi
+//            it.type = security.type
         }!!.toTrackingSecurity()
+    }
+
+    override suspend fun updateTrackingSecurities(
+        securities: List<TrackingSecurity>
+    ): Result<List<TrackingSecurity>> = databaseConnector.transactionCatching {
+        val result = mutableListOf<TrackingSecurity>()
+        securities.forEach { security ->
+            val newSecurity = SecurityEntity.findByIdAndUpdate(security.id) {
+                updateSecurity(it, security)
+            }!!.toTrackingSecurity()
+            result.add(newSecurity)
+        }
+        return@transactionCatching result
+    }
+
+    private fun updateSecurity(entity: SecurityEntity, security: TrackingSecurity) {
+        entity.ticker = security.ticker
+        entity.name = security.name
+        entity.uid = security.uid
+        entity.targetPrice = security.targetPrice
+        entity.targetDeviation = security.targetDeviation
+        entity.isActive = security.isActive
+        entity.remainActive = security.remainActive
+        entity.note = security.note
+        entity.showNote = security.showNote
+        entity.shouldNotify = security.shouldNotify
+        entity.shouldNotifyRsi = security.shouldNotifyRsi
+        entity.type = security.type
     }
 
     override suspend fun deleteTrackingSecurity(id: Long) {

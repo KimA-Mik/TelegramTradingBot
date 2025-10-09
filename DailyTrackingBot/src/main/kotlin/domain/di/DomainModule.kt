@@ -28,6 +28,5 @@ fun domainModule() = module {
     singleOf(::UpdatePercentUseCase)
     singleOf(::UpdateRemainActiveUseCase)
     singleOf(::UpdateShowNoteUseCase)
-    singleOf(::UpdateTickerUseCase)
     singleOf(::UserToRootUseCase)
 }

@@ -47,10 +47,8 @@ class SecurityListScreen(
 
             append(securityIndex, ". ", inlineSecurityUrl, ": ", security.name, " — ")
 
-            if (security.targetPrice != null) {
-                append(security.targetPrice.formatToRu(), "₽")
-                append(" (±", security.targetDeviation?.formatToRu() ?: "0", "%)")
-            }
+            append(security.targetPrice.formatToRu(), "₽")
+            append(" (±", security.targetDeviation.formatToRu(), "%)")
 
             append(' ')
             append(if (security.isActive) "✅" else "❌", "\n")
