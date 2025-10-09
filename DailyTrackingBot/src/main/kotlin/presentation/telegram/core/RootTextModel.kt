@@ -21,7 +21,7 @@ class RootTextModel(
     )
     private val navigationCommands = mapOf<String, TextModel>(
         Root.Commands.Search.text to searchSecurityTextModel,
-        Root.Commands.Security.text to securityListTextModel
+        Root.Commands.Securities.text to securityListTextModel
     )
 
     override fun executeCommand(user: User, path: List<String>, command: String) = flow {
