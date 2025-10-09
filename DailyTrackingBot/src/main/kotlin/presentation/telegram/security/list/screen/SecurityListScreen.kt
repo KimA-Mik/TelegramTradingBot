@@ -32,9 +32,6 @@ class SecurityListScreen(
             return@buildString
         }
 
-        appendLine("*Отслеживаемые бумаги:*")
-        appendLine()
-
         securities.forEachIndexed { index, security ->
             val securityIndex = pageSize * (page - 1) + index + 1
             val inlineSecurityUrl = MarkdownUtil.inlineUrl(
@@ -58,7 +55,7 @@ class SecurityListScreen(
 
         if (totalPages > 1) {
             appendLine()
-            append("Страница", page + 1, " из ", totalPages)
+            append("Страница ", page, " из ", totalPages)
         }
     }
 

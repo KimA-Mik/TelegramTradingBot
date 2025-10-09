@@ -13,7 +13,7 @@ import presentation.telegram.core.UiError
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.core.screen.ErrorScreen
 import presentation.telegram.security.edit.textmodel.EditSecurityTextModel
-import presentation.telegram.security.list.screen.SecurityHeader
+import presentation.telegram.security.list.screen.SecurityListHeader
 import presentation.telegram.security.list.screen.SecurityListScreen
 
 class SecurityListTextModel(
@@ -56,7 +56,7 @@ class SecurityListTextModel(
                 )
             }
 
-            emit(SecurityHeader(user.id))
+            emit(SecurityListHeader(user.id))
             emit(screen)
             return@flow
         }

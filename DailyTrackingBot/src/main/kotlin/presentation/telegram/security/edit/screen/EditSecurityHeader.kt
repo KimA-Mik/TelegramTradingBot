@@ -1,11 +1,11 @@
-package presentation.telegram.security.list.screen
+package presentation.telegram.security.edit.screen
 
 import com.github.kotlintelegrambot.entities.KeyboardReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.KeyboardButton
 import presentation.telegram.core.DefaultCommands
 import presentation.telegram.core.screen.BotScreen
 
-class SecurityHeader(id: Long) : BotScreen(id) {
+class EditSecurityHeader(id: Long) : BotScreen(id) {
     override val text = "Ваши бумаги:"
     override val replyMarkup = _replayMarkup
 

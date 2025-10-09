@@ -9,7 +9,8 @@ import presentation.telegram.core.TextModel
 import presentation.telegram.core.UiError
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.core.screen.ErrorScreen
-import presentation.telegram.security.list.screen.SecurityHeader
+import presentation.telegram.security.edit.screen.EditSecurityHeader
+import presentation.telegram.security.list.screen.SecurityListHeader
 import presentation.telegram.security.list.screen.SecurityScreen
 import ru.kima.cacheserver.api.api.CacheServerApi
 import ru.kima.cacheserver.api.schema.model.requests.FindSecurityResponse
@@ -30,9 +31,9 @@ class EditSecurityTextModel(
         editPriceTextModel.node.destination to editPriceTextModel
     )
     private val navigationCommands = mapOf<String, TextModel>(
-        SecurityHeader.Command.Notes.text to editNoteTextModel,
-        SecurityHeader.Command.Price.text to editPriceTextModel,
-        SecurityHeader.Command.Percent.text to editPercentTextModel,
+        EditSecurityHeader.Command.Notes.text to editNoteTextModel,
+        EditSecurityHeader.Command.Price.text to editPriceTextModel,
+        EditSecurityHeader.Command.Percent.text to editPercentTextModel,
     )
 
     override fun executeCommand(
@@ -72,7 +73,7 @@ class EditSecurityTextModel(
             return
         }
         val lastPrice = security.let { api.getOrderBook(GetOrderBookRequest(it.uid)).getOrNull()?.lastPrice }
-        emit(SecurityHeader(user.id))
+        emit(SecurityListHeader(user.id))
         emit(SecurityScreen(user, security, lastPrice))
 
     }
