@@ -13,7 +13,12 @@ sealed class UiError {
     }
 
     class UnknownCommand(val command: String) : UiError() {
-        override fun render() = "Неизвестная команда: $command"
+        override fun render() =
+            "Неизвестная команда: $command, eсли потерялись нажмите /$HOME_COMMAND, чтобы вернуться в главное меню"
+
+        companion object {
+            const val HOME_COMMAND: String = "Home"
+        }
     }
 
     class TextError(val text: String) : UiError() {
@@ -31,5 +36,13 @@ sealed class UiError {
 
     object BrokenCallbackButton : UiError() {
         override fun render() = "Похоже эта кнопка сломана"
+    }
+
+    class UnsubscribedToSecurity(val ticker: String) : UiError() {
+        override fun render() = "Вы не подписаны на $ticker"
+    }
+
+    object UnableToLoadSecurity : UiError() {
+        override fun render() = "Не удалось загрузить информацию о ценной бумаге"
     }
 }

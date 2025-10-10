@@ -10,7 +10,7 @@ import kotlin.time.Instant
 data class Future @OptIn(ExperimentalTime::class) constructor(
     override val uid: String = String(),
     override val ticker: String = String(),
-    val name: String = String(),
+    override val name: String = String(),
     val lot: Int = 0,
     val expirationDate: Instant
 ) : Security()

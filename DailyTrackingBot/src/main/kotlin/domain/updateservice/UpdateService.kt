@@ -1,7 +1,8 @@
 package domain.updateservice
 
 import domain.updateservice.indicators.IndicatorsCache
-import domain.user.model.User
+import domain.user.model.FullUser
+import domain.user.model.TrackingSecurity
 import domain.user.repository.UserRepository
 import domain.util.DateUtil
 import domain.util.MathUtil
@@ -14,6 +15,7 @@ import kotlinx.datetime.LocalTime
 import kotlinx.datetime.toLocalDateTime
 import org.slf4j.LoggerFactory
 import ru.kima.cacheserver.api.api.CacheServerApi
+import ru.kima.cacheserver.api.schema.model.LastPrice
 import ru.kima.cacheserver.api.schema.model.Security
 import ru.kima.cacheserver.api.schema.model.requests.GetLastPricesRequest
 import ru.kima.cacheserver.api.schema.model.requests.InstrumentsRequest
@@ -85,15 +87,15 @@ class UpdateService(
     }
 
     suspend fun checkForUpdates() {
-        val users = repository.getAllUsers()
+        val users = repository.getFullUsers()
         val securities = getSecurities(users)
         handleUsers(users, securities)
     }
 
-    private suspend fun getSecurities(users: List<User>): Map<String, Security> = coroutineScope {
+    private suspend fun getSecurities(users: List<FullUser>): Map<String, Security> = coroutineScope {
         val sharesDeferred = async { cacheServerApi.tradableShares(InstrumentsRequest.default) }
         val futuresDeferred = async { cacheServerApi.tradableFutures(InstrumentsRequest.default) }
-        val tickers = users.map { it.ticker }.toSet()
+        val tickers = users.flatMap { it.securities }.map { it.ticker }.toSet()
 
         val shares = sharesDeferred.await().getOrElse {
             logger.error(it.message)
@@ -110,27 +112,39 @@ class UpdateService(
     }
 
     @OptIn(ExperimentalTime::class)
-    private suspend fun handleUsers(users: List<User>, securities: Map<String, Security>) {
+    private suspend fun handleUsers(users: List<FullUser>, securities: Map<String, Security>) {
         val indicatorsCache = IndicatorsCache(cacheServerApi)
         val uids = securities.values.map { it.uid }
         val lastPrices = cacheServerApi.lastPrices(GetLastPricesRequest.default(uids))
             .getOrElse { return }.associateBy { it.uid }
+        val toUpdate = mutableListOf<TrackingSecurity>()
         for (user in users) {
-            var currentUser = user
-            if (!user.isActive) continue
-            if (user.ticker == null) continue
-            if (user.targetPrice == null) continue
-            if (user.targetDeviation == null) continue
-            val security = securities[user.ticker] ?: continue
+            handleUser(user, lastPrices, indicatorsCache, toUpdate)
+        }
+
+        if (toUpdate.isNotEmpty()) {
+            repository.updateTrackingSecurities(toUpdate)
+        }
+    }
+
+    private suspend fun handleUser(
+        user: FullUser,
+        lastPrices: Map<String, LastPrice>,
+        indicatorsCache: IndicatorsCache,
+        outTrackingSecurities: MutableList<TrackingSecurity>
+    ) {
+        for (security in user.securities) {
+            if (!security.isActive) continue
+            var currentSecurity = security
             val lastPrice = lastPrices[security.uid]?.price ?: continue
 
-            val currentDeviation = MathUtil.absolutePercentageDifference(lastPrice, user.targetPrice)
-            val shouldNotify = currentDeviation < user.targetDeviation
+            val currentDeviation = MathUtil.absolutePercentageDifference(lastPrice, currentSecurity.targetPrice)
+            val shouldNotify = currentDeviation < security.targetDeviation
             val indicators = indicatorsCache[security.uid]
-            if (shouldNotify && user.shouldNotify) {
+            if (shouldNotify && currentSecurity.shouldNotify) {
                 _updates.emit(
                     TelegramUpdate.PriceAlert(
-                        user = user,
+                        user = user.user,
                         security = security,
                         currentPrice = lastPrice,
                         currentDeviation = currentDeviation,
@@ -138,18 +152,18 @@ class UpdateService(
                     )
                 )
 
-                currentUser = repository.updateUser(currentUser.copy(shouldNotify = false)) ?: continue
-            } else if (!shouldNotify && !currentUser.shouldNotify) {
-                currentUser = repository.updateUser(currentUser.copy(shouldNotify = true)) ?: continue
+                currentSecurity = security.copy(shouldNotify = false)
+            } else if (!shouldNotify && !currentSecurity.shouldNotify) {
+                currentSecurity = security.copy(shouldNotify = true)
             }
 
             if (indicators == null) continue
             val rsi = indicators.min15Rsi
             val shouldNotifyRsi = rsi <= MathUtil.RSI_LOW || rsi >= MathUtil.RSI_HIGH
-            if (shouldNotifyRsi && currentUser.shouldNotifyRsi) {
+            if (shouldNotifyRsi && currentSecurity.shouldNotifyRsi) {
                 _updates.emit(
                     TelegramUpdate.RsiAlert(
-                        user = user,
+                        user = user.user,
                         security = security,
                         currentPrice = lastPrice,
                         currentRsi = rsi,
@@ -157,31 +171,15 @@ class UpdateService(
                     )
                 )
 
-                currentUser = repository.updateUser(currentUser.copy(shouldNotifyRsi = false)) ?: continue
-            } else if (!shouldNotifyRsi && !currentUser.shouldNotifyRsi) {
-                currentUser = repository.updateUser(currentUser.copy(shouldNotifyRsi = true)) ?: continue
+                currentSecurity = security.copy(shouldNotifyRsi = false)
+            } else if (!shouldNotifyRsi && !currentSecurity.shouldNotifyRsi) {
+                currentSecurity = security.copy(shouldNotify = true)
+            }
+
+            if (currentSecurity != security) {
+                outTrackingSecurities.add(currentSecurity)
             }
         }
-    }
-
-    fun User.skip(): Boolean {
-        if (!isActive) return true
-        if (ticker == null) return true
-        if (targetPrice == null) return true
-        if (targetDeviation == null) return true
-        return false
-
-//        val now = Clock.System.now().toLocalDateTime(DateUtil.timezoneMoscow)
-//        if (now.dayOfWeek in weekends) {
-//            return true
-//        }
-//        if (now.hour < 10 || (now.hour == 10 && now.minute < 0)) {
-//            return true
-//        }
-//        if (now.hour > 19 || (now.hour == 19 && now.minute > 0)) {
-//            return true
-//        }
-//        return false
     }
 
     @OptIn(ExperimentalTime::class)
@@ -189,16 +187,18 @@ class UpdateService(
         val currentTime = Clock.System.now().toLocalDateTime(DateUtil.timezoneMoscow).time
         if (currentTime < LocalTime(23, 50)) return
 
-        val users = repository.getAllUsers()
+        val users = repository.getFullUsers()
+        val toUpdate = mutableListOf<TrackingSecurity>()
         for (user in users) {
-            if (!user.isActive) continue
-            if (user.ticker == null) continue
-            if (user.targetPrice == null) continue
-            if (user.targetDeviation == null) continue
-
-            if (!user.remainActive) {
-                repository.updateUser(user.copy(isActive = false, shouldNotify = true))
+            for (security in user.securities) {
+                if (!security.isActive) continue
+                if (!security.remainActive) {
+                    toUpdate.add(
+                        security.copy(isActive = false, shouldNotify = true, shouldNotifyRsi = true)
+                    )
+                }
             }
         }
+        repository.updateTrackingSecurities(toUpdate)
     }
 }

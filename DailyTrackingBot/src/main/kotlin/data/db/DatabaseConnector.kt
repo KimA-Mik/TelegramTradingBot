@@ -17,4 +17,7 @@ class DatabaseConnector {
     suspend fun <T> transaction(block: suspend Transaction.() -> T): T =
         newSuspendedTransaction(Dispatchers.IO, db = connection) { block() }
 
+    suspend fun <T> transactionCatching(block: suspend Transaction.() -> T): Result<T> =
+        runCatching { transaction { block() } }
+
 }

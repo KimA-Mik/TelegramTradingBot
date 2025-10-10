@@ -9,6 +9,6 @@ import kotlinx.serialization.Serializable
 data class Share(
     override val uid: String = String(),
     override val ticker: String = String(),
-    val name: String = String(),
+    override val name: String = String(),
     val lot: Int = 0
 ) : Security()

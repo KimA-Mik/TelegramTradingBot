@@ -8,21 +8,38 @@ import presentation.telegram.core.CallbackButtonHandler
 import presentation.telegram.core.UiError
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.core.screen.ErrorScreen
-import presentation.telegram.security.callbackbutton.*
+import presentation.telegram.security.edit.callbackbutton.*
+import presentation.telegram.security.list.callbackbutton.*
+import presentation.telegram.security.search.callbackbutton.*
 
 class CallbackHandler(
-    /* Security screen */
+    /* Ticker search screen */
     tickerSuggestionCallbackHandler: TickerSuggestionCallbackHandler,
+    subscribeToSecurityCallbackHandler: SubscribeToSecurityCallbackHandler,
+    unsubscribeFromSecurityCallbackHandler: UnsubscribeFromSecurityCallbackHandler,
+    /* Security screen */
     toggleIsActiveCallbackHandler: ToggleIsActiveCallbackHandler,
     toggleRemainActiveCallbackHandler: ToggleRemainActiveCallbackHandler,
     toggleShowNoteCallbackHandler: ToggleShowNoteCallbackHandler,
+    /* Security list screen */
+    editSecurityCallbackButtonHandler: EditSecurityCallbackButtonHandler,
+    securitiesListBackwardCallbackButtonHandler: SecuritiesListBackwardCallbackButtonHandler,
+    securitiesListForwardCallbackButtonHandler: SecuritiesListForwardCallbackButtonHandler,
     private val findUser: FindUserUseCase
 ) {
     private val buttonHandlers = mapOf(
+        /* Ticker search screen */
         TickerSuggestionCallbackButton.callbackName to tickerSuggestionCallbackHandler,
+        SubscribeToSecurityCallbackButton.callbackName to subscribeToSecurityCallbackHandler,
+        UnsubscribeFromSecurityCallbackButton.callbackName to unsubscribeFromSecurityCallbackHandler,
+        /* Security screen */
         ToggleIsActiveCallbackButton.callbackName to toggleIsActiveCallbackHandler,
         ToggleRemainActiveCallbackButton.callbackName to toggleRemainActiveCallbackHandler,
-        ToggleShowNoteCallbackButton.callbackName to toggleShowNoteCallbackHandler
+        ToggleShowNoteCallbackButton.callbackName to toggleShowNoteCallbackHandler,
+        /* Security list screen */
+        EditSecurityCallbackButton.callbackName to editSecurityCallbackButtonHandler,
+        SecuritiesListBackwardCallbackButton.callbackName to securitiesListBackwardCallbackButtonHandler,
+        SecuritiesListForwardCallbackButton.callbackName to securitiesListForwardCallbackButtonHandler
     )
 
     private val _outFlow = MutableSharedFlow<BotScreen>()

@@ -34,6 +34,20 @@ class BotModel(
         updateHandler.outScreens
     )
 
+    suspend fun homeCommand(userId: Long) {
+        val userResource = findUser(userId)
+        val user = if (userResource.isSuccess) {
+            userResource.getOrNull()!!
+        } else {
+            val screen = ErrorScreen(userId, UiError.UnregisteredUserError)
+            _outMessages.emit(screen)
+            return
+        }
+
+        userToRoot(user)
+        _outMessages.emit(Root(user.id))
+    }
+
     suspend fun dispatchStartMessage(sender: Long) {
         val result = registerUser(sender)
         val registered = if (result.isSuccess) {

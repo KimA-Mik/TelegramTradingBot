@@ -4,8 +4,8 @@ import domain.updateservice.TelegramUpdate
 import domain.updateservice.UpdateService
 import kotlinx.coroutines.flow.mapNotNull
 import presentation.telegram.core.screen.BotScreen
-import presentation.telegram.security.screen.update.PriceAlertScreen
-import presentation.telegram.security.screen.update.RsiAlertScreen
+import presentation.telegram.security.update.PriceAlertScreen
+import presentation.telegram.security.update.RsiAlertScreen
 
 class UpdateHandler(
     service: UpdateService

@@ -10,6 +10,7 @@ import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
+import presentation.telegram.core.UiError
 
 
 class TelegramBot(
@@ -40,6 +41,11 @@ class TelegramBot(
                     bot.sendMessage(chatId = ChatId.fromId(message.chat.id), text = "Stopping bot")
                     onStop()
 //                    update.consume()
+                }
+
+                command(UiError.UnknownCommand.HOME_COMMAND) {
+                    model.homeCommand(message.chat.id)
+                    update.consume()
                 }
 
                 text {
