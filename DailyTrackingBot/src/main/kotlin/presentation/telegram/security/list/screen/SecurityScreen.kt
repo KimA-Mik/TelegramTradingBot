@@ -15,7 +15,7 @@ import presentation.telegram.security.edit.callbackbutton.ToggleShowNoteCallback
 import presentation.util.TelegramUtil
 
 class SecurityScreen(
-    private val user: User,
+    user: User,
     private val security: TrackingSecurity?,
     private val lastPrice: Double?,
     messageId: Long? = null
@@ -31,7 +31,6 @@ class SecurityScreen(
             return@buildString
         }
 
-        append("Бумага: ")
         when (security.type) {
             FUTURE -> append("Фьючерс \"${security.name}\" (${TelegramUtil.clickableTrackingSecurity(security)})")
             SHARE -> append("Акция \"${security.name}\" (${TelegramUtil.clickableTrackingSecurity(security)})")
