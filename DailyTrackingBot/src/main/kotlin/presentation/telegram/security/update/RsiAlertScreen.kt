@@ -6,6 +6,7 @@ import domain.common.formatToRu
 import domain.updateservice.TelegramUpdate
 import domain.user.model.SecurityType
 import presentation.telegram.core.screen.BotScreen
+import presentation.util.PresentationUtil
 import presentation.util.TelegramUtil
 
 class RsiAlertScreen(
@@ -29,11 +30,14 @@ class RsiAlertScreen(
             appendLine("*Индикаторы:*")
             appendLine("*RSI (1ч):* ${ind.hourlyRsi.formatToRu()}")
             appendLine("*RSI (1д):* ${ind.dailyRsi.formatToRu()}")
-            append("*BB (15м):* верхняя: ${ind.min15bb.upper.formatToRu()}, ")
+            var bbColor = PresentationUtil.markupBbColor(ind.min15bb.middle, ind.min15bb.lower, ind.min15bb.upper)
+            append("*BB (15м) $bbColor:* верхняя: ${ind.min15bb.upper.formatToRu()}, ")
             appendLine("нижняя: ${ind.min15bb.lower.formatToRu()}")
-            append("*BB (1ч):* верхняя: ${ind.hourlyBb.upper.formatToRu()}, ")
+            bbColor = PresentationUtil.markupBbColor(ind.hourlyBb.middle, ind.hourlyBb.lower, ind.hourlyBb.upper)
+            append("*BB (1ч) $bbColor:* верхняя: ${ind.hourlyBb.upper.formatToRu()}, ")
             appendLine("нижняя: ${ind.hourlyBb.lower.formatToRu()}")
-            append("*BB (1д):* верхняя: ${ind.dailyBb.upper.formatToRu()}, ")
+            bbColor = PresentationUtil.markupBbColor(ind.dailyBb.middle, ind.dailyBb.lower, ind.dailyBb.upper)
+            append("*BB (1д) $bbColor:* верхняя: ${ind.dailyBb.upper.formatToRu()}, ")
             appendLine("нижняя: ${ind.dailyBb.lower.formatToRu()}")
         }
         update.security.note?.takeIf { it.isNotBlank() }?.let {
