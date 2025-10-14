@@ -1,21 +1,17 @@
 package presentation.util
 
-import domain.common.formatToRu
 import domain.util.MathUtil
 
 object PresentationUtil {
     const val GREEN = "🟢"
     const val RED = "🔴"
     const val YELLOW = "🟡"
-    fun renderRsi(value: Double) = buildString {
-        append(value.formatToRu())
-        append(' ')
-        if (value >= MathUtil.RSI_HIGH) {
-            append(GREEN)
-        } else if (value <= MathUtil.RSI_LOW) {
-            append(RED)
-        } else {
-            append(YELLOW)
+
+    fun rsiColor(value: Double): String {
+        return when {
+            value >= MathUtil.RSI_HIGH -> GREEN
+            value <= MathUtil.RSI_LOW -> RED
+            else -> YELLOW
         }
     }
 
