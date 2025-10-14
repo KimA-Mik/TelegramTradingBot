@@ -171,9 +171,9 @@ class UpdateService(
                     )
                 )
 
-                currentSecurity = security.copy(shouldNotifyRsi = false)
+                currentSecurity = currentSecurity.copy(shouldNotifyRsi = false)
             } else if (!shouldNotifyRsi && !currentSecurity.shouldNotifyRsi) {
-                currentSecurity = security.copy(shouldNotify = true)
+                currentSecurity = currentSecurity.copy(shouldNotifyRsi = true)
             }
 
             if (currentSecurity != security) {
