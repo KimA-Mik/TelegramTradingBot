@@ -13,6 +13,7 @@ class SecurityEntity(id: EntityID<Long>) : LongEntity(id) {
     var name by Securities.name
     var uid by Securities.uid
     var targetPrice by Securities.targetPrice
+    var lowTargetPrice by Securities.lowTargetPrice
     var targetDeviation by Securities.targetDeviations
     var isActive by Securities.isActive
     var remainActive by Securities.remainActive

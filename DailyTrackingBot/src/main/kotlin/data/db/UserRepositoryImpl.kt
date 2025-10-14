@@ -92,6 +92,7 @@ class UserRepositoryImpl(
             name = security.name
             uid = security.uid
             targetPrice = security.targetPrice
+            lowTargetPrice = security.lowTargetPrice
             targetDeviation = security.targetDeviation
             isActive = security.isActive
             remainActive = security.remainActive
@@ -139,6 +140,7 @@ class UserRepositoryImpl(
         entity.name = security.name
         entity.uid = security.uid
         entity.targetPrice = security.targetPrice
+        entity.lowTargetPrice = security.lowTargetPrice
         entity.targetDeviation = security.targetDeviation
         entity.isActive = security.isActive
         entity.remainActive = security.remainActive

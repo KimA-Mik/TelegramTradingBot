@@ -11,22 +11,19 @@ class EditSecurityHeader(id: Long) : BotScreen(id) {
 
     enum class Command(val text: String) {
         Notes("Редактировать заметку"),
-        Price("Редактировать желаемую цену"),
+        Price("Цена продажи"),
+        LowPrice("Цена покупки"),
         Percent("Редактировать процент расхождения"),
     }
 
     companion object {
         private val _replayMarkup = KeyboardReplyMarkup(
-            buildList {
-                Command.entries.forEach {
-                    add(
-                        listOf(KeyboardButton(it.text))
-                    )
-                }
-                add(
-                    listOf(KeyboardButton(DefaultCommands.Pop.text))
-                )
-            },
+            listOf(
+                listOf(KeyboardButton(Command.Notes.text)),
+                listOf(KeyboardButton(Command.Price.text), KeyboardButton(Command.LowPrice.text)),
+                listOf(KeyboardButton(Command.Percent.text)),
+                listOf(KeyboardButton(DefaultCommands.Pop.text))
+            ),
             resizeKeyboard = true
         )
     }

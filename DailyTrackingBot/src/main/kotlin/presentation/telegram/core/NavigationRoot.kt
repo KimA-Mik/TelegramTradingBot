@@ -6,6 +6,7 @@ object NavigationRoot : NavigationGraphNode("") {
     object SecurityList : NavigationGraphNode("security_list") {
         object SecurityDetails : NavigationGraphNode("security_details") {
             object EditPrice : NavigationGraphNode("edit_price")
+            object EditLowPrice : NavigationGraphNode("edit_low_price")
             object EditNote : NavigationGraphNode("edit_note")
             object EditPercentage : NavigationGraphNode("edit_percentage")
         }

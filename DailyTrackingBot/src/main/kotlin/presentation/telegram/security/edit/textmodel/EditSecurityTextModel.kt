@@ -20,6 +20,7 @@ class EditSecurityTextModel(
     private val navigateUser: NavigateUserUseCase,
     private val repository: UserRepository,
     editPriceTextModel: EditPriceTextModel,
+    editLowPriceTextModel: EditLowPriceTextModel,
     editPercentTextModel: EditPercentTextModel,
     editNoteTextModel: EditNoteTextModel
 ) : TextModel {
@@ -27,11 +28,13 @@ class EditSecurityTextModel(
     private val textModels = mapOf(
         editNoteTextModel.node.destination to editNoteTextModel,
         editPercentTextModel.node.destination to editPercentTextModel,
-        editPriceTextModel.node.destination to editPriceTextModel
+        editPriceTextModel.node.destination to editPriceTextModel,
+        editLowPriceTextModel.node.destination to editLowPriceTextModel,
     )
     private val navigationCommands = mapOf<String, TextModel>(
         EditSecurityHeader.Command.Notes.text to editNoteTextModel,
         EditSecurityHeader.Command.Price.text to editPriceTextModel,
+        EditSecurityHeader.Command.LowPrice.text to editLowPriceTextModel,
         EditSecurityHeader.Command.Percent.text to editPercentTextModel,
     )
 

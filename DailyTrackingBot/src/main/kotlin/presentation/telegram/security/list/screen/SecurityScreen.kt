@@ -42,13 +42,14 @@ class SecurityScreen(
             appendLine()
         }
 
-        append("Текущая отслеживаемая ценa: ")
-        append("*${security.targetPrice.formatToRu()}$ROUBLE_SIGN*")
+        append("Текущая ценa продажи: ")
+        appendLine("*${security.targetPrice.formatToRu()}$ROUBLE_SIGN*")
+        append("Текущая ценa покупки: ")
+        appendLine("*${security.lowTargetPrice.formatToRu()}$ROUBLE_SIGN*")
 
-        append(" с отклонением ")
-        append("*${security.targetDeviation.formatToRu()}%*")
+        append("Отклонение для срабатывания сигнала: ")
+        appendLine("*${security.targetDeviation.formatToRu()}%*")
 
-        append('\n')
         append("Отслеживание: ")
         if (security.isActive) {
             appendLine("*включено*")
