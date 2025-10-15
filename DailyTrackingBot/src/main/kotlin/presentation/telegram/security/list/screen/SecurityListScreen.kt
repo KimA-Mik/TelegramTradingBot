@@ -3,6 +3,7 @@ package presentation.telegram.security.list.screen
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.entities.ReplyMarkup
+import domain.common.ROUBLE_SIGN
 import domain.common.formatToRu
 import domain.user.model.SecurityType
 import domain.user.model.TrackingSecurity
@@ -44,7 +45,11 @@ class SecurityListScreen(
 
             append(securityIndex, ". ", inlineSecurityUrl, ": ", security.name, " — ")
 
-            append(security.targetPrice.formatToRu(), "₽")
+            append(
+                security.lowTargetPrice.formatToRu(), ROUBLE_SIGN,
+                " - ",
+                security.targetPrice.formatToRu(), ROUBLE_SIGN
+            )
             append(" (±", security.targetDeviation.formatToRu(), "%)")
 
             append(' ')

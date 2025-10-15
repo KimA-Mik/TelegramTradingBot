@@ -1,5 +1,6 @@
 package domain.updateservice
 
+import domain.updateservice.indicators.CacheEntry
 import domain.updateservice.indicators.IndicatorsCache
 import domain.user.model.FullUser
 import domain.user.model.TrackingSecurity
@@ -135,51 +136,81 @@ class UpdateService(
     ) {
         for (security in user.securities) {
             if (!security.isActive) continue
-            var currentSecurity = security
             val lastPrice = lastPrices[security.uid]?.price ?: continue
-
-            val currentDeviation = MathUtil.absolutePercentageDifference(lastPrice, currentSecurity.targetPrice)
-            val shouldNotify = currentDeviation < security.targetDeviation
             val indicators = indicatorsCache[security.uid]
-            if (shouldNotify && currentSecurity.shouldNotify) {
-                _updates.emit(
-                    TelegramUpdate.PriceAlert(
-                        user = user.user,
-                        security = security,
-                        currentPrice = lastPrice,
-                        currentDeviation = currentDeviation,
-                        indicators = indicators
-                    )
-                )
 
-                currentSecurity = security.copy(shouldNotify = false)
-            } else if (!shouldNotify && !currentSecurity.shouldNotify) {
-                currentSecurity = security.copy(shouldNotify = true)
-            }
-
-            if (indicators == null) continue
-            val rsi = indicators.min15Rsi
-            val shouldNotifyRsi = rsi <= MathUtil.RSI_LOW || rsi >= MathUtil.RSI_HIGH
-            if (shouldNotifyRsi && currentSecurity.shouldNotifyRsi) {
-                _updates.emit(
-                    TelegramUpdate.RsiAlert(
-                        user = user.user,
-                        security = security,
-                        currentPrice = lastPrice,
-                        currentRsi = rsi,
-                        indicators = indicators
-                    )
-                )
-
-                currentSecurity = security.copy(shouldNotifyRsi = false)
-            } else if (!shouldNotifyRsi && !currentSecurity.shouldNotifyRsi) {
-                currentSecurity = security.copy(shouldNotify = true)
-            }
+            var currentSecurity = handlePrice(user, security, indicators, lastPrice)
+            currentSecurity = handleRsi(user, currentSecurity, indicators, lastPrice)
 
             if (currentSecurity != security) {
                 outTrackingSecurities.add(currentSecurity)
             }
         }
+    }
+
+    private suspend fun handlePrice(
+        user: FullUser,
+        security: TrackingSecurity,
+        indicators: CacheEntry?,
+        lastPrice: Double
+    ): TrackingSecurity {
+        val currentDeviation = MathUtil.absolutePercentageDifference(lastPrice, security.targetPrice)
+        val currentLowDeviation = MathUtil.absolutePercentageDifference(lastPrice, security.lowTargetPrice)
+        val shouldNotify = currentDeviation < security.targetDeviation
+        val shouldNotifyLow = currentLowDeviation < security.targetDeviation
+        if ((shouldNotifyLow || shouldNotify) && security.shouldNotify) {
+            _updates.emit(
+                TelegramUpdate.PriceAlert(
+                    user = user.user,
+                    security = security,
+                    currentPrice = lastPrice,
+                    indicators = indicators,
+                    type = when {
+                        shouldNotify && shouldNotifyLow -> TelegramUpdate.PriceAlert.PriceType.All(
+                            deviation = currentDeviation,
+                            lowDeviation = currentLowDeviation
+                        )
+
+                        shouldNotify -> TelegramUpdate.PriceAlert.PriceType.Target(currentDeviation)
+                        else -> TelegramUpdate.PriceAlert.PriceType.LowTarget(currentLowDeviation)
+                    }
+                )
+            )
+
+            return security.copy(shouldNotify = false)
+        } else if (!shouldNotify && !shouldNotifyLow && !security.shouldNotify) {
+            return security.copy(shouldNotify = true)
+        }
+
+        return security
+    }
+
+    private suspend fun handleRsi(
+        user: FullUser,
+        security: TrackingSecurity,
+        indicators: CacheEntry?,
+        lastPrice: Double,
+    ): TrackingSecurity {
+        if (indicators == null) return security
+        val rsi = indicators.min15Rsi
+        val shouldNotifyRsi = rsi <= MathUtil.RSI_LOW || rsi >= MathUtil.RSI_HIGH
+        if (shouldNotifyRsi && security.shouldNotifyRsi) {
+            _updates.emit(
+                TelegramUpdate.RsiAlert(
+                    user = user.user,
+                    security = security,
+                    currentPrice = lastPrice,
+                    currentRsi = rsi,
+                    indicators = indicators
+                )
+            )
+
+            return security.copy(shouldNotifyRsi = false)
+        } else if (!shouldNotifyRsi && !security.shouldNotifyRsi) {
+            return security.copy(shouldNotifyRsi = true)
+        }
+
+        return security
     }
 
     @OptIn(ExperimentalTime::class)

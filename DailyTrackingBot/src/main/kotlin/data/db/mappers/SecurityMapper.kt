@@ -9,6 +9,7 @@ fun SecurityEntity.toTrackingSecurity() = TrackingSecurity(
     name = name,
     uid = uid,
     targetPrice = targetPrice,
+    lowTargetPrice = lowTargetPrice,
     targetDeviation = targetDeviation,
     isActive = isActive,
     remainActive = remainActive,

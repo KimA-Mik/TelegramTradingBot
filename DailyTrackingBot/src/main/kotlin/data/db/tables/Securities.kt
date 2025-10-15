@@ -10,6 +10,7 @@ object Securities : LongIdTable("security") {
     val name = varchar(name = "name", length = 128)
     val uid = varchar(name = "uid", length = 64)
     val targetPrice = double(name = "target_rice")
+    val lowTargetPrice = double(name = "low_target_rice").default(0.0)
     val targetDeviations = double(name = "target_deviations")
     val isActive = bool(name = "is_active").default(false)
     val remainActive = bool(name = "remain_active").default(false)

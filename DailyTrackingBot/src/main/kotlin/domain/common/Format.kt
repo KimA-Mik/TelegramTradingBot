@@ -5,7 +5,7 @@ import java.text.DecimalFormatSymbols
 import java.util.*
 
 private val df = DecimalFormat(
-    "#,##0.##",
+    "#,##0.####",
     DecimalFormatSymbols(Locale.Builder().setLanguage("ru").setRegion("RU").build())
 )
 

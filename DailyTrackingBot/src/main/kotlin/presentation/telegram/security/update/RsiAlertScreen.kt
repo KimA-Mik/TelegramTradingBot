@@ -6,6 +6,7 @@ import domain.common.formatToRu
 import domain.updateservice.TelegramUpdate
 import domain.user.model.SecurityType
 import presentation.telegram.core.screen.BotScreen
+import presentation.util.PresentationUtil
 import presentation.util.TelegramUtil
 
 class RsiAlertScreen(
@@ -23,18 +24,24 @@ class RsiAlertScreen(
             SecurityType.SHARE -> appendLine("*Акция:* ${TelegramUtil.clickableTrackingSecurity(update.security)} — (${update.security.name})")
         }
         appendLine("*Текущая цена:* ${update.currentPrice.formatToRu()}$ROUBLE_SIGN")
-        appendLine("*Текущий RSI:* ${update.currentRsi.formatToRu()}")
+        appendLine("*${PresentationUtil.rsiColor(update.currentRsi)}Текущий RSI:* ${update.currentRsi.formatToRu()}")
         update.indicators?.let { ind ->
             appendLine()
             appendLine("*Индикаторы:*")
-            appendLine("*RSI (1ч):* ${ind.hourlyRsi.formatToRu()}")
-            appendLine("*RSI (1д):* ${ind.dailyRsi.formatToRu()}")
-            append("*BB (15м):* верхняя: ${ind.min15bb.upper.formatToRu()}, ")
-            appendLine("нижняя: ${ind.min15bb.lower.formatToRu()}")
-            append("*BB (1ч):* верхняя: ${ind.hourlyBb.upper.formatToRu()}, ")
-            appendLine("нижняя: ${ind.hourlyBb.lower.formatToRu()}")
-            append("*BB (1д):* верхняя: ${ind.dailyBb.upper.formatToRu()}, ")
-            appendLine("нижняя: ${ind.dailyBb.lower.formatToRu()}")
+            appendLine("*${PresentationUtil.rsiColor(ind.hourlyRsi)}RSI (1ч):* ${ind.hourlyRsi.formatToRu()}")
+            appendLine("*${PresentationUtil.rsiColor(ind.dailyRsi)}RSI (1д):* ${ind.dailyRsi.formatToRu()}")
+            var bbColor = PresentationUtil.markupBbColor(ind.min15bb.middle, ind.min15bb.lower, ind.min15bb.upper)
+            append("*${bbColor}BB (15м):* ${ind.min15bb.lower.formatToRu()} - ")
+            append("*${ind.min15bb.middle.formatToRu()}* - ")
+            appendLine(ind.min15bb.upper.formatToRu())
+            bbColor = PresentationUtil.markupBbColor(ind.hourlyBb.middle, ind.hourlyBb.lower, ind.hourlyBb.upper)
+            append("*${bbColor}BB (1ч):* ${ind.hourlyBb.lower.formatToRu()} - ")
+            append("*${ind.hourlyBb.middle.formatToRu()}* - ")
+            appendLine(ind.hourlyBb.upper.formatToRu())
+            bbColor = PresentationUtil.markupBbColor(ind.dailyBb.middle, ind.dailyBb.lower, ind.dailyBb.upper)
+            append("*${bbColor}BB (1д):* ${ind.dailyBb.lower.formatToRu()} - ")
+            append("*${ind.dailyBb.middle.formatToRu()}* - ")
+            appendLine(ind.dailyBb.upper.formatToRu())
         }
         update.security.note?.takeIf { it.isNotBlank() }?.let {
             appendLine()

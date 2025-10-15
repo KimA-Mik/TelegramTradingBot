@@ -15,11 +15,11 @@ import presentation.telegram.security.edit.screen.EditPriceResultScreen
 import presentation.telegram.security.edit.screen.EditPriceScreen
 import presentation.telegram.security.edit.util.getTickerInEditScreen
 
-class EditPriceTextModel(
+class EditLowPriceTextModel(
     private val updateExpectedPrice: UpdateExpectedPriceUseCase,
     private val popUser: PopUserUseCase
 ) : TextModel {
-    override val node = NavigationRoot.SecurityList.SecurityDetails.EditPrice
+    override val node = NavigationRoot.SecurityList.SecurityDetails.EditLowPrice
     private val rootTextModel: RootTextModel by inject(RootTextModel::class.java)
 
     override fun executeCommand(
@@ -27,7 +27,7 @@ class EditPriceTextModel(
         path: List<String>,
         command: String
     ): Flow<BotScreen> = flow {
-        val priceType = UpdateExpectedPriceUseCase.PriceType.HIGH
+        val priceType = UpdateExpectedPriceUseCase.PriceType.LOW
         if (command.isBlank()) {
             emit(EditPriceScreen(user.id, priceType))
             return@flow
@@ -36,7 +36,7 @@ class EditPriceTextModel(
         val res = user.getTickerInEditScreen()?.let {
             updateExpectedPrice(user, it, command, priceType)
         }
-        emit(EditPriceResultScreen(user.id, res?.targetPrice, priceType))
+        emit(EditPriceResultScreen(user.id, res?.lowTargetPrice, priceType))
         res?.let {
             popUser(user).onSuccess {
                 emitAll(rootTextModel.executeCommand(it, it.pathList, ""))
