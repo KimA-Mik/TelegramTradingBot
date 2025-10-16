@@ -9,8 +9,8 @@ object PresentationUtil {
 
     fun rsiColor(value: Double): String {
         return when {
-            value >= MathUtil.RSI_HIGH -> GREEN
-            value <= MathUtil.RSI_LOW -> RED
+            value >= MathUtil.RSI_HIGH -> RED
+            value <= MathUtil.RSI_LOW -> GREEN
             else -> YELLOW
         }
     }
@@ -25,8 +25,8 @@ object PresentationUtil {
         if (high == low) return YELLOW // avoid division by zero
         val percent = (value - low) / (high - low)
         return when {
-            percent < lowPercent -> RED
-            percent > highPercent -> GREEN
+            percent < lowPercent -> GREEN
+            percent > highPercent -> RED
             else -> YELLOW
         }
     }
