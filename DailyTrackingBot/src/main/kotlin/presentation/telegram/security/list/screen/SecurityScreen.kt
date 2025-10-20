@@ -37,14 +37,14 @@ class SecurityScreen(
         }
 
         if (lastPrice != null) {
-            appendLine(" по ${lastPrice.formatToRu()}$ROUBLE_SIGN")
+            appendLine(" сейчас ${lastPrice.formatToRu()}$ROUBLE_SIGN")
         } else {
             appendLine()
         }
 
-        append("Текущая ценa продажи: ")
+        append("Планируемая цена продажи: ")
         appendLine("*${security.targetPrice.formatToRu()}$ROUBLE_SIGN*")
-        append("Текущая ценa покупки: ")
+        append("Планируемая ценa покупки: ")
         appendLine("*${security.lowTargetPrice.formatToRu()}$ROUBLE_SIGN*")
 
         append("Отклонение для срабатывания сигнала: ")
