@@ -46,8 +46,9 @@ class SecurityListScreen(
             append(securityIndex, ". ", inlineSecurityUrl, ": ", security.name, " — ")
 
             append(
+                "🟩 ", //Green
                 security.lowTargetPrice.formatToRu(), ROUBLE_SIGN,
-                " - ",
+                " - 🟥 ", //Red
                 security.targetPrice.formatToRu(), ROUBLE_SIGN
             )
             append(" (±", security.targetDeviation.formatToRu(), "%)")
