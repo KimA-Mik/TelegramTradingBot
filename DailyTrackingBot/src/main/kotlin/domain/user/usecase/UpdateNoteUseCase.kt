@@ -11,7 +11,12 @@ class UpdateNoteUseCase(
         val fullUser = repository.findFullUserById(user.id) ?: return null
         val security = fullUser.securities.find { it.ticker == ticker } ?: return null
         return repository.updateTrackingSecurity(
-            security.copy(note = text, shouldNotify = true, shouldNotifyRsi = true)
+            security.copy(
+                note = text,
+                noteUpdatedMs = System.currentTimeMillis(),
+                shouldNotify = true,
+                shouldNotifyRsi = true
+            )
         ).getOrNull()
     }
 }

@@ -8,11 +8,16 @@ import domain.user.model.SecurityType.FUTURE
 import domain.user.model.SecurityType.SHARE
 import domain.user.model.TrackingSecurity
 import domain.user.model.User
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.toLocalDateTime
 import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.security.edit.callbackbutton.ToggleIsActiveCallbackButton
 import presentation.telegram.security.edit.callbackbutton.ToggleRemainActiveCallbackButton
 import presentation.telegram.security.edit.callbackbutton.ToggleShowNoteCallbackButton
 import presentation.util.TelegramUtil
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 class SecurityScreen(
     user: User,
@@ -25,6 +30,7 @@ class SecurityScreen(
     override val parseMode = ParseMode.MARKDOWN
     override val disableWebPagePreview = true
 
+    @OptIn(ExperimentalTime::class)
     private fun renderText(): String = buildString {
         if (security == null) {
             append("Бумага не найдена в базе.")
@@ -66,10 +72,15 @@ class SecurityScreen(
 
         if (security.showNote) {
             append('\n')
-            append("Заметка: ")
+            append("Заметка")
             if (security.note == null) {
                 append("не установлена")
             } else {
+                security.noteUpdatedMs?.let {
+                    val ldt = Instant.fromEpochMilliseconds(it).toLocalDateTime(TimeZone.currentSystemDefault())
+                    append(" (", ldt.format(TelegramUtil.localDateTimeFormat), ")")
+                }
+                appendLine(":")
                 append(security.note)
             }
         }

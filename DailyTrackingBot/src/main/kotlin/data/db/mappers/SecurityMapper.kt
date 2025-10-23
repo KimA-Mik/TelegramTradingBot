@@ -2,7 +2,11 @@ package data.db.mappers
 
 import data.db.entities.SecurityEntity
 import domain.user.model.TrackingSecurity
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 fun SecurityEntity.toTrackingSecurity() = TrackingSecurity(
     id = id.value,
     ticker = ticker,
@@ -14,6 +18,7 @@ fun SecurityEntity.toTrackingSecurity() = TrackingSecurity(
     isActive = isActive,
     remainActive = remainActive,
     note = note,
+    noteUpdatedMs = noteUpdated?.toInstant(TimeZone.currentSystemDefault())?.toEpochMilliseconds(),
     showNote = showNote,
     shouldNotify = shouldNotify,
     shouldNotifyRsi = shouldNotifyRsi,

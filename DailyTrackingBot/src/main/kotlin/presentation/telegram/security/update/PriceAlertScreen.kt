@@ -60,10 +60,7 @@ class PriceAlertScreen(
             append("*${ind.dailyBb.middle.formatToRu()}* - ")
             appendLine(ind.dailyBb.upper.formatToRu())
         }
-        update.security.note?.takeIf { it.isNotBlank() }?.let {
-            appendLine()
-            append("Заметка: ")
-            append(it)
-        }
+
+        appendNoteToSecurityAlert(update.security)
     }
 }

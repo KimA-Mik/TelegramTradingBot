@@ -18,6 +18,7 @@ class SecurityEntity(id: EntityID<Long>) : LongEntity(id) {
     var isActive by Securities.isActive
     var remainActive by Securities.remainActive
     var note by Securities.note
+    var noteUpdated by Securities.noteUpdated
     var showNote by Securities.showNote
     var shouldNotify by Securities.shouldNotify
     var shouldNotifyRsi by Securities.shouldNotifyRsi
