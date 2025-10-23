@@ -12,7 +12,7 @@ import org.koin.java.KoinJavaComponent.get
 import presentation.di.presentationModule
 import presentation.telegram.BotModel
 import presentation.telegram.TelegramBot
-import java.util.Locale
+import java.util.*
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -23,6 +23,8 @@ class Program : CliktCommand() {
         .default("127.0.0.1:6969")
 
     override fun run() {
+        val ruLocale = Locale.Builder().setLanguage("ru").setRegion("RU").build()
+        Locale.setDefault(ruLocale)
         startKoin {
             modules(
                 dataModule(apiUrl),
@@ -37,8 +39,4 @@ class Program : CliktCommand() {
     }
 }
 
-fun main(array: Array<String>) {
-    val ruLocale = Locale.Builder().setLanguage("ru").setRegion("RU").build()
-    Locale.setDefault(ruLocale)
-    Program().main(array)
-}
+fun main(array: Array<String>) = Program().main(array)
