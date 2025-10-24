@@ -22,5 +22,6 @@ fun SecurityEntity.toTrackingSecurity() = TrackingSecurity(
     showNote = showNote,
     shouldNotify = shouldNotify,
     shouldNotifyRsi = shouldNotifyRsi,
+    shouldNotifyBb = shouldNotifyBb,
     type = type
 )

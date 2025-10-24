@@ -20,6 +20,7 @@ object Securities : LongIdTable("security") {
     val showNote = bool(name = "show_note").default(true)
     val shouldNotify = bool(name = "should_notify").default(true)
     val shouldNotifyRsi = bool(name = "should_notify_rsi").default(true)
+    val shouldNotifyBb = bool(name = "should_notify_bb").default(true)
     val type = enumerationByName(name = "type", length = 16, klass = SecurityType::class)
 }
 

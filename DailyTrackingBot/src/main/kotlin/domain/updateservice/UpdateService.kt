@@ -140,6 +140,7 @@ class UpdateService(
 
             var currentSecurity = handlePrice(user, security, indicators, lastPrice)
             currentSecurity = handleRsi(user, currentSecurity, indicators, lastPrice)
+            currentSecurity = handleBB(user, currentSecurity, indicators, lastPrice)
 
             if (currentSecurity != security) {
                 outTrackingSecurities.add(currentSecurity)
@@ -212,6 +213,37 @@ class UpdateService(
             return security.copy(shouldNotifyRsi = false)
         } else if (!shouldNotifyRsi && !security.shouldNotifyRsi) {
             return security.copy(shouldNotifyRsi = true)
+        }
+
+        return security
+    }
+
+    private suspend fun handleBB(
+        user: FullUser,
+        security: TrackingSecurity,
+        indicators: CacheEntry?,
+        lastPrice: Double,
+    ): TrackingSecurity {
+        if (indicators == null) return security
+        val intervals = mutableListOf<TelegramUpdate.BbAlert.BbInterval>()
+        if (MathUtil.isBbCritical(lastPrice, indicators.min15bb)) intervals.add(TelegramUpdate.BbAlert.BbInterval.MIN15)
+        if (MathUtil.isBbCritical(lastPrice, indicators.hour4Bb)) intervals.add(TelegramUpdate.BbAlert.BbInterval.HOUR4)
+
+        val shouldNotifyBb = intervals.isNotEmpty()
+        if (shouldNotifyBb && security.shouldNotifyBb) {
+            _updates.emit(
+                TelegramUpdate.BbAlert(
+                    user = user.user,
+                    security = security,
+                    currentPrice = lastPrice,
+                    intervals = intervals,
+                    indicators = indicators
+                )
+            )
+
+            return security.copy(shouldNotifyBb = false)
+        } else if (!shouldNotifyBb && !security.shouldNotifyBb) {
+            return security.copy(shouldNotifyBb = true)
         }
 
         return security

@@ -15,7 +15,8 @@ class UpdateNoteUseCase(
                 note = text,
                 noteUpdatedMs = System.currentTimeMillis(),
                 shouldNotify = true,
-                shouldNotifyRsi = true
+                shouldNotifyRsi = true,
+                shouldNotifyBb = true
             )
         ).getOrNull()
     }

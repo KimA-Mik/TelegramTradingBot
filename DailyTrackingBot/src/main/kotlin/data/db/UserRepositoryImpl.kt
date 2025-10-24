@@ -153,6 +153,7 @@ class UserRepositoryImpl(
         entity.showNote = security.showNote
         entity.shouldNotify = security.shouldNotify
         entity.shouldNotifyRsi = security.shouldNotifyRsi
+        entity.shouldNotifyBb = security.shouldNotifyBb
         entity.type = security.type
     }
 

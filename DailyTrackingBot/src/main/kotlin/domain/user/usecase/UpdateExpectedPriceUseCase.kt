@@ -19,8 +19,19 @@ class UpdateExpectedPriceUseCase(
         val security = fullUser.securities.find { it.ticker == ticker } ?: return null
 
         val copy = when (priceType) {
-            PriceType.HIGH -> security.copy(targetPrice = number, shouldNotify = true, shouldNotifyRsi = true)
-            PriceType.LOW -> security.copy(lowTargetPrice = number, shouldNotify = true, shouldNotifyRsi = true)
+            PriceType.HIGH -> security.copy(
+                targetPrice = number,
+                shouldNotify = true,
+                shouldNotifyRsi = true,
+                shouldNotifyBb = true
+            )
+
+            PriceType.LOW -> security.copy(
+                lowTargetPrice = number,
+                shouldNotify = true,
+                shouldNotifyRsi = true,
+                shouldNotifyBb = true
+            )
         }
 
         return repository.updateTrackingSecurity(copy).getOrNull()

@@ -22,6 +22,7 @@ class SecurityEntity(id: EntityID<Long>) : LongEntity(id) {
     var showNote by Securities.showNote
     var shouldNotify by Securities.shouldNotify
     var shouldNotifyRsi by Securities.shouldNotifyRsi
+    var shouldNotifyBb by Securities.shouldNotifyBb
     var type by Securities.type
 
     override fun toString(): String {

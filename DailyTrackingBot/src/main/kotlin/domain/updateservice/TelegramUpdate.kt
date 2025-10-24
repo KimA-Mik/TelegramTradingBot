@@ -32,4 +32,16 @@ sealed class TelegramUpdate(val userId: Long) {
             MIN15, HOUR4
         }
     }
+
+    data class BbAlert(
+        val user: User,
+        val security: TrackingSecurity,
+        val currentPrice: Double,
+        val intervals: List<BbInterval>,
+        val indicators: CacheEntry
+    ) : TelegramUpdate(user.id) {
+        enum class BbInterval {
+            MIN15, HOUR4
+        }
+    }
 }
