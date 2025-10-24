@@ -30,4 +30,6 @@ object PresentationUtil {
             else -> YELLOW
         }
     }
+
+    const val T_INVEST_TITLE = "T-Инвестиции"
 }

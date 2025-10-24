@@ -1,13 +1,17 @@
 package presentation.telegram.security.update
 
+import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
+import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import domain.common.formatToRu
 import domain.updateservice.indicators.CacheEntry
 import domain.user.model.TrackingSecurity
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
+import presentation.telegram.security.list.callbackbutton.EditSecurityCallbackButton
 import presentation.util.PresentationUtil
 import presentation.util.TelegramUtil
+import presentation.util.TinInvestUtil
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -51,3 +55,15 @@ fun StringBuilder.appendIndicatorsToSecurityAlert(indicators: CacheEntry?, curre
     append("*${indicators.dailyBb.middle.formatToRu()}* - ")
     appendLine(indicators.dailyBb.upper.formatToRu())
 }
+
+fun defaultSecurityAlertReplayMarkup(security: TrackingSecurity) = InlineKeyboardMarkup.create(
+    listOf(
+        listOf(
+            InlineKeyboardButton.Url(
+                text = PresentationUtil.T_INVEST_TITLE,
+                url = TinInvestUtil.securityUrl(security)
+            )
+        ),
+        listOf(EditSecurityCallbackButton.getCallbackData(security.ticker))
+    )
+)

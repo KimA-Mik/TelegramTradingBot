@@ -14,6 +14,8 @@ class PriceAlertScreen(
     override val text = renderText()
     override val parseMode = ParseMode.MARKDOWN
     override val disableWebPagePreview = true
+    override val replyMarkup = defaultSecurityAlertReplayMarkup(update.security)
+
     private fun renderText() = buildString {
         appendLine("*Сработал ценовой сигнал!*")
         appendLine()
