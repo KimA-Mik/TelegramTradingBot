@@ -1,6 +1,11 @@
 package presentation.util
 
 import domain.util.MathUtil
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 object PresentationUtil {
     const val GREEN = "🟢"
@@ -32,4 +37,10 @@ object PresentationUtil {
     }
 
     const val T_INVEST_TITLE = "T-Инвестиции"
+
+    @OptIn(ExperimentalTime::class)
+    fun renderLongTimestamp(timestamp: Long) = Instant
+        .fromEpochMilliseconds(timestamp)
+        .toLocalDateTime(TimeZone.currentSystemDefault())
+        .format(TelegramUtil.localDateTimeFormat)
 }
