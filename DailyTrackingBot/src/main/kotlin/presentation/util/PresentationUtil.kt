@@ -19,8 +19,8 @@ object PresentationUtil {
         value: Double,
         low: Double,
         high: Double,
-        lowPercent: Double = 0.4,
-        highPercent: Double = 0.6
+        lowPercent: Double = MathUtil.BB_CRITICAL_LOW,
+        highPercent: Double = MathUtil.BB_CRITICAL_HIGH
     ): String {
         if (high == low) return YELLOW // avoid division by zero
         val percent = (value - low) / (high - low)
