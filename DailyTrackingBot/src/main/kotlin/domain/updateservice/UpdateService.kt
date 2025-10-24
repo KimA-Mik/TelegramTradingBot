@@ -135,7 +135,6 @@ class UpdateService(
         outTrackingSecurities: MutableList<TrackingSecurity>
     ) {
         for (security in user.securities) {
-            if (!security.isActive) continue
             val lastPrice = lastPrices[security.uid]?.price ?: continue
             val indicators = indicatorsCache[security.uid]
 
@@ -154,6 +153,7 @@ class UpdateService(
         indicators: CacheEntry?,
         lastPrice: Double
     ): TrackingSecurity {
+        if (!security.isActive) return security
         val currentDeviation = MathUtil.absolutePercentageDifference(lastPrice, security.targetPrice)
         val currentLowDeviation = MathUtil.absolutePercentageDifference(lastPrice, security.lowTargetPrice)
         val shouldNotify = currentDeviation < security.targetDeviation
@@ -185,6 +185,7 @@ class UpdateService(
         return security
     }
 
+
     private suspend fun handleRsi(
         user: FullUser,
         security: TrackingSecurity,
@@ -192,15 +193,18 @@ class UpdateService(
         lastPrice: Double,
     ): TrackingSecurity {
         if (indicators == null) return security
-        val rsi = indicators.min15Rsi
-        val shouldNotifyRsi = rsi <= MathUtil.RSI_LOW || rsi >= MathUtil.RSI_HIGH
+        val intervals = mutableListOf<TelegramUpdate.RsiAlert.RsiInterval>()
+        if (MathUtil.isRsiCritical(indicators.min15Rsi)) intervals.add(TelegramUpdate.RsiAlert.RsiInterval.MIN15)
+        if (MathUtil.isRsiCritical(indicators.hour4Rsi)) intervals.add(TelegramUpdate.RsiAlert.RsiInterval.HOUR4)
+
+        val shouldNotifyRsi = intervals.isNotEmpty()
         if (shouldNotifyRsi && security.shouldNotifyRsi) {
             _updates.emit(
                 TelegramUpdate.RsiAlert(
                     user = user.user,
                     security = security,
                     currentPrice = lastPrice,
-                    currentRsi = rsi,
+                    intervals = intervals,
                     indicators = indicators
                 )
             )
