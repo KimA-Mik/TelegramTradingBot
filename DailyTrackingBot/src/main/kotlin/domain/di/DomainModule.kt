@@ -21,6 +21,7 @@ fun domainModule() = module {
     singleOf(::NavigateUserUseCase)
     singleOf(::PopUserUseCase)
     singleOf(::RegisterUserUseCase)
+    singleOf(::ResetPriceUseCase)
     singleOf(::SubscribeToSecurityUseCase)
     singleOf(::UnsubscribeFromSecurityUseCase)
     singleOf(::UpdateExpectedPriceUseCase)

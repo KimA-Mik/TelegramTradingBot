@@ -6,10 +6,7 @@ import presentation.telegram.BotModel
 import presentation.telegram.CallbackHandler
 import presentation.telegram.UpdateHandler
 import presentation.telegram.core.RootTextModel
-import presentation.telegram.security.edit.callbackbutton.SecurityScreenUpdateUserHandler
-import presentation.telegram.security.edit.callbackbutton.ToggleIsActiveCallbackHandler
-import presentation.telegram.security.edit.callbackbutton.ToggleRemainActiveCallbackHandler
-import presentation.telegram.security.edit.callbackbutton.ToggleShowNoteCallbackHandler
+import presentation.telegram.security.edit.callbackbutton.*
 import presentation.telegram.security.edit.textmodel.*
 import presentation.telegram.security.list.callbackbutton.EditSecurityCallbackButtonHandler
 import presentation.telegram.security.list.callbackbutton.SecuritiesListBackwardCallbackButtonHandler
@@ -41,6 +38,7 @@ fun presentationModule() = module {
     singleOf(::SecurityListTextModel)
 
     //SecurityEntry
+    singleOf(::ResetPriceCallbackHandler)
     singleOf(::SecurityScreenUpdateUserHandler)
     singleOf(::ToggleIsActiveCallbackHandler)
     singleOf(::ToggleRemainActiveCallbackHandler)

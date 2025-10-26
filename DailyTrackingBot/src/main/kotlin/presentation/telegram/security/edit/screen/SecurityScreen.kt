@@ -1,17 +1,17 @@
-package presentation.telegram.security.list.screen
+package presentation.telegram.security.edit.screen
 
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.ParseMode
 import domain.common.ROUBLE_SIGN
 import domain.common.formatToRu
-import domain.user.model.SecurityType.FUTURE
-import domain.user.model.SecurityType.SHARE
+import domain.user.model.SecurityType
 import domain.user.model.TrackingSecurity
 import domain.user.model.User
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
 import presentation.telegram.core.screen.BotScreen
+import presentation.telegram.security.edit.callbackbutton.ResetPriceCallbackButton
 import presentation.telegram.security.edit.callbackbutton.ToggleIsActiveCallbackButton
 import presentation.telegram.security.edit.callbackbutton.ToggleRemainActiveCallbackButton
 import presentation.telegram.security.edit.callbackbutton.ToggleShowNoteCallbackButton
@@ -38,20 +38,27 @@ class SecurityScreen(
         }
 
         when (security.type) {
-            FUTURE -> append("Фьючерс \"${security.name}\" (${TelegramUtil.clickableTrackingSecurity(security)})")
-            SHARE -> append("Акция \"${security.name}\" (${TelegramUtil.clickableTrackingSecurity(security)})")
+            SecurityType.FUTURE -> append(
+                "Фьючерс \"${security.name}\" (${
+                    TelegramUtil.clickableTrackingSecurity(
+                        security
+                    )
+                })"
+            )
+
+            SecurityType.SHARE -> append("Акция \"${security.name}\" (${TelegramUtil.clickableTrackingSecurity(security)})")
         }
 
         if (lastPrice != null) {
-            appendLine(" сейчас ${lastPrice.formatToRu()}$ROUBLE_SIGN")
+            appendLine(" сейчас ${lastPrice.formatToRu()}${ROUBLE_SIGN}")
         } else {
             appendLine()
         }
 
         append("Планируемая цена продажи: ")
-        appendLine("*${security.targetPrice.formatToRu()}$ROUBLE_SIGN*")
+        appendLine("*${security.targetPrice.formatToRu()}${ROUBLE_SIGN}*")
         append("Планируемая ценa покупки: ")
-        appendLine("*${security.lowTargetPrice.formatToRu()}$ROUBLE_SIGN*")
+        appendLine("*${security.lowTargetPrice.formatToRu()}${ROUBLE_SIGN}*")
 
         append("Отклонение для срабатывания сигнала: ")
         appendLine("*${security.targetDeviation.formatToRu()}%*")
@@ -77,7 +84,8 @@ class SecurityScreen(
                 append("не установлена")
             } else {
                 security.noteUpdatedMs?.let {
-                    val ldt = Instant.fromEpochMilliseconds(it).toLocalDateTime(TimeZone.currentSystemDefault())
+                    val ldt = Instant.fromEpochMilliseconds(it)
+                        .toLocalDateTime(TimeZone.currentSystemDefault())
                     append(" (", ldt.format(TelegramUtil.localDateTimeFormat), ")")
                 }
                 appendLine(":")
@@ -97,6 +105,9 @@ class SecurityScreen(
             ),
             listOf(
                 ToggleShowNoteCallbackButton.getCallbackData(security.ticker, security.showNote)
+            ),
+            listOf(
+                ResetPriceCallbackButton.getCallbackData(security.ticker)
             )
         )
     )

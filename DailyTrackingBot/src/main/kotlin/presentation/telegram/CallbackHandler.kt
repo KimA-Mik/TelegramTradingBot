@@ -18,6 +18,7 @@ class CallbackHandler(
     subscribeToSecurityCallbackHandler: SubscribeToSecurityCallbackHandler,
     unsubscribeFromSecurityCallbackHandler: UnsubscribeFromSecurityCallbackHandler,
     /* Security screen */
+    resetPriceCallbackHandler: ResetPriceCallbackHandler,
     toggleIsActiveCallbackHandler: ToggleIsActiveCallbackHandler,
     toggleRemainActiveCallbackHandler: ToggleRemainActiveCallbackHandler,
     toggleShowNoteCallbackHandler: ToggleShowNoteCallbackHandler,
@@ -33,6 +34,7 @@ class CallbackHandler(
         SubscribeToSecurityCallbackButton.callbackName to subscribeToSecurityCallbackHandler,
         UnsubscribeFromSecurityCallbackButton.callbackName to unsubscribeFromSecurityCallbackHandler,
         /* Security screen */
+        ResetPriceCallbackButton.callbackName to resetPriceCallbackHandler,
         ToggleIsActiveCallbackButton.callbackName to toggleIsActiveCallbackHandler,
         ToggleRemainActiveCallbackButton.callbackName to toggleRemainActiveCallbackHandler,
         ToggleShowNoteCallbackButton.callbackName to toggleShowNoteCallbackHandler,
