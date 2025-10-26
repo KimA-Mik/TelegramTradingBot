@@ -7,7 +7,8 @@ import kotlin.time.Instant
 data class User @OptIn(ExperimentalTime::class) constructor(
     val id: Long,
     val path: String,
-    val registered: Instant
+    val registered: Instant,
+    val defaultPriceProlongation: PriceProlongation
 ) {
     val pathList by lazy { path.split(PATH_SEPARATOR).drop(1) }
 }

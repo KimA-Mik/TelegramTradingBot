@@ -64,6 +64,7 @@ class UserRepositoryImpl(
             UserEntity.findByIdAndUpdate(user.id) {
                 it.path = user.path
                 it.registered = user.registered.toLocalDateTime(TimeZone.currentSystemDefault())
+                it.defaultPriceProlongation = user.defaultPriceProlongation
             }?.toUser()
         }
 
