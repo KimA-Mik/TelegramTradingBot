@@ -4,10 +4,8 @@ import com.github.kotlintelegrambot.entities.ParseMode
 import domain.common.ROUBLE_SIGN
 import domain.common.formatToRu
 import domain.updateservice.TelegramUpdate
-import domain.user.model.SecurityType
 import presentation.telegram.core.screen.BotScreen
 import presentation.util.PresentationUtil
-import presentation.util.TelegramUtil
 
 class RsiAlertScreen(
     private val update: TelegramUpdate.RsiAlert
@@ -19,11 +17,7 @@ class RsiAlertScreen(
 
     private fun renderText() = buildString {
         appendLine("*Сработал сигнал по RSI!*")
-        appendLine()
-        when (update.security.type) {
-            SecurityType.FUTURE -> appendLine("*Фьючерс:* ${TelegramUtil.clickableTrackingSecurity(update.security)} — (${update.security.name})")
-            SecurityType.SHARE -> appendLine("*Акция:* ${TelegramUtil.clickableTrackingSecurity(update.security)} — (${update.security.name})")
-        }
+        renderSecurityTitleForAlert(update.security)
 
         appendLine("*Текущая цена:* ${update.currentPrice.formatToRu()}$ROUBLE_SIGN")
         appendLine("Критические значения RSI:")

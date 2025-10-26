@@ -4,9 +4,7 @@ import com.github.kotlintelegrambot.entities.ParseMode
 import domain.common.ROUBLE_SIGN
 import domain.common.formatToRu
 import domain.updateservice.TelegramUpdate
-import domain.user.model.SecurityType
 import presentation.telegram.core.screen.BotScreen
-import presentation.util.TelegramUtil
 
 class PriceAlertScreen(
     private val update: TelegramUpdate.PriceAlert
@@ -18,11 +16,8 @@ class PriceAlertScreen(
 
     private fun renderText() = buildString {
         appendLine("*Сработал ценовой сигнал!*")
-        appendLine()
-        when (update.security.type) {
-            SecurityType.SHARE -> appendLine("*Акция:* ${TelegramUtil.clickableTrackingSecurity(update.security)} — (${update.security.name})")
-            SecurityType.FUTURE -> appendLine("*Фьючерс:* ${TelegramUtil.clickableTrackingSecurity(update.security)} — (${update.security.name})")
-        }
+        renderSecurityTitleForAlert(update.security)
+
         appendLine("*Текущая цена:* ${update.currentPrice.formatToRu()}${ROUBLE_SIGN}")
         when (update.type) {
             is TelegramUpdate.PriceAlert.PriceType.Target -> appendLine("*Цена продажи:* ${update.security.targetPrice.formatToRu()}$ROUBLE_SIGN")

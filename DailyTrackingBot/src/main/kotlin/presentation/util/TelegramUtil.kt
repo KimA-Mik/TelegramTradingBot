@@ -8,6 +8,7 @@ import kotlinx.datetime.format.char
 import ru.kima.cacheserver.api.schema.model.Security
 
 object TelegramUtil {
+    fun hashtag(text: String) = "#${text.replace(" ", "_")}"
     fun copiableText(text: String) = "`$text`"
 
     fun clickableSecurity(security: Security) = MarkdownUtil.inlineUrl(

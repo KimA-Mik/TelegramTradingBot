@@ -5,6 +5,7 @@ import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import domain.common.formatToRu
 import domain.techanalysis.BollingerBands
 import domain.updateservice.indicators.CacheEntry
+import domain.user.model.SecurityType
 import domain.user.model.TrackingSecurity
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
@@ -15,6 +16,19 @@ import presentation.util.TelegramUtil
 import presentation.util.TinInvestUtil
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+
+fun StringBuilder.renderSecurityTitleForAlert(security: TrackingSecurity) {
+    val type = when (security.type) {
+        SecurityType.FUTURE -> "*Фьючерс:* "
+        SecurityType.SHARE -> "*Акция:* "
+    }
+
+    append(type)
+    append(TelegramUtil.hashtag(security.ticker))
+    append(" — (")
+    append(security.name)
+    appendLine(')')
+}
 
 @OptIn(ExperimentalTime::class)
 fun StringBuilder.appendNoteToSecurityAlert(security: TrackingSecurity) {
