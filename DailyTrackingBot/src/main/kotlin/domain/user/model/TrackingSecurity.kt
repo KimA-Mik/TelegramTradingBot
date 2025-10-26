@@ -11,9 +11,11 @@ data class TrackingSecurity(
     val isActive: Boolean,
     val remainActive: Boolean,
     val note: String?,
+    val noteUpdatedMs: Long?,
     val showNote: Boolean,
     val shouldNotify: Boolean,
     val shouldNotifyRsi: Boolean,
+    val shouldNotifyBb: Boolean,
     val type: SecurityType
 ) {
 
@@ -30,9 +32,11 @@ data class TrackingSecurity(
             isActive: Boolean = true,
             remainActive: Boolean = true,
             note: String? = null,
+            noteUpdatedMs: Long? = null,
             showNote: Boolean = true,
             shouldNotify: Boolean = true,
-            shouldNotifyRsi: Boolean = true
+            shouldNotifyRsi: Boolean = true,
+            shouldNotifyBb: Boolean = true,
         ) = TrackingSecurity(
             id = id,
             ticker = ticker,
@@ -44,9 +48,11 @@ data class TrackingSecurity(
             isActive = isActive,
             remainActive = remainActive,
             note = note,
+            noteUpdatedMs = noteUpdatedMs,
             showNote = showNote,
             shouldNotify = shouldNotify,
             shouldNotifyRsi = shouldNotifyRsi,
+            shouldNotifyBb = shouldNotifyBb,
             type = type
         )
     }

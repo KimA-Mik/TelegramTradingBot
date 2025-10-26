@@ -11,6 +11,7 @@ import presentation.telegram.core.NavigationRoot
 import presentation.telegram.core.RootTextModel
 import presentation.telegram.core.TextModel
 import presentation.telegram.core.screen.BotScreen
+import presentation.telegram.security.edit.screen.EditPriceHeader
 import presentation.telegram.security.edit.screen.EditPriceResultScreen
 import presentation.telegram.security.edit.screen.EditPriceScreen
 import presentation.telegram.security.edit.util.getTickerInEditScreen
@@ -29,6 +30,7 @@ class EditLowPriceTextModel(
     ): Flow<BotScreen> = flow {
         val priceType = UpdateExpectedPriceUseCase.PriceType.LOW
         if (command.isBlank()) {
+            emit(EditPriceHeader(user))
             emit(EditPriceScreen(user.id, priceType))
             return@flow
         }

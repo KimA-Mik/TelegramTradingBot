@@ -5,10 +5,9 @@ import domain.common.ROUBLE_SIGN
 import domain.common.formatToRu
 import domain.updateservice.TelegramUpdate
 import presentation.telegram.core.screen.BotScreen
-import presentation.util.PresentationUtil
 
-class RsiAlertScreen(
-    private val update: TelegramUpdate.RsiAlert
+class BbAlertScreen(
+    private val update: TelegramUpdate.BbAlert
 ) : BotScreen(update.user.id) {
     override val text = renderText()
     override val parseMode = ParseMode.MARKDOWN
@@ -16,15 +15,24 @@ class RsiAlertScreen(
     override val replyMarkup = defaultSecurityAlertReplayMarkup(update.security)
 
     private fun renderText() = buildString {
-        appendLine("*Сработал сигнал по RSI!*")
+        appendLine("*Сработал сигнал по BB!*")
         renderSecurityTitleForAlert(update.security)
 
         appendLine("*Текущая цена:* ${update.currentPrice.formatToRu()}$ROUBLE_SIGN")
-        appendLine("Критические значения RSI:")
+        appendLine("Критические значения BB:")
         for (interval in update.intervals) {
             when (interval) {
-                TelegramUpdate.RsiAlert.RsiInterval.MIN15 -> appendLine("*${PresentationUtil.rsiColor(update.indicators.min15Rsi)}RSI (15м):* ${update.indicators.min15Rsi.formatToRu()}")
-                TelegramUpdate.RsiAlert.RsiInterval.HOUR4 -> appendLine("*${PresentationUtil.rsiColor(update.indicators.hour4Rsi)}RSI (4ч):* ${update.indicators.hour4Rsi.formatToRu()}")
+                TelegramUpdate.BbAlert.BbInterval.MIN15 -> renderBb(
+                    update.indicators.min15bb,
+                    update.currentPrice,
+                    "15м"
+                )
+
+                TelegramUpdate.BbAlert.BbInterval.HOUR4 -> renderBb(
+                    update.indicators.hour4Bb,
+                    update.currentPrice,
+                    "4ч"
+                )
             }
         }
 

@@ -15,11 +15,13 @@ fun domainModule() = module {
     singleOf(::GetSecurityUseCase)
 
     //User
+    singleOf(::FindTickerForUserUseCase)
     singleOf(::FindUserUseCase)
     singleOf(::GetUserTrackingSecuritiesUseCase)
     singleOf(::NavigateUserUseCase)
     singleOf(::PopUserUseCase)
     singleOf(::RegisterUserUseCase)
+    singleOf(::ResetPriceUseCase)
     singleOf(::SubscribeToSecurityUseCase)
     singleOf(::UnsubscribeFromSecurityUseCase)
     singleOf(::UpdateExpectedPriceUseCase)

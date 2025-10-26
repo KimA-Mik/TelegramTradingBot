@@ -11,7 +11,7 @@ class UpdateIsActiveUseCase(
         val fullUser = repository.findFullUserById(user.id) ?: return null
         val security = fullUser.securities.find { it.ticker == ticker } ?: return null
         return repository.updateTrackingSecurity(
-            security.copy(isActive = newValue, shouldNotify = true, shouldNotifyRsi = true)
+            security.copy(isActive = newValue, shouldNotify = true, shouldNotifyRsi = true, shouldNotifyBb = true)
         ).getOrNull()
     }
 }

@@ -23,7 +23,9 @@ import org.slf4j.LoggerFactory
 import java.sql.Connection
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
+@OptIn(ExperimentalTime::class)
 class UserRepositoryImpl(
     private val databaseConnector: DatabaseConnector
 ) : UserRepository {
@@ -50,7 +52,6 @@ class UserRepositoryImpl(
     override suspend fun findUserById(id: Long): User? =
         databaseConnector.transaction { UserEntity.findById(id)?.toUser() }
 
-    @OptIn(ExperimentalTime::class)
     override suspend fun registerUser(id: Long): User =
         databaseConnector.transaction {
             UserEntity.new(id = id) {
@@ -58,12 +59,12 @@ class UserRepositoryImpl(
             }.toUser()
         }
 
-    @OptIn(ExperimentalTime::class)
     override suspend fun updateUser(user: User): User? =
         databaseConnector.transaction {
             UserEntity.findByIdAndUpdate(user.id) {
                 it.path = user.path
                 it.registered = user.registered.toLocalDateTime(TimeZone.currentSystemDefault())
+                it.defaultPriceProlongation = user.defaultPriceProlongation
             }?.toUser()
         }
 
@@ -88,19 +89,21 @@ class UserRepositoryImpl(
     ): Result<TrackingSecurity> = databaseConnector.transactionCatching {
         SecurityEntity.new {
             this.user = UserEntity[user.id]
-            ticker = security.ticker
-            name = security.name
-            uid = security.uid
-            targetPrice = security.targetPrice
-            lowTargetPrice = security.lowTargetPrice
-            targetDeviation = security.targetDeviation
-            isActive = security.isActive
-            remainActive = security.remainActive
-            note = security.note
-            showNote = security.showNote
-            shouldNotify = security.shouldNotify
-            shouldNotifyRsi = security.shouldNotifyRsi
-            type = security.type
+            updateSecurity(this, security)
+//            ticker = security.ticker
+//            name = security.name
+//            uid = security.uid
+//            targetPrice = security.targetPrice
+//            lowTargetPrice = security.lowTargetPrice
+//            targetDeviation = security.targetDeviation
+//            isActive = security.isActive
+//            remainActive = security.remainActive
+//            note = security.note
+//            noteUpdated = security.noteUpdated?.toLocalDateTime(TimeZone.currentSystemDefault())
+//            showNote = security.showNote
+//            shouldNotify = security.shouldNotify
+//            shouldNotifyRsi = security.shouldNotifyRsi
+//            type = security.type
         }.toTrackingSecurity()
     }
 
@@ -145,9 +148,13 @@ class UserRepositoryImpl(
         entity.isActive = security.isActive
         entity.remainActive = security.remainActive
         entity.note = security.note
+        entity.noteUpdated = security.noteUpdatedMs?.let {
+            Instant.fromEpochMilliseconds(it).toLocalDateTime(TimeZone.currentSystemDefault())
+        }
         entity.showNote = security.showNote
         entity.shouldNotify = security.shouldNotify
         entity.shouldNotifyRsi = security.shouldNotifyRsi
+        entity.shouldNotifyBb = security.shouldNotifyBb
         entity.type = security.type
     }
 

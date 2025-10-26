@@ -1,6 +1,7 @@
 package presentation.telegram.security.edit.textmodel
 
 import domain.user.model.User
+import domain.user.usecase.FindTickerForUserUseCase
 import domain.user.usecase.PopUserUseCase
 import domain.user.usecase.UpdateNoteUseCase
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +20,8 @@ import presentation.telegram.security.edit.util.getTickerInEditScreen
 
 class EditNoteTextModel(
     private val popUser: PopUserUseCase,
-    private val updateNote: UpdateNoteUseCase
+    private val updateNote: UpdateNoteUseCase,
+    private val findTickerForUser: FindTickerForUserUseCase
 ) : TextModel {
     override val node = NavigationRoot.SecurityList.SecurityDetails.EditNote
     private val rootTextModel: RootTextModel by inject(RootTextModel::class.java)
@@ -29,8 +31,20 @@ class EditNoteTextModel(
         path: List<String>,
         command: String
     ): Flow<BotScreen> = flow {
+        val ticker = user.getTickerInEditScreen()
+        if (ticker == null) {
+            emit(ErrorScreen(user.id, UiError.UnknownError))
+            return@flow
+        }
+
+        val security = findTickerForUser(user.id, ticker)
+        if (security == null) {
+            emit(ErrorScreen(user.id, UiError.UnsubscribedToSecurity(ticker)))
+            return@flow
+        }
+
         if (command.isBlank()) {
-            emit(EditNoteScreen(user.id))
+            emit(EditNoteScreen(user.id, security.note, security.noteUpdatedMs))
             return@flow
         }
 
@@ -47,9 +61,7 @@ class EditNoteTextModel(
             }
         }
 
-        val updatedSecurity = user.getTickerInEditScreen()?.let {
-            updateNote(user, it, note)
-        }
+        val updatedSecurity = updateNote(user, ticker, note)
         if (updatedSecurity == null) {
             emit(ErrorScreen(user.id, UiError.UnregisteredUserError))
             return@flow

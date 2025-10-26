@@ -25,7 +25,7 @@ class ToggleIsActiveCallbackHandler(
             return@flow
         }
 
-        securityScreenUpdateUserHandler.handle(user, messageId) {
+        securityScreenUpdateUserHandler.handle(user, messageId, UiError.UnsubscribedToSecurity(callbackData.ticker)) {
             updateIsActive(user, callbackData.ticker, callbackData.newValue)
         }.let { emit(it) }
     }
