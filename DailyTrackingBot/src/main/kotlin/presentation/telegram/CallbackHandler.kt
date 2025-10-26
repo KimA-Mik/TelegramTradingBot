@@ -18,6 +18,7 @@ class CallbackHandler(
     subscribeToSecurityCallbackHandler: SubscribeToSecurityCallbackHandler,
     unsubscribeFromSecurityCallbackHandler: UnsubscribeFromSecurityCallbackHandler,
     /* Security screen */
+    changeDefaultPriceProlongationCallbackHandler: ChangeDefaultPriceProlongationCallbackHandler,
     resetPriceCallbackHandler: ResetPriceCallbackHandler,
     toggleIsActiveCallbackHandler: ToggleIsActiveCallbackHandler,
     toggleRemainActiveCallbackHandler: ToggleRemainActiveCallbackHandler,
@@ -34,6 +35,7 @@ class CallbackHandler(
         SubscribeToSecurityCallbackButton.callbackName to subscribeToSecurityCallbackHandler,
         UnsubscribeFromSecurityCallbackButton.callbackName to unsubscribeFromSecurityCallbackHandler,
         /* Security screen */
+        ChangeDefaultPriceProlongationCallbackButton.callbackName to changeDefaultPriceProlongationCallbackHandler,
         ResetPriceCallbackButton.callbackName to resetPriceCallbackHandler,
         ToggleIsActiveCallbackButton.callbackName to toggleIsActiveCallbackHandler,
         ToggleRemainActiveCallbackButton.callbackName to toggleRemainActiveCallbackHandler,

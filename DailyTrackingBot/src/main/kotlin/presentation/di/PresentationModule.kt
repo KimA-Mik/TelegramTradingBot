@@ -38,6 +38,7 @@ fun presentationModule() = module {
     singleOf(::SecurityListTextModel)
 
     //SecurityEntry
+    singleOf(::ChangeDefaultPriceProlongationCallbackHandler)
     singleOf(::ResetPriceCallbackHandler)
     singleOf(::SecurityScreenUpdateUserHandler)
     singleOf(::ToggleIsActiveCallbackHandler)

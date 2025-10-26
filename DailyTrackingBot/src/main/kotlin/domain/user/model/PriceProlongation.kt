@@ -1,5 +1,5 @@
 package domain.user.model
 
 enum class PriceProlongation {
-    NONE, INFINITE
+    NONE, DAY, INFINITE
 }
