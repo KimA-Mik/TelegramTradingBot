@@ -79,7 +79,7 @@ class SecurityScreen(
 
         if (security.showNote) {
             append('\n')
-            append("Заметка")
+            append("Заметка ")
             if (security.note == null) {
                 append("не установлена")
             } else {
