@@ -11,7 +11,14 @@ class ResetPriceUseCase(
         val fullUser = repository.findFullUserById(user.id) ?: return null
         val security = fullUser.securities.find { it.ticker == ticker } ?: return null
 
-        val updatedSecurity = security.copy(isActive = false, note = null, noteUpdatedMs = null, shouldNotify = true)
+        val updatedSecurity = security.copy(
+            targetPrice = 0.0,
+            lowTargetPrice = 0.0,
+            isActive = false,
+            note = null,
+            noteUpdatedMs = null,
+            shouldNotify = true
+        )
         return repository.updateTrackingSecurity(updatedSecurity).getOrNull()
     }
 }
