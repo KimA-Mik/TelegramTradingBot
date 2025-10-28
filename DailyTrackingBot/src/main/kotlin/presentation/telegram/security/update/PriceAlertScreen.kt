@@ -20,8 +20,8 @@ class PriceAlertScreen(
 
         appendLine("*Текущая цена:* ${update.currentPrice.formatToRu()}${ROUBLE_SIGN}")
         when (update.type) {
-            is TelegramUpdate.PriceAlert.PriceType.Target -> appendLine("*Цена продажи:* ${update.security.targetPrice.formatToRu()}$ROUBLE_SIGN")
-            is TelegramUpdate.PriceAlert.PriceType.LowTarget -> appendLine("*Цена покупки:* ${update.security.lowTargetPrice.formatToRu()}$ROUBLE_SIGN")
+            is TelegramUpdate.PriceAlert.PriceType.Target -> appendLine("*Планируемая цена продажи:* ${update.security.targetPrice.formatToRu()}$ROUBLE_SIGN")
+            is TelegramUpdate.PriceAlert.PriceType.LowTarget -> appendLine("*Планируемая цена покупки:* ${update.security.lowTargetPrice.formatToRu()}$ROUBLE_SIGN")
             is TelegramUpdate.PriceAlert.PriceType.All -> {
                 appendLine("*Планируемая цена покупки:* ${update.security.lowTargetPrice.formatToRu()}$ROUBLE_SIGN")
                 appendLine("*Планируемая цена продажи:* ${update.security.targetPrice.formatToRu()}$ROUBLE_SIGN")
