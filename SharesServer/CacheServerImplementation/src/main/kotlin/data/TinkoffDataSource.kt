@@ -130,18 +130,18 @@ class TinkoffDataSource(token: String) {
     }
 
     suspend fun findSecurity(ticker: String): Result<Security> = runCatching {
-        val cleanedTicker = ticker.trim().uppercase()
+        val cleanedTicker = ticker.trim()
         for (instrumentStatus in InstrumentStatus.entries) {
             for (instrumentExchangeType in InstrumentExchangeType.entries) {
                 val pair = instrumentStatus to instrumentExchangeType
                 accessSharesCache(pair)
                     .getValue().getOrNull()
-                    ?.find { it.ticker == cleanedTicker }
+                    ?.find { it.ticker.equals(cleanedTicker, ignoreCase = true) }
                     ?.let { return@runCatching it }
 
                 accessFuturesCache(pair)
                     .getValue().getOrNull()
-                    ?.find { it.ticker == cleanedTicker }
+                    ?.find { it.ticker.equals(cleanedTicker, ignoreCase = true) }
                     ?.let { return@runCatching it }
             }
         }

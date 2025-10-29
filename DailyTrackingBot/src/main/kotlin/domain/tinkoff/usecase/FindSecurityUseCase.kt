@@ -15,7 +15,7 @@ class FindSecurityUseCase(
     private val repository: UserRepository
 ) {
     suspend operator fun invoke(userId: Long, ticker: String): Result {
-        val normalizedTicker = ticker.trim().uppercase()
+        val normalizedTicker = ticker.trim()
         return when (val res = api.findSecurity(normalizedTicker)) {
             is FindSecurityResponse.Share -> handleSecurity(userId, res.share)
             is FindSecurityResponse.Future -> handleSecurity(userId, res.future)
@@ -33,6 +33,7 @@ class FindSecurityUseCase(
     }
 
     private suspend fun findSuggestions(ticker: String): Result = coroutineScope {
+        val t = ticker.uppercase().lowercase()
         val sharesDeferred = async { api.tradableShares(InstrumentsRequest.default) }
         val futuresDeferred = async { api.tradableFutures(InstrumentsRequest.default) }
         val shares = sharesDeferred.await().getOrNull()?.map { it.ticker }
@@ -45,7 +46,7 @@ class FindSecurityUseCase(
 
         val suggestions = tickers
             .asSequence()
-            .map { it to levenshtein(ticker, it) }
+            .map { it to levenshtein(t, it.uppercase().lowercase()) }
             .sortedBy { it.second }
             .take(5)
             .map { it.first }
