@@ -14,11 +14,12 @@ class BbAlertScreen(
     override val disableWebPagePreview = true
     override val replyMarkup = defaultSecurityAlertReplayMarkup(update.security)
 
-    private fun renderText() = buildString {
+    private fun renderText() = buildString(UPDATE_BUILDER_CAPACITY) {
         appendLine("*Сработал сигнал по BB!*")
         renderSecurityTitleForAlert(update.security)
 
         appendLine("*Текущая цена:* ${update.currentPrice.formatToRu()}$ROUBLE_SIGN")
+        appendPlannedPricesToSecurityAlert(update.security)
         appendLine("Критические значения BB:")
         for (interval in update.intervals) {
             when (interval) {

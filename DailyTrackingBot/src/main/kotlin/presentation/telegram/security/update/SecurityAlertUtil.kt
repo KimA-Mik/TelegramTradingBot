@@ -2,6 +2,7 @@ package presentation.telegram.security.update
 
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
+import domain.common.ROUBLE_SIGN
 import domain.common.formatToRu
 import domain.techanalysis.BollingerBands
 import domain.updateservice.indicators.CacheEntry
@@ -16,6 +17,8 @@ import presentation.util.TelegramUtil
 import presentation.util.TinInvestUtil
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+
+const val UPDATE_BUILDER_CAPACITY = 1024
 
 fun StringBuilder.renderSecurityTitleForAlert(security: TrackingSecurity) {
     val type = when (security.type) {
@@ -58,22 +61,11 @@ fun StringBuilder.appendIndicatorsToSecurityAlert(indicators: CacheEntry?, curre
     renderBb(indicators.hourlyBb, currentPrice, "1ч")
     renderBb(indicators.hour4Bb, currentPrice, "4ч")
     renderBb(indicators.dailyBb, currentPrice, "1д")
-//    var bbColor = PresentationUtil.markupBbColor(currentPrice, indicators.min15bb.lower, indicators.min15bb.upper)
-//    append("*${bbColor}BB (15м):* ${indicators.min15bb.lower.formatToRu()} - ")
-//    append("*${indicators.min15bb.middle.formatToRu()}* - ")
-//    appendLine(indicators.min15bb.upper.formatToRu())
-//    bbColor = PresentationUtil.markupBbColor(currentPrice, indicators.hourlyBb.lower, indicators.hourlyBb.upper)
-//    append("*${bbColor}BB (1ч):* ${indicators.hourlyBb.lower.formatToRu()} - ")
-//    append("*${indicators.hourlyBb.middle.formatToRu()}* - ")
-//    appendLine(indicators.hourlyBb.upper.formatToRu())
-//    bbColor = PresentationUtil.markupBbColor(currentPrice, indicators.hour4Bb.lower, indicators.hour4Bb.upper)
-//    append("*${bbColor}BB (4ч):* ${indicators.hour4Bb.lower.formatToRu()} - ")
-//    append("*${indicators.hour4Bb.middle.formatToRu()}* - ")
-//    appendLine(indicators.hour4Bb.upper.formatToRu())
-//    bbColor = PresentationUtil.markupBbColor(currentPrice, indicators.dailyBb.lower, indicators.dailyBb.upper)
-//    append("*${bbColor}BB (1д):* ${indicators.dailyBb.lower.formatToRu()} - ")
-//    append("*${indicators.dailyBb.middle.formatToRu()}* - ")
-//    appendLine(indicators.dailyBb.upper.formatToRu())
+}
+
+fun StringBuilder.appendPlannedPricesToSecurityAlert(security: TrackingSecurity) {
+    append("*Планируемая цена покупки:* ", security.lowTargetPrice.formatToRu(), ROUBLE_SIGN, '\n')
+    append("*Планируемая цена продажи:* ", security.targetPrice.formatToRu(), ROUBLE_SIGN, '\n')
 }
 
 fun StringBuilder.renderBb(

@@ -15,11 +15,12 @@ class RsiAlertScreen(
     override val disableWebPagePreview = true
     override val replyMarkup = defaultSecurityAlertReplayMarkup(update.security)
 
-    private fun renderText() = buildString {
+    private fun renderText() = buildString(UPDATE_BUILDER_CAPACITY) {
         appendLine("*Сработал сигнал по RSI!*")
         renderSecurityTitleForAlert(update.security)
 
         appendLine("*Текущая цена:* ${update.currentPrice.formatToRu()}$ROUBLE_SIGN")
+        appendPlannedPricesToSecurityAlert(update.security)
         appendLine("Критические значения RSI:")
         for (interval in update.intervals) {
             when (interval) {
