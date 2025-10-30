@@ -8,7 +8,7 @@ class FindTickerForUserUseCase(
 ) {
     suspend operator fun invoke(userId: Long, ticker: String): TrackingSecurity? {
         val user = repository.findFullUserById(userId) ?: return null
-        val normalizedTicker = ticker.trim().uppercase()
-        return user.securities.find { normalizedTicker == it.ticker }
+        val normalizedTicker = ticker.trim()
+        return user.securities.find { normalizedTicker.equals(it.ticker, ignoreCase = true) }
     }
 }
