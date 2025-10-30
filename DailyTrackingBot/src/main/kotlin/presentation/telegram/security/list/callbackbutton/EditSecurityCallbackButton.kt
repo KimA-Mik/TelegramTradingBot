@@ -5,7 +5,7 @@ import presentation.telegram.core.CallbackButton
 
 object EditSecurityCallbackButton : CallbackButton("edit_security") {
     fun getCallbackData(ticker: String) = InlineKeyboardButton.CallbackData(
-        text = "Редактировать $ticker",
+        text = ticker,
         callbackData = callbackName + QUERY_SEPARATOR + ticker
     )
 
