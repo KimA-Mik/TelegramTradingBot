@@ -77,10 +77,15 @@ class SecurityListScreen(
                 )
             }
 
-            securities.forEach {
-                add(
-                    listOf(EditSecurityCallbackButton.getCallbackData(it.ticker))
-                )
+            for (i in securities.indices step 2) {
+                val list = buildList {
+                    add(EditSecurityCallbackButton.getCallbackData(securities[i].ticker))
+                    if (i + 1 < securities.size) {
+                        add(EditSecurityCallbackButton.getCallbackData(securities[i + 1].ticker))
+                    }
+                }
+
+                add(list)
             }
         }
 

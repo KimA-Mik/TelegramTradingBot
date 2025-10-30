@@ -40,6 +40,6 @@ class GetUserTrackingSecuritiesUseCase(
     }
 
     companion object {
-        private const val DEFAULT_PAGE_SIZE = 5
+        private const val DEFAULT_PAGE_SIZE = 10
     }
 }
