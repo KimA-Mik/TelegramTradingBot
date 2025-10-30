@@ -62,14 +62,8 @@ class TickerSearchResultScreen(
 
         is FindSecurityUseCase.Result.Success -> InlineKeyboardMarkup.create(
             listOf(
-                if (searchResult.subscribed) InlineKeyboardButton.CallbackData(
-                    text = UnsubscribeFromSecurityCallbackButton.TEXT,
-                    callbackData = UnsubscribeFromSecurityCallbackButton.getCallbackData(searchResult.security.ticker)
-                )
-                else InlineKeyboardButton.CallbackData(
-                    text = SubscribeToSecurityCallbackButton.TEXT,
-                    callbackData = SubscribeToSecurityCallbackButton.getCallbackData(searchResult.security.ticker)
-                )
+                if (searchResult.subscribed) UnsubscribeFromSecurityCallbackButton.getCallbackData(searchResult.security.ticker)
+                else SubscribeToSecurityCallbackButton.getCallbackData(searchResult.security.ticker)
             )
         )
 

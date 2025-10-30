@@ -15,6 +15,7 @@ import presentation.telegram.security.edit.callbackbutton.ResetPriceCallbackButt
 import presentation.telegram.security.edit.callbackbutton.ToggleIsActiveCallbackButton
 import presentation.telegram.security.edit.callbackbutton.ToggleRemainActiveCallbackButton
 import presentation.telegram.security.edit.callbackbutton.ToggleShowNoteCallbackButton
+import presentation.telegram.security.search.callbackbutton.UnsubscribeFromSecurityCallbackButton
 import presentation.util.TelegramUtil
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -104,10 +105,11 @@ class SecurityScreen(
                 ToggleRemainActiveCallbackButton.getCallbackData(security.ticker, security.remainActive)
             ),
             listOf(
-                ToggleShowNoteCallbackButton.getCallbackData(security.ticker, security.showNote)
+                ToggleShowNoteCallbackButton.getCallbackData(security.ticker, security.showNote),
+                ResetPriceCallbackButton.getCallbackData(security.ticker)
             ),
             listOf(
-                ResetPriceCallbackButton.getCallbackData(security.ticker)
+                UnsubscribeFromSecurityCallbackButton.getCallbackData(security.ticker, popBack = true)
             )
         )
     )
