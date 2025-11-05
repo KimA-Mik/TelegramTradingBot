@@ -33,8 +33,8 @@ object MathUtil {
         return percent <= lowPercent || percent >= highPercent
     }
 
-    const val RSI_FOR_BB_HIGH = 65.0
-    const val RSI_FOR_BB_LOW = 35.0
+    const val RSI_FOR_BB_HIGH = 70.0
+    const val RSI_FOR_BB_LOW = 30.0
     fun shouldNotifyBb(
         rsi: Double,
         price: Double,
