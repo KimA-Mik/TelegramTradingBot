@@ -12,10 +12,14 @@ object PresentationUtil {
     const val RED = "🔴"
     const val YELLOW = "🟡"
 
-    fun rsiColor(value: Double): String {
+    fun rsiColor(
+        value: Double,
+        low: Double = MathUtil.RSI_LOW,
+        high: Double = MathUtil.RSI_HIGH
+    ): String {
         return when {
-            value >= MathUtil.RSI_HIGH -> RED
-            value <= MathUtil.RSI_LOW -> GREEN
+            value >= high -> RED
+            value <= low -> GREEN
             else -> YELLOW
         }
     }

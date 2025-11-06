@@ -6,22 +6,16 @@ import kotlin.math.abs
 object MathUtil {
     const val RSI_LOW = 22.0
     const val RSI_HIGH = 78.0
-    fun isRsiCritical(rsi: Double, low: Double = RSI_LOW, high: Double = RSI_HIGH) =
-        rsi <= low || rsi >= high
-
     const val BB_FOR_RSI_HIGH = 80.0
     const val BB_FOR_RSI_LOW = 20.0
-    fun shouldNotifyRsi(
-        rsi: Double,
-        price: Double,
-        bb: BollingerBands.BollingerBandsData,
-        bbLowPercent: Double = BB_FOR_RSI_LOW,
-        bbHighPercent: Double = BB_FOR_RSI_HIGH
-    ) = isRsiCritical(rsi) && isBbCritical(price, bb, bbLowPercent, bbHighPercent)
+    fun isRsiCritical(rsi: Double, low: Double = RSI_LOW, high: Double = RSI_HIGH) =
+        rsi <= low || rsi >= high
 
     const val BOLLINGER_BARS_COUNT = 20
     const val BB_CRITICAL_HIGH = 0.95
     const val BB_CRITICAL_LOW = 0.05
+    const val RSI_FOR_BB_HIGH = 70.0
+    const val RSI_FOR_BB_LOW = 30.0
     fun isBbCritical(
         value: Double,
         bb: BollingerBands.BollingerBandsData,
@@ -32,16 +26,6 @@ object MathUtil {
         val percent = (value - bb.lower) / (bb.upper - bb.lower)
         return percent <= lowPercent || percent >= highPercent
     }
-
-    const val RSI_FOR_BB_HIGH = 70.0
-    const val RSI_FOR_BB_LOW = 30.0
-    fun shouldNotifyBb(
-        rsi: Double,
-        price: Double,
-        bb: BollingerBands.BollingerBandsData,
-        lowRsi: Double = RSI_FOR_BB_LOW,
-        highRsi: Double = RSI_FOR_BB_HIGH,
-    ) = isBbCritical(price, bb) && isRsiCritical(rsi, lowRsi, highRsi)
 
     fun absolutePercentageDifference(oldValue: Double, newValue: Double): Double {
         if (oldValue + newValue == 0.0) return 0.0

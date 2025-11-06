@@ -4,6 +4,7 @@ import com.github.kotlintelegrambot.entities.ParseMode
 import domain.common.ROUBLE_SIGN
 import domain.common.formatToRu
 import domain.updateservice.TelegramUpdate
+import domain.util.MathUtil
 import presentation.telegram.core.screen.BotScreen
 import presentation.util.PresentationUtil
 
@@ -30,7 +31,12 @@ class RsiAlertScreen(
         }
 
         appendLine()
-        appendIndicatorsToSecurityAlert(update.indicators, update.currentPrice)
+        appendIndicatorsToSecurityAlert(
+            update.indicators,
+            update.currentPrice,
+            bbLow = MathUtil.BB_FOR_RSI_LOW,
+            bbHigh = MathUtil.BB_FOR_RSI_HIGH
+        )
         appendNoteToSecurityAlert(update.security)
     }
 }

@@ -8,6 +8,7 @@ import domain.techanalysis.BollingerBands
 import domain.updateservice.indicators.CacheEntry
 import domain.user.model.SecurityType
 import domain.user.model.TrackingSecurity
+import domain.util.MathUtil
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
@@ -48,19 +49,27 @@ fun StringBuilder.appendNoteToSecurityAlert(security: TrackingSecurity) {
     }
 }
 
-fun StringBuilder.appendIndicatorsToSecurityAlert(indicators: CacheEntry?, currentPrice: Double) {
+fun StringBuilder.appendIndicatorsToSecurityAlert(
+    indicators: CacheEntry?, currentPrice: Double,
+    rsiLow: Double = MathUtil.RSI_LOW, rsiHigh: Double = MathUtil.RSI_HIGH,
+    bbLow: Double = MathUtil.BB_CRITICAL_LOW, bbHigh: Double = MathUtil.BB_CRITICAL_HIGH
+) {
     if (indicators == null) return
 
     appendLine("*Индикаторы:*")
-    appendLine("*${PresentationUtil.rsiColor(indicators.min15Rsi)}RSI (15м):* ${indicators.min15Rsi.formatToRu()}")
-    appendLine("*${PresentationUtil.rsiColor(indicators.hourlyRsi)}RSI (1ч):* ${indicators.hourlyRsi.formatToRu()}")
-    appendLine("*${PresentationUtil.rsiColor(indicators.hour4Rsi)}RSI (4ч):* ${indicators.hour4Rsi.formatToRu()}")
-    appendLine("*${PresentationUtil.rsiColor(indicators.dailyRsi)}RSI (1д):* ${indicators.dailyRsi.formatToRu()}")
+    var color = PresentationUtil.rsiColor(indicators.min15Rsi, rsiLow, rsiHigh)
+    append('*', color, "RSI (15м):* ", indicators.min15Rsi.formatToRu(), '\n')
+    color = PresentationUtil.rsiColor(indicators.hourlyRsi, rsiLow, rsiHigh)
+    append('*', color, "RSI (1ч):* ", indicators.hourlyRsi.formatToRu(), '\n')
+    color = PresentationUtil.rsiColor(indicators.hour4Rsi, rsiLow, rsiHigh)
+    append('*', color, "RSI (4ч):* ", indicators.hour4Rsi.formatToRu(), '\n')
+    color = PresentationUtil.rsiColor(indicators.dailyRsi, rsiLow, rsiHigh)
+    append('*', color, "RSI (1д):* ", indicators.dailyRsi.formatToRu(), '\n')
 
-    renderBb(indicators.min15bb, currentPrice, "15м")
-    renderBb(indicators.hourlyBb, currentPrice, "1ч")
-    renderBb(indicators.hour4Bb, currentPrice, "4ч")
-    renderBb(indicators.dailyBb, currentPrice, "1д")
+    renderBb(indicators.min15bb, currentPrice, "15м", bbLow, bbHigh)
+    renderBb(indicators.hourlyBb, currentPrice, "1ч", bbLow, bbHigh)
+    renderBb(indicators.hour4Bb, currentPrice, "4ч", bbLow, bbHigh)
+    renderBb(indicators.dailyBb, currentPrice, "1д", bbLow, bbHigh)
 }
 
 fun StringBuilder.appendPlannedPricesToSecurityAlert(security: TrackingSecurity) {
@@ -71,9 +80,17 @@ fun StringBuilder.appendPlannedPricesToSecurityAlert(security: TrackingSecurity)
 fun StringBuilder.renderBb(
     bollingerBandsData: BollingerBands.BollingerBandsData,
     currentPrice: Double,
-    intervalsString: String
+    intervalsString: String,
+    lowPercent: Double = MathUtil.BB_CRITICAL_LOW,
+    highPercent: Double = MathUtil.BB_CRITICAL_HIGH,
 ) {
-    val bbColor = PresentationUtil.markupBbColor(currentPrice, bollingerBandsData.lower, bollingerBandsData.upper)
+    val bbColor = PresentationUtil.markupBbColor(
+        currentPrice,
+        bollingerBandsData.lower,
+        bollingerBandsData.upper,
+        lowPercent,
+        highPercent
+    )
     append('*', bbColor, "BB (", intervalsString, "):* ", bollingerBandsData.lower.formatToRu(), " - ")
     append('*', bollingerBandsData.middle.formatToRu(), "* - ")
     appendLine(bollingerBandsData.upper.formatToRu())

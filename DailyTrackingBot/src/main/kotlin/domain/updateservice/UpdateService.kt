@@ -195,12 +195,16 @@ class UpdateService(
     ): TrackingSecurity {
         if (indicators == null) return security
         val intervals = mutableListOf<TelegramUpdate.RsiAlert.RsiInterval>()
-        if (MathUtil.shouldNotifyRsi(indicators.min15Rsi, lastPrice, indicators.min15bb)) {
-            intervals.add(TelegramUpdate.RsiAlert.RsiInterval.MIN15)
+        if (!MathUtil.isBbCritical(lastPrice, indicators.min15bb, MathUtil.BB_FOR_RSI_LOW, MathUtil.BB_FOR_RSI_HIGH) &&
+            !MathUtil.isBbCritical(lastPrice, indicators.hourlyBb, MathUtil.BB_FOR_RSI_LOW, MathUtil.BB_FOR_RSI_HIGH) &&
+            !MathUtil.isBbCritical(lastPrice, indicators.hour4Bb, MathUtil.BB_FOR_RSI_LOW, MathUtil.BB_FOR_RSI_HIGH) &&
+            !MathUtil.isBbCritical(lastPrice, indicators.dailyBb, MathUtil.BB_FOR_RSI_LOW, MathUtil.BB_FOR_RSI_HIGH)
+        ) {
+            return security
         }
-        if (MathUtil.shouldNotifyRsi(indicators.hour4Rsi, lastPrice, indicators.hour4Bb)) {
-            intervals.add(TelegramUpdate.RsiAlert.RsiInterval.HOUR4)
-        }
+
+        if (MathUtil.isRsiCritical(indicators.min15Rsi)) intervals.add(TelegramUpdate.RsiAlert.RsiInterval.MIN15)
+        if (MathUtil.isRsiCritical(indicators.hour4Rsi)) intervals.add(TelegramUpdate.RsiAlert.RsiInterval.HOUR4)
 
         val shouldNotifyRsi = intervals.isNotEmpty()
         if (shouldNotifyRsi && security.shouldNotifyRsi) {
@@ -230,12 +234,16 @@ class UpdateService(
     ): TrackingSecurity {
         if (indicators == null) return security
         val intervals = mutableListOf<TelegramUpdate.BbAlert.BbInterval>()
-        if (MathUtil.shouldNotifyBb(indicators.min15Rsi, lastPrice, indicators.min15bb)) {
-            intervals.add(TelegramUpdate.BbAlert.BbInterval.MIN15)
+        if (!MathUtil.isRsiCritical(indicators.min15Rsi, MathUtil.RSI_FOR_BB_LOW, MathUtil.RSI_FOR_BB_HIGH) &&
+            !MathUtil.isRsiCritical(indicators.hourlyRsi, MathUtil.RSI_FOR_BB_LOW, MathUtil.RSI_FOR_BB_HIGH) &&
+            !MathUtil.isRsiCritical(indicators.hour4Rsi, MathUtil.RSI_FOR_BB_LOW, MathUtil.RSI_FOR_BB_HIGH) &&
+            !MathUtil.isRsiCritical(indicators.dailyRsi, MathUtil.RSI_FOR_BB_LOW, MathUtil.RSI_FOR_BB_HIGH)
+        ) {
+            return security
         }
-        if (MathUtil.shouldNotifyBb(indicators.hour4Rsi, lastPrice, indicators.hour4Bb)) {
-            intervals.add(TelegramUpdate.BbAlert.BbInterval.HOUR4)
-        }
+
+        if (MathUtil.isBbCritical(lastPrice, indicators.min15bb)) intervals.add(TelegramUpdate.BbAlert.BbInterval.MIN15)
+        if (MathUtil.isBbCritical(lastPrice, indicators.hour4Bb)) intervals.add(TelegramUpdate.BbAlert.BbInterval.HOUR4)
 
         val shouldNotifyBb = intervals.isNotEmpty()
         if (shouldNotifyBb && security.shouldNotifyBb) {
