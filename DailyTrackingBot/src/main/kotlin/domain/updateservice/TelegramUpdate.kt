@@ -21,6 +21,18 @@ sealed class TelegramUpdate(val userId: Long) {
         }
     }
 
+    data class UnboundPriceAlert(
+        val user: User,
+        val security: TrackingSecurity,
+        val currentPrice: Double,
+        val indicators: CacheEntry?,
+        val type: PriceType
+    ) : TelegramUpdate(user.id) {
+        enum class PriceType {
+            ABOVE, BELOW
+        }
+    }
+
     data class RsiAlert(
         val user: User,
         val security: TrackingSecurity,

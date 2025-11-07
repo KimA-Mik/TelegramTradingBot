@@ -4,6 +4,9 @@ import domain.techanalysis.BollingerBands
 import kotlin.math.abs
 
 object MathUtil {
+    const val PRICE_ZERO = 0.0
+    const val EPSILON = 1e-5
+
     const val RSI_LOW = 22.0
     const val RSI_HIGH = 78.0
     const val BB_FOR_RSI_HIGH = 80.0

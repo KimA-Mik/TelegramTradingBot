@@ -3,6 +3,7 @@ package domain.user.usecase
 import domain.user.model.TrackingSecurity
 import domain.user.model.User
 import domain.user.repository.UserRepository
+import domain.util.MathUtil
 
 class ResetPriceUseCase(
     private val repository: UserRepository
@@ -12,8 +13,8 @@ class ResetPriceUseCase(
         val security = fullUser.securities.find { it.ticker == ticker } ?: return null
 
         val updatedSecurity = security.copy(
-            targetPrice = 0.0,
-            lowTargetPrice = 0.0,
+            targetPrice = MathUtil.PRICE_ZERO,
+            lowTargetPrice = MathUtil.PRICE_ZERO,
             isActive = false,
             note = null,
             noteUpdatedMs = null,

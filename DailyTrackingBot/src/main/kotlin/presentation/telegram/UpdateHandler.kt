@@ -7,6 +7,7 @@ import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.security.update.BbAlertScreen
 import presentation.telegram.security.update.PriceAlertScreen
 import presentation.telegram.security.update.RsiAlertScreen
+import presentation.telegram.security.update.UnboundPriceAlertScreen
 
 class UpdateHandler(
     service: UpdateService
@@ -22,6 +23,7 @@ class UpdateHandler(
             is TelegramUpdate.PriceAlert -> PriceAlertScreen(update)
             is TelegramUpdate.RsiAlert -> RsiAlertScreen(update)
             is TelegramUpdate.BbAlert -> BbAlertScreen(update)
+            is TelegramUpdate.UnboundPriceAlert -> UnboundPriceAlertScreen(update)
         }
     }
 }

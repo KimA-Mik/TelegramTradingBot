@@ -8,6 +8,7 @@ import domain.user.repository.UserRepository
 import domain.util.DateUtil
 import domain.util.MathUtil
 import domain.util.TimeUtil
+import domain.util.isEqual
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -22,6 +23,7 @@ import ru.kima.cacheserver.api.schema.model.requests.GetLastPricesRequest
 import ru.kima.cacheserver.api.schema.model.requests.InstrumentsRequest
 import kotlin.random.Random
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
 
 class UpdateService(
@@ -155,6 +157,66 @@ class UpdateService(
         lastPrice: Double
     ): TrackingSecurity {
         if (!security.isActive) return security
+        return if (lastPrice > security.targetPrice && !security.targetPrice.isEqual(MathUtil.PRICE_ZERO) ||
+            lastPrice < security.lowTargetPrice && !security.lowTargetPrice.isEqual(MathUtil.PRICE_ZERO)
+        ) {
+            handleUnboundPrice(user, security, indicators, lastPrice)
+        } else {
+            handleBoundPrice(user, security, indicators, lastPrice)
+        }
+    }
+
+    private val unboundUpdateIntervalSec = 1.minutes.inWholeSeconds
+    private val unboundThreshold = 0.1
+
+    @OptIn(ExperimentalTime::class)
+    private suspend fun handleUnboundPrice(
+        user: FullUser,
+        security: TrackingSecurity,
+        indicators: CacheEntry?,
+        lastPrice: Double,
+    ): TrackingSecurity {
+        val currentSec = Clock.System.now().epochSeconds
+        if (currentSec - security.lastUnboundUpdateSec < unboundUpdateIntervalSec) {
+            return security
+        }
+
+        val priceType = when {
+            lastPrice > security.targetPrice && MathUtil.absolutePercentageDifference(
+                lastPrice,
+                security.targetPrice
+            ) > unboundThreshold -> TelegramUpdate.UnboundPriceAlert.PriceType.ABOVE
+
+            lastPrice < security.lowTargetPrice && MathUtil.absolutePercentageDifference(
+                lastPrice,
+                security.lowTargetPrice
+            ) > unboundThreshold -> TelegramUpdate.UnboundPriceAlert.PriceType.BELOW
+
+            else -> null
+        }
+
+        if (priceType != null) {
+            _updates.emit(
+                TelegramUpdate.UnboundPriceAlert(
+                    user = user.user,
+                    security = security,
+                    currentPrice = lastPrice,
+                    indicators = indicators,
+                    type = priceType
+                )
+            )
+            return security.copy(shouldNotify = true, lastUnboundUpdateSec = currentSec)
+        }
+
+        return security
+    }
+
+    private suspend fun handleBoundPrice(
+        user: FullUser,
+        security: TrackingSecurity,
+        indicators: CacheEntry?,
+        lastPrice: Double
+    ): TrackingSecurity {
         val currentDeviation = MathUtil.absolutePercentageDifference(lastPrice, security.targetPrice)
         val currentLowDeviation = MathUtil.absolutePercentageDifference(lastPrice, security.lowTargetPrice)
         val shouldNotify = currentDeviation < security.targetDeviation
