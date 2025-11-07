@@ -38,7 +38,7 @@ class BbAlertScreen(
         }
 
         appendLine()
-        appendIndicatorsToSecurityAlert(update.indicators, update.currentPrice)
+        appendIndicatorsToSecurityAlert(update.indicators, update.currentPrice, renderMFI = true)
         appendNoteToSecurityAlert(update.security)
     }
 }

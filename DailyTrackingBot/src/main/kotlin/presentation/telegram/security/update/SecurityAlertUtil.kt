@@ -51,6 +51,8 @@ fun StringBuilder.appendNoteToSecurityAlert(security: TrackingSecurity) {
 
 fun StringBuilder.appendIndicatorsToSecurityAlert(
     indicators: CacheEntry?, currentPrice: Double,
+    //TODO: Have fun with mfi
+    renderMFI: Boolean = false,
     rsiLow: Double = MathUtil.RSI_LOW, rsiHigh: Double = MathUtil.RSI_HIGH,
     bbLow: Double = MathUtil.BB_CRITICAL_LOW, bbHigh: Double = MathUtil.BB_CRITICAL_HIGH
 ) {
@@ -65,6 +67,17 @@ fun StringBuilder.appendIndicatorsToSecurityAlert(
     append('*', color, "RSI (4ч):* ", indicators.hour4Rsi.formatToRu(), '\n')
     color = PresentationUtil.rsiColor(indicators.dailyRsi, rsiLow, rsiHigh)
     append('*', color, "RSI (1д):* ", indicators.dailyRsi.formatToRu(), '\n')
+
+    if (renderMFI) {
+        color = PresentationUtil.rsiColor(indicators.min15Mfi)
+        append('*', color, "MFI (15м):* ", indicators.min15Mfi.formatToRu(), '\n')
+        color = PresentationUtil.rsiColor(indicators.hourlyMfi)
+        append('*', color, "MFI (1ч):* ", indicators.hourlyMfi.formatToRu(), '\n')
+        color = PresentationUtil.rsiColor(indicators.hour4Mfi)
+        append('*', color, "MFI (4ч):* ", indicators.hour4Mfi.formatToRu(), '\n')
+        color = PresentationUtil.rsiColor(indicators.dailyMfi)
+        append('*', color, "MFI (1д):* ", indicators.dailyMfi.formatToRu(), '\n')
+    }
 
     renderBb(indicators.min15bb, currentPrice, "15м", bbLow, bbHigh)
     renderBb(indicators.hourlyBb, currentPrice, "1ч", bbLow, bbHigh)
