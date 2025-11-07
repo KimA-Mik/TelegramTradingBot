@@ -26,7 +26,7 @@ fun List<HistoricCandle>.toSeries(
             .highPrice(candle.high)
             .lowPrice(candle.low)
             .closePrice(candle.close)
-            //.volume()
+            .volume(candle.volume)
             .build()
 
         series.addBar(bar)
