@@ -27,6 +27,11 @@ object MathUtil {
         return percent <= lowPercent || percent >= highPercent
     }
 
+    const val MFI_LOW = 20.0
+    const val MFI_HIGH = 80.0
+    fun isMfiCritical(mfi: Double, low: Double = MFI_LOW, high: Double = MFI_HIGH) =
+        mfi <= low || mfi >= high
+
     fun absolutePercentageDifference(oldValue: Double, newValue: Double): Double {
         if (oldValue + newValue == 0.0) return 0.0
         //https://www.calculatorsoup.com/calculators/algebra/percent-difference-calculator.php

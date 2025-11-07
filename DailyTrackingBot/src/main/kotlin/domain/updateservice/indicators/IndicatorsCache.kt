@@ -6,6 +6,7 @@ import domain.util.lastDouble
 import org.ta4j.core.BarSeries
 import org.ta4j.core.indicators.RSIIndicator
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator
+import org.ta4j.core.indicators.volume.MoneyFlowIndexIndicator
 import ru.kima.cacheserver.api.api.CacheServerApi
 import ru.kima.cacheserver.api.schema.marketdataService.CandleInterval
 import kotlin.time.ExperimentalTime
@@ -49,6 +50,10 @@ class IndicatorsCache(
             hourlyBb = BollingerBands.calculate(seriesResult.hourly),
             hour4Bb = BollingerBands.calculate(seriesResult.hour4),
             dailyBb = BollingerBands.calculate(seriesResult.daily),
+            min15Mfi = MoneyFlowIndexIndicator(seriesResult.min15, rsiPeriod).lastDouble(),
+            hourlyMfi = MoneyFlowIndexIndicator(seriesResult.hourly, rsiPeriod).lastDouble(),
+            hour4Mfi = MoneyFlowIndexIndicator(seriesResult.hour4, rsiPeriod).lastDouble(),
+            dailyMfi = MoneyFlowIndexIndicator(seriesResult.daily, rsiPeriod).lastDouble()
         )
     }
 

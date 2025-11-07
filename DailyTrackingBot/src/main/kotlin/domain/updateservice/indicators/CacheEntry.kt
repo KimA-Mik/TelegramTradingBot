@@ -11,5 +11,9 @@ data class CacheEntry(
     val min15bb: BollingerBands.BollingerBandsData,
     val hourlyBb: BollingerBands.BollingerBandsData,
     val hour4Bb: BollingerBands.BollingerBandsData,
-    val dailyBb: BollingerBands.BollingerBandsData
+    val dailyBb: BollingerBands.BollingerBandsData,
+    val min15Mfi: Double,
+    val hourlyMfi: Double,
+    val hour4Mfi: Double,
+    val dailyMfi: Double,
 )

@@ -233,15 +233,17 @@ class UpdateService(
         lastPrice: Double,
     ): TrackingSecurity {
         if (indicators == null) return security
-        val intervals = mutableListOf<TelegramUpdate.BbAlert.BbInterval>()
         if (!MathUtil.isRsiCritical(indicators.min15Rsi, MathUtil.RSI_FOR_BB_LOW, MathUtil.RSI_FOR_BB_HIGH) &&
             !MathUtil.isRsiCritical(indicators.hourlyRsi, MathUtil.RSI_FOR_BB_LOW, MathUtil.RSI_FOR_BB_HIGH) &&
             !MathUtil.isRsiCritical(indicators.hour4Rsi, MathUtil.RSI_FOR_BB_LOW, MathUtil.RSI_FOR_BB_HIGH) &&
             !MathUtil.isRsiCritical(indicators.dailyRsi, MathUtil.RSI_FOR_BB_LOW, MathUtil.RSI_FOR_BB_HIGH)
-        ) {
-            return security
-        }
+        ) return security
 
+        if (!MathUtil.isMfiCritical(indicators.min15Mfi) && !MathUtil.isMfiCritical(indicators.hourlyMfi) &&
+            !MathUtil.isMfiCritical(indicators.hour4Mfi) && !MathUtil.isMfiCritical(indicators.dailyMfi)
+        ) return security
+
+        val intervals = mutableListOf<TelegramUpdate.BbAlert.BbInterval>()
         if (MathUtil.isBbCritical(lastPrice, indicators.min15bb)) intervals.add(TelegramUpdate.BbAlert.BbInterval.MIN15)
         if (MathUtil.isBbCritical(lastPrice, indicators.hour4Bb)) intervals.add(TelegramUpdate.BbAlert.BbInterval.HOUR4)
 
