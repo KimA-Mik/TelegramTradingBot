@@ -14,8 +14,8 @@ object MathUtil {
     const val BOLLINGER_BARS_COUNT = 20
     const val BB_CRITICAL_HIGH = 0.95
     const val BB_CRITICAL_LOW = 0.05
-    const val RSI_FOR_BB_HIGH = 70.0
-    const val RSI_FOR_BB_LOW = 30.0
+    const val RSI_FOR_BB_HIGH = 69.0
+    const val RSI_FOR_BB_LOW = 31.0
     fun isBbCritical(
         value: Double,
         bb: BollingerBands.BollingerBandsData,
