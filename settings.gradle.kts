@@ -10,7 +10,9 @@ plugins {
 }
 
 rootProject.name = "TelegramTradingBot"
+include(":CommonBotLibrary")
 include(":FuturesBot")
 include(":SharesServer:CacheServerImplementation")
 include(":SharesServer:CacheServerApi")
 include(":DailyTrackingBot")
+include(":WatcherBot")

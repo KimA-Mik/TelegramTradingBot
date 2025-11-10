@@ -1,0 +1,52 @@
+package ru.kima.telegrambot.common.util
+
+import ru.kima.telegrambot.common.techanalysis.BollingerBands
+import kotlin.math.abs
+
+object MathUtil {
+    const val PRICE_ZERO = 0.0
+    const val EPSILON = 1e-5
+
+    const val RSI_LOW = 22.0
+    const val RSI_HIGH = 78.0
+    const val BB_FOR_RSI_HIGH = 80.0
+    const val BB_FOR_RSI_LOW = 20.0
+    fun isRsiCritical(rsi: Double, low: Double = RSI_LOW, high: Double = RSI_HIGH) =
+        rsi <= low || rsi >= high
+
+    const val BOLLINGER_BARS_COUNT = 20
+    const val BB_CRITICAL_HIGH = 0.95
+    const val BB_CRITICAL_LOW = 0.05
+    const val RSI_FOR_BB_HIGH = 69.0
+    const val RSI_FOR_BB_LOW = 31.0
+    fun isBbCritical(
+        value: Double,
+        bb: BollingerBands.BollingerBandsData,
+        lowPercent: Double = BB_CRITICAL_LOW,
+        highPercent: Double = BB_CRITICAL_HIGH
+    ): Boolean {
+        val upper = bb.upper.lastDouble()
+        val lower = bb.lower.lastDouble()
+        if (upper == lower) return false // avoid division by zero
+        val percent = (value - lower) / (upper - lower)
+        return percent <= lowPercent || percent >= highPercent
+    }
+
+    const val MFI_LOW = 20.0
+    const val MFI_HIGH = 80.0
+    fun isMfiCritical(mfi: Double, low: Double = MFI_LOW, high: Double = MFI_HIGH) =
+        mfi <= low || mfi >= high
+
+    fun absolutePercentageDifference(oldValue: Double, newValue: Double): Double {
+        if (oldValue + newValue == 0.0) return 0.0
+        //https://www.calculatorsoup.com/calculators/algebra/percent-difference-calculator.php
+        return abs(newValue - oldValue) * 2 / (newValue + oldValue) * 100
+    }
+
+    fun anotherAbsolutePercentageDifference(oldValue: Double, newValue: Double): Double {
+        if (oldValue == 0.0) {
+            return 0.0
+        }
+        return abs((newValue - oldValue) / oldValue) * 100
+    }
+}

@@ -1,0 +1,19 @@
+package domain.updateservice.indicators
+
+import ru.kima.telegrambot.common.techanalysis.BollingerBands
+
+
+data class CacheEntry(
+    val min15Rsi: Double,
+    val hourlyRsi: Double,
+    val hour4Rsi: Double,
+    val dailyRsi: Double,
+    val min15bb: BollingerBands.BollingerBandsData,
+    val hourlyBb: BollingerBands.BollingerBandsData,
+    val hour4Bb: BollingerBands.BollingerBandsData,
+    val dailyBb: BollingerBands.BollingerBandsData,
+    val min15Mfi: Double,
+    val hourlyMfi: Double,
+    val hour4Mfi: Double,
+    val dailyMfi: Double,
+)
