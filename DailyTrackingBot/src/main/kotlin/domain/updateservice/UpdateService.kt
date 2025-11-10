@@ -49,7 +49,7 @@ class UpdateService(
             delay(30 * TimeUtil.SECOND_MILLIS + delayTime.toLong())
             checkForUpdates()
             resetUsers()
-            delayNonWorkingHours(9, 50, 23, 59)
+            delayNonWorkingHours(8, 45, 23, 59)
         }
     }
 
