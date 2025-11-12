@@ -5,7 +5,6 @@ import ru.kima.cacheserver.api.schema.model.requests.ORDER_BOOK_DEPTH
 import ru.kima.cacheserver.implementation.data.util.toTimestamp
 import ru.tinkoff.piapi.contract.v1.*
 import ru.ttech.piapi.core.connector.AsyncStubWrapper
-import java.util.concurrent.CompletableFuture
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -23,8 +22,8 @@ fun MarketDataService.getLastPrices(
 ) = callAsyncMethod { stub, observer ->
     val builder = GetLastPricesRequest.newBuilder()
     instrumentIds.forEach { builder.addInstrumentId(it) }
-    builder.setInstrumentStatus(instrumentStatus)
-    builder.setLastPriceType(lastPriceType)
+    builder.instrumentStatus = instrumentStatus
+    builder.lastPriceType = lastPriceType
 
     stub.getLastPrices(builder.build(), observer)
 }.asDeferred()
@@ -58,10 +57,10 @@ fun MarketDataService.getCandles(
 fun MarketDataService.getOrderBook(
     uid: String,
     depth: Int = ORDER_BOOK_DEPTH
-): CompletableFuture<GetOrderBookResponse> = callAsyncMethod { stub, observer ->
+) = callAsyncMethod { stub, observer ->
     val builder = GetOrderBookRequest.newBuilder()
         .setInstrumentId(uid)
         .setDepth(depth)
 
     stub.getOrderBook(builder.build(), observer)
-}
+}.asDeferred()
