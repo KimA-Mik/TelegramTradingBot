@@ -1,14 +1,14 @@
 package domain.updateservice.indicators
 
-import domain.techanalysis.BollingerBands
-import domain.techanalysis.mappers.toSeries
-import domain.util.lastDouble
 import org.ta4j.core.BarSeries
 import org.ta4j.core.indicators.RSIIndicator
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator
 import org.ta4j.core.indicators.volume.MoneyFlowIndexIndicator
 import ru.kima.cacheserver.api.api.CacheServerApi
 import ru.kima.cacheserver.api.schema.marketdataService.CandleInterval
+import ru.kima.telegrambot.common.techanalysis.BollingerBands
+import ru.kima.telegrambot.common.techanalysis.mappers.toSeries
+import ru.kima.telegrambot.common.util.lastDouble
 import kotlin.time.ExperimentalTime
 
 class IndicatorsCache(

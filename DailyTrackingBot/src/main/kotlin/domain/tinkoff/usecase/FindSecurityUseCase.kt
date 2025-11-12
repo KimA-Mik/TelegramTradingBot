@@ -1,7 +1,6 @@
 package domain.tinkoff.usecase
 
 import domain.user.repository.UserRepository
-import domain.util.levenshtein
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import ru.kima.cacheserver.api.api.CacheServerApi
@@ -9,6 +8,7 @@ import ru.kima.cacheserver.api.schema.model.Security
 import ru.kima.cacheserver.api.schema.model.requests.FindSecurityResponse
 import ru.kima.cacheserver.api.schema.model.requests.GetOrderBookRequest
 import ru.kima.cacheserver.api.schema.model.requests.InstrumentsRequest
+import ru.kima.telegrambot.common.util.levenshtein
 
 class FindSecurityUseCase(
     private val api: CacheServerApi,

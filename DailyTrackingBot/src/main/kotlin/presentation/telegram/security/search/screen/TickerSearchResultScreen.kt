@@ -11,9 +11,9 @@ import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.security.search.callbackbutton.SubscribeToSecurityCallbackButton
 import presentation.telegram.security.search.callbackbutton.TickerSuggestionCallbackButton
 import presentation.telegram.security.search.callbackbutton.UnsubscribeFromSecurityCallbackButton
-import presentation.util.TelegramUtil
 import ru.kima.cacheserver.api.schema.model.Future
 import ru.kima.cacheserver.api.schema.model.Share
+import ru.kima.telegrambot.common.util.TelegramUtil
 
 class TickerSearchResultScreen(
     userId: Long,

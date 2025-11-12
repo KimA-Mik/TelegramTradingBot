@@ -4,18 +4,16 @@ import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import domain.common.ROUBLE_SIGN
 import domain.common.formatToRu
-import domain.techanalysis.BollingerBands
 import domain.updateservice.indicators.CacheEntry
 import domain.user.model.SecurityType
 import domain.user.model.TrackingSecurity
-import domain.util.MathUtil
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
 import presentation.telegram.security.list.callbackbutton.EditSecurityCallbackButton
-import presentation.util.PresentationUtil
-import presentation.util.TelegramUtil
-import presentation.util.TinInvestUtil
+import presentation.util.securityUrl
+import ru.kima.telegrambot.common.techanalysis.BollingerBands
+import ru.kima.telegrambot.common.util.*
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -97,16 +95,19 @@ fun StringBuilder.renderBb(
     lowPercent: Double = MathUtil.BB_CRITICAL_LOW,
     highPercent: Double = MathUtil.BB_CRITICAL_HIGH,
 ) {
+    val lower = bollingerBandsData.lower.lastDouble()
+    val middle = bollingerBandsData.middle.lastDouble()
+    val upper = bollingerBandsData.upper.lastDouble()
     val bbColor = PresentationUtil.markupBbColor(
         currentPrice,
-        bollingerBandsData.lower,
-        bollingerBandsData.upper,
+        lower,
+        upper,
         lowPercent,
         highPercent
     )
-    append('*', bbColor, "BB (", intervalsString, "):* ", bollingerBandsData.lower.formatToRu(), " - ")
-    append('*', bollingerBandsData.middle.formatToRu(), "* - ")
-    appendLine(bollingerBandsData.upper.formatToRu())
+    append('*', bbColor, "BB (", intervalsString, "):* ", lower.formatToRu(), " - ")
+    append('*', middle.formatToRu(), "* - ")
+    appendLine(upper.formatToRu())
 }
 
 fun defaultSecurityAlertReplayMarkup(security: TrackingSecurity) = InlineKeyboardMarkup.create(

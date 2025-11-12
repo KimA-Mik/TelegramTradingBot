@@ -1,38 +1,11 @@
 package presentation.util
 
 import domain.user.model.TrackingSecurity
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.format.DateTimeFormatBuilder
-import kotlinx.datetime.format.char
-import ru.kima.cacheserver.api.schema.model.Security
+import ru.kima.telegrambot.common.util.MarkdownUtil
+import ru.kima.telegrambot.common.util.TelegramUtil
+import ru.kima.telegrambot.common.util.TinInvestUtil
 
-object TelegramUtil {
-    fun hashtag(text: String) = "#${text.replace(" ", "_")}"
-    fun copiableText(text: String) = "`$text`"
-
-    fun clickableSecurity(security: Security) = MarkdownUtil.inlineUrl(
-        text = security.ticker,
-        url = TinInvestUtil.securityUrl(security)
-    )
-
-    fun clickableTrackingSecurity(security: TrackingSecurity) = MarkdownUtil.inlineUrl(
-        text = security.ticker,
-        url = TinInvestUtil.securityUrl(security)
-    )
-
-    val instantFormat = DateTimeComponents.Format { defaultFormat() }
-    val localDateTimeFormat = LocalDateTime.Format { defaultFormat() }
-
-    private fun DateTimeFormatBuilder.WithDateTime.defaultFormat() {
-        day()
-        char('.')
-        monthNumber()
-        char('.')
-        year()
-        char(' ')
-        hour()
-        char(':')
-        minute()
-    }
-}
+fun TelegramUtil.clickableTrackingSecurity(security: TrackingSecurity) = MarkdownUtil.inlineUrl(
+    text = security.ticker,
+    url = TinInvestUtil.securityUrl(security)
+)

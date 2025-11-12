@@ -5,7 +5,7 @@ import domain.common.ROUBLE_SIGN
 import domain.common.formatToRu
 import domain.updateservice.TelegramUpdate
 import presentation.telegram.core.screen.BotScreen
-import presentation.util.PresentationUtil
+import ru.kima.telegrambot.common.util.PresentationUtil
 
 class RsiAlertScreen(
     private val update: TelegramUpdate.RsiAlert

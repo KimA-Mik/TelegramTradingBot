@@ -34,6 +34,7 @@ dependencies {
     implementation(libs.clikt)
 
     implementation(project(":SharesServer:CacheServerApi"))
+    implementation(project(":CommonBotLibrary"))
     testImplementation(kotlin("test"))
 }
 

@@ -11,8 +11,8 @@ import presentation.telegram.core.screen.BotScreen
 import presentation.telegram.security.list.callbackbutton.EditSecurityCallbackButton
 import presentation.telegram.security.list.callbackbutton.SecuritiesListBackwardCallbackButton
 import presentation.telegram.security.list.callbackbutton.SecuritiesListForwardCallbackButton
-import presentation.util.MarkdownUtil
-import presentation.util.TinInvestUtil
+import ru.kima.telegrambot.common.util.MarkdownUtil
+import ru.kima.telegrambot.common.util.TinInvestUtil
 
 class SecurityListScreen(
     userId: Long,

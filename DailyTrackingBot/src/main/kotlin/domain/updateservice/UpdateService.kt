@@ -5,10 +5,6 @@ import domain.updateservice.indicators.IndicatorsCache
 import domain.user.model.FullUser
 import domain.user.model.TrackingSecurity
 import domain.user.repository.UserRepository
-import domain.util.DateUtil
-import domain.util.MathUtil
-import domain.util.TimeUtil
-import domain.util.isEqual
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -21,6 +17,10 @@ import ru.kima.cacheserver.api.schema.model.LastPrice
 import ru.kima.cacheserver.api.schema.model.Security
 import ru.kima.cacheserver.api.schema.model.requests.GetLastPricesRequest
 import ru.kima.cacheserver.api.schema.model.requests.InstrumentsRequest
+import ru.kima.telegrambot.common.util.DateUtil
+import ru.kima.telegrambot.common.util.MathUtil
+import ru.kima.telegrambot.common.util.TimeUtil
+import ru.kima.telegrambot.common.util.isEqual
 import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes

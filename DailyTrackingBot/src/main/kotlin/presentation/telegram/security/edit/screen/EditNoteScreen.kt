@@ -5,7 +5,7 @@ import com.github.kotlintelegrambot.entities.keyboard.KeyboardButton
 import domain.common.MAX_NOTE_LENGTH
 import presentation.telegram.core.DefaultCommands
 import presentation.telegram.core.screen.BotScreen
-import presentation.util.PresentationUtil
+import ru.kima.telegrambot.common.util.PresentationUtil
 
 class EditNoteScreen(
     userId: Long,

@@ -1,6 +1,6 @@
 package domain.updateservice.indicators
 
-import domain.techanalysis.BollingerBands
+import ru.kima.telegrambot.common.techanalysis.BollingerBands
 
 
 data class CacheEntry(

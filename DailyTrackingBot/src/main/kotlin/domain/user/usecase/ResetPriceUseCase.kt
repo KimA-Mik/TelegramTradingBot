@@ -3,7 +3,7 @@ package domain.user.usecase
 import domain.user.model.TrackingSecurity
 import domain.user.model.User
 import domain.user.repository.UserRepository
-import domain.util.MathUtil
+import ru.kima.telegrambot.common.util.MathUtil
 
 class ResetPriceUseCase(
     private val repository: UserRepository

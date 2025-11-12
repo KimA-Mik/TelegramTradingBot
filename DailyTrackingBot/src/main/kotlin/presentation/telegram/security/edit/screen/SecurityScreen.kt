@@ -16,7 +16,8 @@ import presentation.telegram.security.edit.callbackbutton.ToggleIsActiveCallback
 import presentation.telegram.security.edit.callbackbutton.ToggleRemainActiveCallbackButton
 import presentation.telegram.security.edit.callbackbutton.ToggleShowNoteCallbackButton
 import presentation.telegram.security.search.callbackbutton.UnsubscribeFromSecurityCallbackButton
-import presentation.util.TelegramUtil
+import presentation.util.clickableTrackingSecurity
+import ru.kima.telegrambot.common.util.TelegramUtil
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 

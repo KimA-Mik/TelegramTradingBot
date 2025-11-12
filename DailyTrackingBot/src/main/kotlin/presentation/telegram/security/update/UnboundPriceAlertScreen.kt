@@ -4,8 +4,8 @@ import com.github.kotlintelegrambot.entities.ParseMode
 import domain.common.ROUBLE_SIGN
 import domain.common.formatToRu
 import domain.updateservice.TelegramUpdate
-import domain.util.MathUtil
 import presentation.telegram.core.screen.BotScreen
+import ru.kima.telegrambot.common.util.MathUtil
 
 class UnboundPriceAlertScreen(
     private val update: TelegramUpdate.UnboundPriceAlert
