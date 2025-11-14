@@ -2,7 +2,8 @@ package ru.kima.cacheserver.implementation.data
 
 import data.remoteservice.*
 import data.remoteservice.mappers.toTInstrumentStatus
-import kotlinx.coroutines.future.await
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import ru.kima.cacheserver.api.schema.instrumentsService.InstrumentExchangeType
 import ru.kima.cacheserver.api.schema.instrumentsService.InstrumentStatus
 import ru.kima.cacheserver.api.schema.model.Future
@@ -24,9 +25,16 @@ import ru.kima.cacheserver.implementation.data.remoteservice.mappers.toTCandleSo
 import ru.kima.cacheserver.implementation.data.remoteservice.mappers.toTPriceType
 import ru.tinkoff.piapi.contract.v1.InstrumentsServiceGrpc
 import ru.tinkoff.piapi.contract.v1.MarketDataServiceGrpc
+import ru.tinkoff.piapi.contract.v1.SubscriptionInterval
 import ru.ttech.piapi.core.connector.ConnectorConfiguration
 import ru.ttech.piapi.core.connector.ServiceStubFactory
+import ru.ttech.piapi.core.connector.streaming.StreamManagerFactory
+import ru.ttech.piapi.core.connector.streaming.StreamServiceStubFactory
+import ru.ttech.piapi.core.impl.marketdata.MarketDataStreamManager
+import ru.ttech.piapi.core.impl.marketdata.subscription.CandleSubscriptionSpec
+import ru.ttech.piapi.core.impl.marketdata.subscription.Instrument
 import java.util.*
+import java.util.concurrent.Executors
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
@@ -35,13 +43,20 @@ import kotlin.time.ExperimentalTime
 private const val TINKOFF_UNARY_REQUEST_LIMIT = 50
 private val TINKOFF_RATE_WINDOW = 1.minutes
 
+typealias TCandleSource = ru.tinkoff.piapi.contract.v1.GetCandlesRequest.CandleSource
+
 class TinkoffDataSource(token: String) {
     private val marketDataService: MarketDataService
     private val instrumentsService: InstrumentsService
+    private val marketDataStreamManager: MarketDataStreamManager
     private val rateLimiter = RateLimiter(
         limit = TINKOFF_UNARY_REQUEST_LIMIT,
         rateWindow = TINKOFF_RATE_WINDOW
     )
+
+    //Use concurrent data structures
+    private val candleSubscriptions = mutableMapOf<String, MutableSet<String>>()
+    private val candleSubscriptionMutex = Mutex()
 
     init {
         val properties = Properties()
@@ -52,6 +67,14 @@ class TinkoffDataSource(token: String) {
 
         marketDataService = unaryServiceFactory.newAsyncService(MarketDataServiceGrpc::newStub)
         instrumentsService = unaryServiceFactory.newAsyncService(InstrumentsServiceGrpc::newStub)
+
+        val streamServiceFactory = StreamServiceStubFactory.create(unaryServiceFactory)
+        val streamManagerFactory = StreamManagerFactory.create(streamServiceFactory)
+        val executorService = Executors.newCachedThreadPool()
+        val scheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
+        marketDataStreamManager =
+            streamManagerFactory.newMarketDataStreamManager(executorService, scheduledExecutorService)
+        marketDataStreamManager.start()
     }
 
     private val sharesCache =
@@ -157,5 +180,24 @@ class TinkoffDataSource(token: String) {
             .await()
             .lastPricesList
             .map { it.toLastPrice() }
+    }
+
+
+    private val candleSubscriptionSpec = CandleSubscriptionSpec(TCandleSource.CANDLE_SOURCE_UNSPECIFIED, false)
+    suspend fun subscribeToCandles(apiKey: String, ids: List<String>) {
+        candleSubscriptionMutex.withLock {
+            if (!candleSubscriptions.contains(apiKey)) return@withLock
+
+            candleSubscriptions.getValue(apiKey)
+
+        }
+
+        marketDataStreamManager.subscribeCandles(
+            setOf(
+                Instrument("", SubscriptionInterval.SUBSCRIPTION_INTERVAL_MONTH)
+            ), candleSubscriptionSpec
+        ) { candle ->
+
+        }
     }
 }
