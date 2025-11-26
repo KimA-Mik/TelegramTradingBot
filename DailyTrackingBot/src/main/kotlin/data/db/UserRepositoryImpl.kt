@@ -11,6 +11,9 @@ import domain.user.model.FullUser
 import domain.user.model.TrackingSecurity
 import domain.user.model.User
 import domain.user.repository.UserRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.v1.dao.load
@@ -21,6 +24,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.migration.jdbc.MigrationUtils
 import org.slf4j.LoggerFactory
 import java.sql.Connection
+import kotlin.math.abs
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -45,6 +49,30 @@ class UserRepositoryImpl(
                 } catch (e: Exception) {
                     logger.error(e.message)
                 }
+            }
+        }
+
+        //Migration hack, to be removed
+        CoroutineScope(Dispatchers.Default).launch {
+            val fullUsers = getFullUsers()
+            val updates = mutableListOf<TrackingSecurity>()
+            for (user in fullUsers) {
+                for (security in user.securities) {
+                    val resetPrice = security.targetPrice != null && abs(security.targetPrice) < 1.0
+                    val resetLowPrice = security.lowTargetPrice != null && abs(security.lowTargetPrice) < 1.0
+                    if (resetPrice || resetLowPrice) {
+                        updates.add(
+                            security.copy(
+                                targetPrice = if (resetPrice) null else security.targetPrice,
+                                lowTargetPrice = if (resetLowPrice) null else security.lowTargetPrice
+                            )
+                        )
+                    }
+                }
+            }
+
+            if (updates.isNotEmpty()) {
+                updateTrackingSecurities(updates)
             }
         }
     }
