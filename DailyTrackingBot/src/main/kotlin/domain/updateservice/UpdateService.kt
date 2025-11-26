@@ -142,6 +142,7 @@ class UpdateService(
             var currentSecurity = handlePrice(user, security, indicators, lastPrice)
             currentSecurity = handleRsi(user, currentSecurity, indicators, lastPrice)
             currentSecurity = handleBB(user, currentSecurity, indicators, lastPrice)
+            currentSecurity = handleSrsi(user, currentSecurity, indicators, lastPrice)
 
             if (currentSecurity != security) {
                 outTrackingSecurities.add(currentSecurity)
@@ -327,6 +328,39 @@ class UpdateService(
 
         return security
     }
+
+    private suspend fun handleSrsi(
+        user: FullUser,
+        security: TrackingSecurity,
+        indicators: CacheEntry?,
+        lastPrice: Double,
+    ): TrackingSecurity {
+        if (indicators == null) return security
+        if (!user.user.enableSrsi) return security
+
+        val intervals = mutableListOf<TelegramUpdate.SrsiAlert.SrsiInterval>()
+        if (MathUtil.isSrsiCritical(indicators.min15Srsi)) intervals.add(TelegramUpdate.SrsiAlert.SrsiInterval.MIN15)
+        if (MathUtil.isSrsiCritical(indicators.hour4Srsi)) intervals.add(TelegramUpdate.SrsiAlert.SrsiInterval.HOUR4)
+        val shouldNotifySrsi = intervals.isNotEmpty()
+        if (shouldNotifySrsi && security.shouldNotifySrsi) {
+            _updates.emit(
+                TelegramUpdate.SrsiAlert(
+                    user = user.user,
+                    security = security,
+                    currentPrice = lastPrice,
+                    intervals = intervals,
+                    indicators = indicators
+                )
+            )
+
+            return security.copy(shouldNotifySrsi = false)
+        } else if (!shouldNotifySrsi && !security.shouldNotifySrsi) {
+            return security.copy(shouldNotifySrsi = true)
+        }
+
+        return security
+    }
+
 
     @OptIn(ExperimentalTime::class)
     suspend fun resetUsers() {

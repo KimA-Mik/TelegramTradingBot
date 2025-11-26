@@ -56,4 +56,16 @@ sealed class TelegramUpdate(val userId: Long) {
             MIN15, HOUR4
         }
     }
+
+    data class SrsiAlert(
+        val user: User,
+        val security: TrackingSecurity,
+        val currentPrice: Double,
+        val intervals: List<SrsiInterval>,
+        val indicators: CacheEntry
+    ) : TelegramUpdate(user.id) {
+        enum class SrsiInterval {
+            MIN15, HOUR4
+        }
+    }
 }

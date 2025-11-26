@@ -12,8 +12,10 @@ import org.ta4j.core.indicators.statistics.StandardDeviationIndicator
 
 //TODO: Factor out to common module
 object BollingerBands {
-    fun calculate(series: BarSeries, barsCount: Int = MathUtil.BOLLINGER_BARS_COUNT): BollingerBandsData {
-        val closes = ClosePriceIndicator(series)
+    fun calculate(series: BarSeries, barsCount: Int = MathUtil.BOLLINGER_BARS_COUNT) =
+        calculate(ClosePriceIndicator(series), barsCount)
+
+    fun calculate(closes: ClosePriceIndicator, barsCount: Int = MathUtil.BOLLINGER_BARS_COUNT): BollingerBandsData {
         val middle = BollingerBandsMiddleIndicator(SMAIndicator(closes, barsCount))
 
         val deviation = StandardDeviationIndicator(closes, barsCount)

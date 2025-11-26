@@ -12,7 +12,8 @@ fun UserEntity.toUser() = User(
     id = id.value,
     path = path,
     registered = registered.toInstant(TimeZone.currentSystemDefault()),
-    defaultPriceProlongation = defaultPriceProlongation
+    defaultPriceProlongation = defaultPriceProlongation,
+    enableSrsi = enableSrsi
 )
 
 fun UserEntity.toFullUser() = FullUser(

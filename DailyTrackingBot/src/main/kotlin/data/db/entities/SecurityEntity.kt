@@ -23,14 +23,15 @@ class SecurityEntity(id: EntityID<Long>) : LongEntity(id) {
     var shouldNotify by Securities.shouldNotify
     var shouldNotifyRsi by Securities.shouldNotifyRsi
     var shouldNotifyBb by Securities.shouldNotifyBb
+    var shouldNotifySrsi by Securities.shouldNotifySrsi
     var type by Securities.type
     var lastUnboundUpdate by Securities.lastUnboundUpdate
 
     override fun toString(): String {
-        return "Security(id=$id, user=${user.id}, ticker=$ticker, name=$name, uid=$uid, " +
-                "targetPrice=$targetPrice, lowTargetPrice=$lowTargetPrice, targetDeviation=$targetDeviation, " +
-                "isActive=$isActive, remainActive=$remainActive, note=$note, noteUpdated=$noteUpdated, " +
-                "showNote=$showNote, shouldNotify=$shouldNotify, shouldNotifyRsi=$shouldNotifyRsi, " +
-                "shouldNotifyBb=$shouldNotifyBb, type=$type, lastUnboundUpdate=$lastUnboundUpdate)"
+        return "Security(id=$id, ticker=$ticker, name=$name, uid=$uid, targetPrice=$targetPrice, " +
+                "lowTargetPrice=$lowTargetPrice, targetDeviation=$targetDeviation, isActive=$isActive, " +
+                "remainActive=$remainActive, note=$note, noteUpdated=$noteUpdated, showNote=$showNote, " +
+                "shouldNotify=$shouldNotify, shouldNotifyRsi=$shouldNotifyRsi, shouldNotifyBb=$shouldNotifyBb, " +
+                "shouldNotifySrsi=$shouldNotifySrsi, type=$type, lastUnboundUpdate=$lastUnboundUpdate)"
     }
 }

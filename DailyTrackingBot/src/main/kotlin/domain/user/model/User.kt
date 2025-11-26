@@ -8,7 +8,8 @@ data class User @OptIn(ExperimentalTime::class) constructor(
     val id: Long,
     val path: String,
     val registered: Instant,
-    val defaultPriceProlongation: PriceProlongation
+    val defaultPriceProlongation: PriceProlongation,
+    val enableSrsi: Boolean
 ) {
     val pathList by lazy { path.split(PATH_SEPARATOR).drop(1) }
 }

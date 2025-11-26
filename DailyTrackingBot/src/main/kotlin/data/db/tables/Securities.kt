@@ -21,6 +21,7 @@ object Securities : LongIdTable("security") {
     val shouldNotify = bool(name = "should_notify").default(true)
     val shouldNotifyRsi = bool(name = "should_notify_rsi").default(true)
     val shouldNotifyBb = bool(name = "should_notify_bb").default(true)
+    val shouldNotifySrsi = bool(name = "should_notify_srsi").default(true)
     val type = enumerationByName(name = "type", length = 16, klass = SecurityType::class)
     val lastUnboundUpdate = long("last_unbound_update").default(0L)
 }

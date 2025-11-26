@@ -11,4 +11,6 @@ object Users : LongIdTable("users") {
     val defaultPriceProlongation = enumerationByName<PriceProlongation>(
         "default_price_prolongation", PriceProlongation.entries.maxBy { it.name.length }.name.length
     ).default(PriceProlongation.NONE)
+
+    val enableSrsi = bool("enable_srsi").default(false)
 }

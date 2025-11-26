@@ -5,11 +5,14 @@ import domain.techanalysis.mappers.toSeries
 import domain.util.lastDouble
 import org.ta4j.core.BarSeries
 import org.ta4j.core.indicators.RSIIndicator
+import org.ta4j.core.indicators.StochasticRSIIndicator
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator
 import org.ta4j.core.indicators.volume.MoneyFlowIndexIndicator
 import ru.kima.cacheserver.api.api.CacheServerApi
 import ru.kima.cacheserver.api.schema.marketdataService.CandleInterval
 import kotlin.time.ExperimentalTime
+
+private const val DEFAULT_BAR_COUNT = 14
 
 class IndicatorsCache(
     private val cacheServerApi: CacheServerApi,
@@ -31,29 +34,32 @@ class IndicatorsCache(
         if (seriesResult.hourly.barCount == 0 || seriesResult.daily.barCount == 0) return null
 
         // RSI
-        val rsiPeriod = 14
         val min15Close = ClosePriceIndicator(seriesResult.min15)
         val hourlyClose = ClosePriceIndicator(seriesResult.hourly)
         val hour4Close = ClosePriceIndicator(seriesResult.hour4)
         val dailyClose = ClosePriceIndicator(seriesResult.daily)
-        val min15RsiInd = RSIIndicator(min15Close, rsiPeriod)
-        val hourlyRsiInd = RSIIndicator(hourlyClose, rsiPeriod)
-        val hour4RsiInd = RSIIndicator(hour4Close, rsiPeriod)
-        val dailyRsiInd = RSIIndicator(dailyClose, rsiPeriod)
+        val min15RsiInd = RSIIndicator(min15Close, DEFAULT_BAR_COUNT)
+        val hourlyRsiInd = RSIIndicator(hourlyClose, DEFAULT_BAR_COUNT)
+        val hour4RsiInd = RSIIndicator(hour4Close, DEFAULT_BAR_COUNT)
+        val dailyRsiInd = RSIIndicator(dailyClose, DEFAULT_BAR_COUNT)
 
         return CacheEntry(
             min15Rsi = min15RsiInd.lastDouble(),
             hourlyRsi = hourlyRsiInd.lastDouble(),
             hour4Rsi = hour4RsiInd.lastDouble(),
             dailyRsi = dailyRsiInd.lastDouble(),
-            min15bb = BollingerBands.calculate(seriesResult.min15),
-            hourlyBb = BollingerBands.calculate(seriesResult.hourly),
-            hour4Bb = BollingerBands.calculate(seriesResult.hour4),
-            dailyBb = BollingerBands.calculate(seriesResult.daily),
-            min15Mfi = MoneyFlowIndexIndicator(seriesResult.min15, rsiPeriod).lastDouble(),
-            hourlyMfi = MoneyFlowIndexIndicator(seriesResult.hourly, rsiPeriod).lastDouble(),
-            hour4Mfi = MoneyFlowIndexIndicator(seriesResult.hour4, rsiPeriod).lastDouble(),
-            dailyMfi = MoneyFlowIndexIndicator(seriesResult.daily, rsiPeriod).lastDouble()
+            min15bb = BollingerBands.calculate(min15Close),
+            hourlyBb = BollingerBands.calculate(hourlyClose),
+            hour4Bb = BollingerBands.calculate(hour4Close),
+            dailyBb = BollingerBands.calculate(dailyClose),
+            min15Mfi = MoneyFlowIndexIndicator(seriesResult.min15, DEFAULT_BAR_COUNT).lastDouble(),
+            hourlyMfi = MoneyFlowIndexIndicator(seriesResult.hourly, DEFAULT_BAR_COUNT).lastDouble(),
+            hour4Mfi = MoneyFlowIndexIndicator(seriesResult.hour4, DEFAULT_BAR_COUNT).lastDouble(),
+            dailyMfi = MoneyFlowIndexIndicator(seriesResult.daily, DEFAULT_BAR_COUNT).lastDouble(),
+            min15Srsi = StochasticRSIIndicator(min15RsiInd, DEFAULT_BAR_COUNT).lastDouble(),
+            hourlySrsi = StochasticRSIIndicator(hourlyRsiInd, DEFAULT_BAR_COUNT).lastDouble(),
+            hour4Srsi = StochasticRSIIndicator(hour4RsiInd, DEFAULT_BAR_COUNT).lastDouble(),
+            dailySrsi = StochasticRSIIndicator(dailyRsiInd, DEFAULT_BAR_COUNT).lastDouble(),
         )
     }
 
