@@ -1,5 +1,7 @@
 package presentation.util
 
+import domain.common.ROUBLE_SIGN
+import domain.common.formatToRu
 import domain.util.MathUtil
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
@@ -47,4 +49,11 @@ object PresentationUtil {
         .fromEpochMilliseconds(timestamp)
         .toLocalDateTime(TimeZone.currentSystemDefault())
         .format(TelegramUtil.localDateTimeFormat)
+
+    fun formatTargetPrice(price: Double?): String {
+        return when {
+            price == null -> "не установлена"
+            else -> price.formatToRu() + ROUBLE_SIGN
+        }
+    }
 }

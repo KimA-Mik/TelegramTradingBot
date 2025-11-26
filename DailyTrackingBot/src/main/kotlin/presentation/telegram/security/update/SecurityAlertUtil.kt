@@ -2,7 +2,6 @@ package presentation.telegram.security.update
 
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
-import domain.common.ROUBLE_SIGN
 import domain.common.formatToRu
 import domain.techanalysis.BollingerBands
 import domain.updateservice.indicators.CacheEntry
@@ -86,8 +85,8 @@ fun StringBuilder.appendIndicatorsToSecurityAlert(
 }
 
 fun StringBuilder.appendPlannedPricesToSecurityAlert(security: TrackingSecurity) {
-    append("*Планируемая цена покупки:* ", security.lowTargetPrice.formatToRu(), ROUBLE_SIGN, '\n')
-    append("*Планируемая цена продажи:* ", security.targetPrice.formatToRu(), ROUBLE_SIGN, '\n')
+    append("*Планируемая цена покупки:* ", PresentationUtil.formatTargetPrice(security.lowTargetPrice), '\n')
+    append("*Планируемая цена продажи:* ", PresentationUtil.formatTargetPrice(security.targetPrice), '\n')
 }
 
 fun StringBuilder.renderBb(

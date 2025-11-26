@@ -16,6 +16,7 @@ import presentation.telegram.security.edit.callbackbutton.ToggleIsActiveCallback
 import presentation.telegram.security.edit.callbackbutton.ToggleRemainActiveCallbackButton
 import presentation.telegram.security.edit.callbackbutton.ToggleShowNoteCallbackButton
 import presentation.telegram.security.search.callbackbutton.UnsubscribeFromSecurityCallbackButton
+import presentation.util.PresentationUtil
 import presentation.util.TelegramUtil
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -57,9 +58,9 @@ class SecurityScreen(
         }
 
         append("Планируемая цена продажи: ")
-        appendLine("*${security.targetPrice.formatToRu()}${ROUBLE_SIGN}*")
+        appendLine("*${PresentationUtil.formatTargetPrice(security.targetPrice)}*")
         append("Планируемая ценa покупки: ")
-        appendLine("*${security.lowTargetPrice.formatToRu()}${ROUBLE_SIGN}*")
+        appendLine("*${PresentationUtil.formatTargetPrice(security.lowTargetPrice)}*")
 
         append("Отклонение для срабатывания сигнала: ")
         appendLine("*${security.targetDeviation.formatToRu()}%*")
