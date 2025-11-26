@@ -22,15 +22,19 @@ class UnboundPriceAlertScreen(
         append("*Текущая цена:* ${update.currentPrice.formatToRu()}${ROUBLE_SIGN} ")
         when (update.type) {
             TelegramUpdate.UnboundPriceAlert.PriceType.ABOVE -> {
-                val diff = MathUtil.absolutePercentageDifference(update.currentPrice, update.security.targetPrice)
-                append("на ", diff.formatToRu(), "% выше планируемой цены продажи (")
-                append(update.security.targetPrice.formatToRu(), ROUBLE_SIGN, ')')
+                update.security.targetPrice?.let {
+                    val diff = MathUtil.absolutePercentageDifference(update.currentPrice, it)
+                    append("на ", diff.formatToRu(), "% выше планируемой цены продажи (")
+                    append(update.security.targetPrice.formatToRu(), ROUBLE_SIGN, ')')
+                }
             }
 
             TelegramUpdate.UnboundPriceAlert.PriceType.BELOW -> {
-                val diff = MathUtil.absolutePercentageDifference(update.currentPrice, update.security.lowTargetPrice)
-                append("на ", diff.formatToRu(), "% ниже планируемой цены покупки (")
-                append(update.security.lowTargetPrice.formatToRu(), ROUBLE_SIGN, ')')
+                update.security.lowTargetPrice?.let {
+                    val diff = MathUtil.absolutePercentageDifference(update.currentPrice, it)
+                    append("на ", diff.formatToRu(), "% ниже планируемой цены покупки (")
+                    append(update.security.lowTargetPrice.formatToRu(), ROUBLE_SIGN, ')')
+                }
             }
         }
 

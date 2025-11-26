@@ -1,20 +1,20 @@
 [versions]
 toolchain = "21"
 
-kotlin = "2.2.20"
+kotlin = "2.2.21"
 kotlinx-coroutines = "1.10.2"
 kotlin-telegram-bot = "6.3.0"
 slf4j = "2.0.17"
-tinkoff-piapi = "1.40"
+tinkoff-piapi = "1.42"
 retrofit = "3.0.0"
-okhttp = "5.2.1"
+okhttp = "5.3.0"
 koin = "4.1.1"
-exposed = "1.0.0-rc-2"
-sqlite-jdbc = "3.50.3.0"
+exposed = "1.0.0-rc-3"
+sqlite-jdbc = "3.51.0.0"
 kotlinx-datetime = "0.7.1"
 ta4j = "0.18"
 clikt = "5.0.3"
-ktor = "3.3.1"
+ktor = "3.3.2"
 serialization = "1.9.0"
 
 [libraries]

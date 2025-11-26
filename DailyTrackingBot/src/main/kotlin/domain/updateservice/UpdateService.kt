@@ -8,7 +8,6 @@ import domain.user.repository.UserRepository
 import domain.util.DateUtil
 import domain.util.MathUtil
 import domain.util.TimeUtil
-import domain.util.isEqual
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -157,8 +156,8 @@ class UpdateService(
         lastPrice: Double
     ): TrackingSecurity {
         if (!security.isActive) return security
-        return if (lastPrice > security.targetPrice && !security.targetPrice.isEqual(MathUtil.PRICE_ZERO) ||
-            lastPrice < security.lowTargetPrice && !security.lowTargetPrice.isEqual(MathUtil.PRICE_ZERO)
+        return if (security.targetPrice != null && lastPrice > security.targetPrice ||
+            security.lowTargetPrice != null && lastPrice < security.lowTargetPrice
         ) {
             handleUnboundPrice(user, security, indicators, lastPrice)
         } else {
@@ -182,12 +181,12 @@ class UpdateService(
         }
 
         val priceType = when {
-            lastPrice > security.targetPrice && MathUtil.absolutePercentageDifference(
+            security.targetPrice != null && lastPrice > security.targetPrice && MathUtil.absolutePercentageDifference(
                 lastPrice,
                 security.targetPrice
             ) > unboundThreshold -> TelegramUpdate.UnboundPriceAlert.PriceType.ABOVE
 
-            lastPrice < security.lowTargetPrice && MathUtil.absolutePercentageDifference(
+            security.lowTargetPrice != null && lastPrice < security.lowTargetPrice && MathUtil.absolutePercentageDifference(
                 lastPrice,
                 security.lowTargetPrice
             ) > unboundThreshold -> TelegramUpdate.UnboundPriceAlert.PriceType.BELOW
@@ -217,10 +216,10 @@ class UpdateService(
         indicators: CacheEntry?,
         lastPrice: Double
     ): TrackingSecurity {
-        val currentDeviation = MathUtil.absolutePercentageDifference(lastPrice, security.targetPrice)
-        val currentLowDeviation = MathUtil.absolutePercentageDifference(lastPrice, security.lowTargetPrice)
-        val shouldNotify = currentDeviation < security.targetDeviation
-        val shouldNotifyLow = currentLowDeviation < security.targetDeviation
+        val currentDeviation = security.targetPrice?.let { MathUtil.absolutePercentageDifference(lastPrice, it) }
+        val currentLowDeviation = security.lowTargetPrice?.let { MathUtil.absolutePercentageDifference(lastPrice, it) }
+        val shouldNotify = currentDeviation != null && currentDeviation < security.targetDeviation
+        val shouldNotifyLow = currentLowDeviation != null && currentLowDeviation < security.targetDeviation
         if ((shouldNotifyLow || shouldNotify) && security.shouldNotify) {
             _updates.emit(
                 TelegramUpdate.PriceAlert(
@@ -235,7 +234,7 @@ class UpdateService(
                         )
 
                         shouldNotify -> TelegramUpdate.PriceAlert.PriceType.Target(currentDeviation)
-                        else -> TelegramUpdate.PriceAlert.PriceType.LowTarget(currentLowDeviation)
+                        else -> TelegramUpdate.PriceAlert.PriceType.LowTarget(currentLowDeviation ?: return security)
                     }
                 )
             )
