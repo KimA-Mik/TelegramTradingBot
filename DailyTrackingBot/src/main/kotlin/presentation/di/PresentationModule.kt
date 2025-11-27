@@ -16,6 +16,7 @@ import presentation.telegram.security.search.callbackbutton.SubscribeToSecurityC
 import presentation.telegram.security.search.callbackbutton.TickerSuggestionCallbackHandler
 import presentation.telegram.security.search.callbackbutton.UnsubscribeFromSecurityCallbackHandler
 import presentation.telegram.security.search.textmodel.SearchSecurityTextModel
+import presentation.telegram.settings.root.callbackbutton.ToggleSrsiAlertCallbackButtonHandler
 
 fun presentationModule() = module {
     singleOf(::BotModel)
@@ -50,4 +51,7 @@ fun presentationModule() = module {
     singleOf(::EditNoteTextModel)
     singleOf(::EditPercentTextModel)
     singleOf(::EditPriceTextModel)
+
+    //Settings
+    singleOf(::ToggleSrsiAlertCallbackButtonHandler)
 }

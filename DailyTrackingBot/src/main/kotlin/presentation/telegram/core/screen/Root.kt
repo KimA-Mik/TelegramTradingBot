@@ -26,5 +26,6 @@ class Root(userId: Long, messageId: Long? = null) : BotScreen(userId, messageId)
     enum class Commands(val text: String) {
         Search("Поиск"),
         Securities("Отслеживаемые бумаги"),
+        Settings("Настройки")
     }
 }
