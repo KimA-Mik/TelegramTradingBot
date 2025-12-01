@@ -93,6 +93,7 @@ class UserRepositoryImpl(
                 it.path = user.path
                 it.registered = user.registered.toLocalDateTime(TimeZone.currentSystemDefault())
                 it.defaultPriceProlongation = user.defaultPriceProlongation
+                it.enableSrsi = user.enableSrsi
             }?.toUser()
         }
 
@@ -183,6 +184,7 @@ class UserRepositoryImpl(
         entity.shouldNotify = security.shouldNotify
         entity.shouldNotifyRsi = security.shouldNotifyRsi
         entity.shouldNotifyBb = security.shouldNotifyBb
+        entity.shouldNotifySrsi = security.shouldNotifySrsi
         entity.type = security.type
     }
 

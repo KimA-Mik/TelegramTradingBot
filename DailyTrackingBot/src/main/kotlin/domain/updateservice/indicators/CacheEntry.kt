@@ -16,4 +16,8 @@ data class CacheEntry(
     val hourlyMfi: Double,
     val hour4Mfi: Double,
     val dailyMfi: Double,
+    val min15Srsi: Double,
+    val hourlySrsi: Double,
+    val hour4Srsi: Double,
+    val dailySrsi: Double,
 )

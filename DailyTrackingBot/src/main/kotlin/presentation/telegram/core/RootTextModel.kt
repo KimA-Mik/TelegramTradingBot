@@ -8,6 +8,7 @@ import presentation.telegram.core.screen.ErrorScreen
 import presentation.telegram.core.screen.Root
 import presentation.telegram.security.list.textmodel.SecurityListTextModel
 import presentation.telegram.security.search.textmodel.SearchSecurityTextModel
+import presentation.telegram.settings.root.screen.SettingsRootScreen
 
 class RootTextModel(
     private val navigateUser: NavigateUserUseCase,
@@ -57,6 +58,14 @@ class RootTextModel(
             emitAll(model.executeCommand(user, emptyList(), String()))
             return@flow
         }
+
+        when (command) {
+            Root.Commands.Settings.text -> {
+                emit(SettingsRootScreen(user))
+                return@flow
+            }
+        }
+
         emit(ErrorScreen(user.id, UiError.UnknownCommand(command)))
     }
 }

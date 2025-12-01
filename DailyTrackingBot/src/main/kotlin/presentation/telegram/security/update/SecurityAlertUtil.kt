@@ -52,6 +52,7 @@ fun StringBuilder.appendIndicatorsToSecurityAlert(
     indicators: CacheEntry?, currentPrice: Double,
     //TODO: Have fun with mfi
     renderMFI: Boolean = false,
+    renderSrsi: Boolean = false,
     rsiLow: Double = MathUtil.RSI_LOW, rsiHigh: Double = MathUtil.RSI_HIGH,
     bbLow: Double = MathUtil.BB_CRITICAL_LOW, bbHigh: Double = MathUtil.BB_CRITICAL_HIGH
 ) {
@@ -66,6 +67,17 @@ fun StringBuilder.appendIndicatorsToSecurityAlert(
     append('*', color, "RSI (4ч):* ", indicators.hour4Rsi.formatToRu(), '\n')
     color = PresentationUtil.rsiColor(indicators.dailyRsi, rsiLow, rsiHigh)
     append('*', color, "RSI (1д):* ", indicators.dailyRsi.formatToRu(), '\n')
+
+    if (renderSrsi) {
+        color = PresentationUtil.rsiColor(indicators.min15Srsi, MathUtil.SRSI_LOW, MathUtil.SRSI_HIGH)
+        append('*', color, "SRSI (15м):* ", indicators.min15Srsi.formatToRu(), '\n')
+        color = PresentationUtil.rsiColor(indicators.hourlySrsi, MathUtil.SRSI_LOW, MathUtil.SRSI_HIGH)
+        append('*', color, "SRSI (1ч):* ", indicators.hourlySrsi.formatToRu(), '\n')
+        color = PresentationUtil.rsiColor(indicators.hour4Srsi, MathUtil.SRSI_LOW, MathUtil.SRSI_HIGH)
+        append('*', color, "SRSI (4ч):* ", indicators.hour4Srsi.formatToRu(), '\n')
+        color = PresentationUtil.rsiColor(indicators.dailySrsi, MathUtil.SRSI_LOW, MathUtil.SRSI_HIGH)
+        append('*', color, "SRSI (1д):* ", indicators.dailySrsi.formatToRu(), '\n')
+    }
 
     if (renderMFI) {
         color = PresentationUtil.rsiColor(indicators.min15Mfi)
