@@ -37,6 +37,8 @@ object MathUtil {
 
     const val SRSI_LOW = 20.0
     const val SRSI_HIGH = 80.0
+    const val BB_FOR_SRSI_HIGH = 80.0
+    const val BB_FOR_SRSI_LOW = 20.0
     fun isSrsiCritical(srsi: Double, low: Double = SRSI_LOW, high: Double = SRSI_HIGH) =
         srsi <= low || srsi >= high
 

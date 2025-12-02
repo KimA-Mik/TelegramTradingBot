@@ -256,14 +256,8 @@ class UpdateService(
         lastPrice: Double,
     ): TrackingSecurity {
         if (indicators == null) return security
+        if (!isAnyBbCritical(lastPrice, indicators, MathUtil.BB_FOR_RSI_LOW, MathUtil.BB_FOR_RSI_HIGH)) return security
         val intervals = mutableListOf<TelegramUpdate.RsiAlert.RsiInterval>()
-        if (!MathUtil.isBbCritical(lastPrice, indicators.min15bb, MathUtil.BB_FOR_RSI_LOW, MathUtil.BB_FOR_RSI_HIGH) &&
-            !MathUtil.isBbCritical(lastPrice, indicators.hourlyBb, MathUtil.BB_FOR_RSI_LOW, MathUtil.BB_FOR_RSI_HIGH) &&
-            !MathUtil.isBbCritical(lastPrice, indicators.hour4Bb, MathUtil.BB_FOR_RSI_LOW, MathUtil.BB_FOR_RSI_HIGH) &&
-            !MathUtil.isBbCritical(lastPrice, indicators.dailyBb, MathUtil.BB_FOR_RSI_LOW, MathUtil.BB_FOR_RSI_HIGH)
-        ) {
-            return security
-        }
 
         if (MathUtil.isRsiCritical(indicators.min15Rsi)) intervals.add(TelegramUpdate.RsiAlert.RsiInterval.MIN15)
         if (MathUtil.isRsiCritical(indicators.hour4Rsi)) intervals.add(TelegramUpdate.RsiAlert.RsiInterval.HOUR4)
@@ -337,6 +331,14 @@ class UpdateService(
     ): TrackingSecurity {
         if (indicators == null) return security
         if (!user.user.enableSrsi) return security
+        if (!isAnyBbCritical(
+                lastPrice, indicators,
+                MathUtil.BB_FOR_SRSI_LOW,
+                MathUtil.BB_FOR_SRSI_HIGH
+            )
+        ) {
+            return security
+        }
 
         val intervals = mutableListOf<TelegramUpdate.SrsiAlert.SrsiInterval>()
         if (MathUtil.isSrsiCritical(indicators.min15Srsi)) intervals.add(TelegramUpdate.SrsiAlert.SrsiInterval.MIN15)
@@ -361,6 +363,15 @@ class UpdateService(
         return security
     }
 
+    private fun isAnyBbCritical(
+        price: Double,
+        indicators: CacheEntry,
+        bbLow: Double,
+        bbHeigh: Double
+    ) = MathUtil.isBbCritical(price, indicators.min15bb, bbLow, bbHeigh) ||
+            MathUtil.isBbCritical(price, indicators.hourlyBb, bbLow, bbHeigh) ||
+            MathUtil.isBbCritical(price, indicators.hour4Bb, bbLow, bbHeigh) ||
+            MathUtil.isBbCritical(price, indicators.dailyBb, bbLow, bbHeigh)
 
     @OptIn(ExperimentalTime::class)
     suspend fun resetUsers() {
