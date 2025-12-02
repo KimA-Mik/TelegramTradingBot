@@ -5,6 +5,7 @@ import domain.common.ROUBLE_SIGN
 import domain.common.formatToRu
 import domain.updateservice.TelegramUpdate
 import presentation.telegram.core.screen.BotScreen
+import presentation.util.PresentationUtil
 
 class BbAlertScreen(
     private val update: TelegramUpdate.BbAlert
@@ -15,7 +16,9 @@ class BbAlertScreen(
     override val replyMarkup = defaultSecurityAlertReplayMarkup(update.security)
 
     private fun renderText() = buildString(UPDATE_BUILDER_CAPACITY) {
-        appendLine("*Сработал сигнал по BB!*")
+        append("*Сработал сигнал по BB!* ")
+        alertColor(update)?.let { append(it) }
+        appendLine()
         renderSecurityTitleForAlert(update.security)
 
         appendLine("*Текущая цена:* ${update.currentPrice.formatToRu()}$ROUBLE_SIGN")
@@ -40,5 +43,13 @@ class BbAlertScreen(
         appendLine()
         appendIndicatorsToSecurityAlert(update.indicators, update.currentPrice, renderMFI = true)
         appendNoteToSecurityAlert(update.security)
+    }
+
+    private fun alertColor(update: TelegramUpdate.BbAlert) = update.intervals.firstOrNull()?.let {
+        val bb = when (it) {
+            TelegramUpdate.BbAlert.BbInterval.MIN15 -> update.indicators.min15bb
+            TelegramUpdate.BbAlert.BbInterval.HOUR4 -> update.indicators.hour4Bb
+        }
+        PresentationUtil.markupBbColor(update.currentPrice, bb.lower, bb.upper)
     }
 }

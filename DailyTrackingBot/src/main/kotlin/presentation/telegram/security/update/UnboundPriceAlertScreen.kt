@@ -6,6 +6,7 @@ import domain.common.formatToRu
 import domain.updateservice.TelegramUpdate
 import domain.util.MathUtil
 import presentation.telegram.core.screen.BotScreen
+import presentation.util.PresentationUtil
 
 class UnboundPriceAlertScreen(
     private val update: TelegramUpdate.UnboundPriceAlert
@@ -16,7 +17,8 @@ class UnboundPriceAlertScreen(
     override val replyMarkup = defaultSecurityAlertReplayMarkup(update.security)
 
     private fun renderText() = buildString(UPDATE_BUILDER_CAPACITY) {
-        appendLine("*Сработал ценовой сигнал!*")
+        append("*Сработал ценовой сигнал!* ")
+        appendLine(alertColor(update))
         renderSecurityTitleForAlert(update.security)
 
         append("*Текущая цена:* ${update.currentPrice.formatToRu()}${ROUBLE_SIGN} ")
@@ -41,5 +43,12 @@ class UnboundPriceAlertScreen(
         appendLine()
         appendIndicatorsToSecurityAlert(update.indicators, update.currentPrice)
         appendNoteToSecurityAlert(update.security)
+    }
+
+    private fun alertColor(update: TelegramUpdate.UnboundPriceAlert): String {
+        return when (update.type) {
+            TelegramUpdate.UnboundPriceAlert.PriceType.ABOVE -> PresentationUtil.RED
+            TelegramUpdate.UnboundPriceAlert.PriceType.BELOW -> PresentationUtil.GREEN
+        }
     }
 }

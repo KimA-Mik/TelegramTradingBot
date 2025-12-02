@@ -16,7 +16,9 @@ class RsiAlertScreen(
     override val replyMarkup = defaultSecurityAlertReplayMarkup(update.security)
 
     private fun renderText() = buildString(UPDATE_BUILDER_CAPACITY) {
-        appendLine("*Сработал сигнал по RSI!*")
+        append("*Сработал сигнал по RSI!* ")
+        alertColor(update)?.let { append(it) }
+        appendLine()
         renderSecurityTitleForAlert(update.security)
 
         appendLine("*Текущая цена:* ${update.currentPrice.formatToRu()}$ROUBLE_SIGN")
@@ -32,5 +34,13 @@ class RsiAlertScreen(
         appendLine()
         appendIndicatorsToSecurityAlert(update.indicators, update.currentPrice)
         appendNoteToSecurityAlert(update.security)
+    }
+
+    private fun alertColor(update: TelegramUpdate.RsiAlert) = update.intervals.firstOrNull()?.let {
+        val rsi = when (it) {
+            TelegramUpdate.RsiAlert.RsiInterval.MIN15 -> update.indicators.min15Rsi
+            TelegramUpdate.RsiAlert.RsiInterval.HOUR4 -> update.indicators.hour4Rsi
+        }
+        PresentationUtil.rsiColor(rsi)
     }
 }
