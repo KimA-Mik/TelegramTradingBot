@@ -29,18 +29,18 @@ class SrsiAlertScreen(
             when (interval) {
                 TelegramUpdate.SrsiAlert.SrsiInterval.MIN15 -> {
                     val color = PresentationUtil.rsiColor(
-                        update.indicators.min15Rsi,
+                        update.indicators.min15Srsi,
                         MathUtil.SRSI_LOW, MathUtil.SRSI_HIGH
                     )
-                    append("*${color}SRSI (15м):* ${update.indicators.min15Rsi.formatToRu()}")
+                    appendLine("*${color}SRSI (15м):* ${update.indicators.min15Srsi.formatToRu()}")
                 }
 
                 TelegramUpdate.SrsiAlert.SrsiInterval.HOUR4 -> {
                     val color = PresentationUtil.rsiColor(
-                        update.indicators.hour4Rsi,
+                        update.indicators.hour4Srsi,
                         MathUtil.SRSI_LOW, MathUtil.SRSI_HIGH
                     )
-                    appendLine("*${color}SRSI (4ч):* ${update.indicators.hour4Rsi.formatToRu()}")
+                    appendLine("*${color}SRSI (4ч):* ${update.indicators.hour4Srsi.formatToRu()}")
                 }
             }
         }
@@ -52,8 +52,8 @@ class SrsiAlertScreen(
 
     private fun alertColor(update: TelegramUpdate.SrsiAlert): String? = update.intervals.firstOrNull()?.let {
         val rsi = when (it) {
-            TelegramUpdate.SrsiAlert.SrsiInterval.MIN15 -> update.indicators.min15Rsi
-            TelegramUpdate.SrsiAlert.SrsiInterval.HOUR4 -> update.indicators.hour4Rsi
+            TelegramUpdate.SrsiAlert.SrsiInterval.MIN15 -> update.indicators.min15Srsi
+            TelegramUpdate.SrsiAlert.SrsiInterval.HOUR4 -> update.indicators.hour4Srsi
         }
         PresentationUtil.rsiColor(rsi, MathUtil.SRSI_LOW, MathUtil.SRSI_HIGH)
     }
