@@ -1,5 +1,6 @@
 package presentation.telegram
 
+import com.github.kotlintelegrambot.types.TelegramBotResult
 import domain.common.PATH_SEPARATOR
 import domain.user.usecase.FindUserUseCase
 import domain.user.usecase.PopUserUseCase
@@ -25,13 +26,15 @@ class BotModel(
     private val userToRoot: UserToRootUseCase,
     private val popUser: PopUserUseCase,
     private val updateHandler: UpdateHandler,
+    private val errorHandler: MessageErrorHandler
 ) {
 
     private val _outMessages = MutableSharedFlow<BotScreen>()
     val outMessages = merge(
         _outMessages,
         callbackHandler.outFlow,
-        updateHandler.outScreens
+        updateHandler.outScreens,
+        errorHandler.outMessages
     )
 
     suspend fun homeCommand(userId: Long) {
@@ -106,4 +109,7 @@ class BotModel(
     ) {
         callbackHandler.handleCallback(callbackData, userId, messageId, messageText)
     }
+
+    suspend fun handleMessageError(screen: BotScreen, error: TelegramBotResult.Error) =
+        errorHandler.handleError(screen, error)
 }

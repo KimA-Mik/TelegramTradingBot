@@ -11,6 +11,7 @@ abstract class BotScreen(val id: Long, val messageId: Long? = null) {
     open val replyMarkup: ReplyMarkup? = null
     open val parseMode: ParseMode? = null
     open val disableWebPagePreview = false
+    open fun shouldFireError(): Boolean = true
 
     companion object {
         val basicReplayMarkup = KeyboardReplyMarkup(

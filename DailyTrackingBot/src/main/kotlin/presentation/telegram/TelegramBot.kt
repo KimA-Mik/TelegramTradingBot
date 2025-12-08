@@ -8,6 +8,7 @@ import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.telegramError
 import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
+import com.github.kotlintelegrambot.types.TelegramBotResult
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import presentation.telegram.core.UiError
@@ -87,14 +88,16 @@ class TelegramBot(
                     return@collect
                 }
 
-                telegramBot.sendMessage(
+                val result = telegramBot.sendMessage(
                     chatId = ChatId.fromId(screen.id),
                     text = screen.text,
                     parseMode = screen.parseMode,
                     disableWebPagePreview = screen.disableWebPagePreview,
                     replyMarkup = screen.replyMarkup
-                ).onError { error ->
-                    logger.error("Failed to send message to user ${screen.id}: $error")
+                )
+                // Can't run suspend function in onError callback, noice
+                if (result is TelegramBotResult.Error) {
+                    model.handleMessageError(screen, result)
                 }
             }
         }

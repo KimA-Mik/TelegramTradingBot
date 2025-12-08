@@ -35,4 +35,6 @@ object TelegramUtil {
         char(':')
         minute()
     }
+
+    const val CANNOT_DISPLAY_NOTE = "Не удалось отобразить заметку из-за ограничений Telegram."
 }

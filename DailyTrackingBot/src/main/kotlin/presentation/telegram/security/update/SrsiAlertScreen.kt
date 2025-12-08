@@ -5,13 +5,13 @@ import domain.common.ROUBLE_SIGN
 import domain.common.formatToRu
 import domain.updateservice.TelegramUpdate
 import domain.util.MathUtil
-import presentation.telegram.core.screen.BotScreen
 import presentation.util.PresentationUtil
 
 class SrsiAlertScreen(
     private val update: TelegramUpdate.SrsiAlert
-) : BotScreen(update.user.id) {
-    override val text = renderText()
+) : SecurityAlertScreen(update.user.id) {
+    override val text
+        get() = renderText()
     override val parseMode = ParseMode.MARKDOWN
     override val disableWebPagePreview = true
     override val replyMarkup = defaultSecurityAlertReplayMarkup(update.security)
@@ -47,7 +47,7 @@ class SrsiAlertScreen(
 
         appendLine()
         appendIndicatorsToSecurityAlert(update.indicators, update.currentPrice, renderSrsi = true)
-        appendNoteToSecurityAlert(update.security)
+        appendNoteToSecurityAlert(update.security, hideProblematicUserNote)
     }
 
     private fun alertColor(update: TelegramUpdate.SrsiAlert): String? = update.intervals.firstOrNull()?.let {

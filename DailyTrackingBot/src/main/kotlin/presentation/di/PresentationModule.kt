@@ -4,6 +4,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import presentation.telegram.BotModel
 import presentation.telegram.CallbackHandler
+import presentation.telegram.MessageErrorHandler
 import presentation.telegram.UpdateHandler
 import presentation.telegram.core.RootTextModel
 import presentation.telegram.security.edit.callbackbutton.*
@@ -23,6 +24,7 @@ fun presentationModule() = module {
     singleOf(::CallbackHandler)
     singleOf(::UpdateHandler)
     singleOf(::RootTextModel)
+    singleOf(::MessageErrorHandler)
 
     /* Security */
 
