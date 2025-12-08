@@ -21,6 +21,7 @@ import ru.kima.cacheserver.api.schema.model.Security
 import ru.kima.cacheserver.api.schema.model.requests.GetLastPricesRequest
 import ru.kima.cacheserver.api.schema.model.requests.InstrumentsRequest
 import kotlin.random.Random
+import kotlin.random.nextLong
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
@@ -44,8 +45,7 @@ class UpdateService(
 
     private fun run() = scope.launch {
         while (isActive) {
-            val delayTime = Random.nextFloat() * 30f * TimeUtil.SECOND_MILLIS
-            delay(30 * TimeUtil.SECOND_MILLIS + delayTime.toLong())
+            delay((15L + Random.nextLong(0L..15L)) * TimeUtil.SECOND_MILLIS)
             checkForUpdates()
             resetUsers()
             delayNonWorkingHours(8, 45, 23, 59)
