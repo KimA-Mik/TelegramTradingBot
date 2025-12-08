@@ -45,4 +45,8 @@ sealed class UiError {
     object UnableToLoadSecurity : UiError() {
         override fun render() = "Не удалось загрузить информацию о ценной бумаге"
     }
+
+    object TelegramApiError : UiError() {
+        override fun render() = "Произошла ошибка при взаимодействии с Telegram"
+    }
 }
