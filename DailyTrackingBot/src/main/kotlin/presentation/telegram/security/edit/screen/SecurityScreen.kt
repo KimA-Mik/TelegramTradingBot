@@ -27,10 +27,17 @@ class SecurityScreen(
     private val lastPrice: Double?,
     messageId: Long? = null
 ) : BotScreen(user.id, messageId) {
-    override val text = renderText()
+    private var hideProblematicUserNote = false
+    override val text
+        get() = renderText()
     override val replyMarkup = calculateReplayMarkup()
     override val parseMode = ParseMode.MARKDOWN
     override val disableWebPagePreview = true
+    override fun shouldFireError() = hideProblematicUserNote
+
+    fun fixNoteMarkdown() {
+        hideProblematicUserNote = true
+    }
 
     @OptIn(ExperimentalTime::class)
     private fun renderText(): String = buildString {
@@ -91,7 +98,11 @@ class SecurityScreen(
                     append(" (", ldt.format(TelegramUtil.localDateTimeFormat), ")")
                 }
                 appendLine(":")
-                append(security.note)
+                if (hideProblematicUserNote) {
+                    append(TelegramUtil.CANNOT_DISPLAY_NOTE)
+                } else {
+                    append(security.note)
+                }
             }
         }
     }
