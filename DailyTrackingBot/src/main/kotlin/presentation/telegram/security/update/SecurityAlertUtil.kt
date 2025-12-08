@@ -34,7 +34,7 @@ fun StringBuilder.renderSecurityTitleForAlert(security: TrackingSecurity) {
 }
 
 @OptIn(ExperimentalTime::class)
-fun StringBuilder.appendNoteToSecurityAlert(security: TrackingSecurity) {
+fun StringBuilder.appendNoteToSecurityAlert(security: TrackingSecurity, hideProblematicUserNote: Boolean) {
     security.note?.takeIf { it.isNotBlank() }?.let {
         append("Заметка")
         security.noteUpdatedMs?.let {
@@ -44,7 +44,11 @@ fun StringBuilder.appendNoteToSecurityAlert(security: TrackingSecurity) {
             append(')')
         }
         appendLine(":")
-        append(security.note)
+        if (hideProblematicUserNote) {
+            append(TelegramUtil.CANNOT_DISPLAY_NOTE)
+        } else {
+            append(security.note)
+        }
     }
 }
 

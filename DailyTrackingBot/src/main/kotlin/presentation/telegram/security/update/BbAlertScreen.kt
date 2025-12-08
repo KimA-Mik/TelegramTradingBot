@@ -4,13 +4,13 @@ import com.github.kotlintelegrambot.entities.ParseMode
 import domain.common.ROUBLE_SIGN
 import domain.common.formatToRu
 import domain.updateservice.TelegramUpdate
-import presentation.telegram.core.screen.BotScreen
 import presentation.util.PresentationUtil
 
 class BbAlertScreen(
     private val update: TelegramUpdate.BbAlert
-) : BotScreen(update.user.id) {
-    override val text = renderText()
+) : SecurityAlertScreen(update.user.id) {
+    override val text
+        get() = renderText()
     override val parseMode = ParseMode.MARKDOWN
     override val disableWebPagePreview = true
     override val replyMarkup = defaultSecurityAlertReplayMarkup(update.security)
@@ -42,7 +42,7 @@ class BbAlertScreen(
 
         appendLine()
         appendIndicatorsToSecurityAlert(update.indicators, update.currentPrice, renderMFI = true)
-        appendNoteToSecurityAlert(update.security)
+        appendNoteToSecurityAlert(update.security, hideProblematicUserNote)
     }
 
     private fun alertColor(update: TelegramUpdate.BbAlert) = update.intervals.firstOrNull()?.let {
