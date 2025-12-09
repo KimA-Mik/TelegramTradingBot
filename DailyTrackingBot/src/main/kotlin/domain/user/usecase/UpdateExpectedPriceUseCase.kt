@@ -5,6 +5,8 @@ import domain.user.model.PriceProlongation
 import domain.user.model.TrackingSecurity
 import domain.user.model.User
 import domain.user.repository.UserRepository
+import domain.util.MathUtil
+import domain.util.isEqual
 
 class UpdateExpectedPriceUseCase(
     private val repository: UserRepository
@@ -16,6 +18,7 @@ class UpdateExpectedPriceUseCase(
         priceType: PriceType
     ): TrackingSecurity? {
         val number = runCatching { inputNumber.parseToDouble() }.getOrElse { return null }
+        val price = if (number.isEqual(MathUtil.PRICE_ZERO)) null else number
         val fullUser = repository.findFullUserById(user.id) ?: return null
         val security = fullUser.securities.find { it.ticker == ticker } ?: return null
 
@@ -39,7 +42,7 @@ class UpdateExpectedPriceUseCase(
 
         val copy = when (priceType) {
             PriceType.HIGH -> security.copy(
-                targetPrice = number,
+                targetPrice = price,
                 isActive = isActive,
                 remainActive = remainActive,
                 shouldNotify = true,
@@ -48,7 +51,7 @@ class UpdateExpectedPriceUseCase(
             )
 
             PriceType.LOW -> security.copy(
-                lowTargetPrice = number,
+                lowTargetPrice = price,
                 isActive = isActive,
                 remainActive = remainActive,
                 shouldNotify = true,
