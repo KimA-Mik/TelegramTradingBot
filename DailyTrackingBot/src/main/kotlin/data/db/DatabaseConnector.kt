@@ -1,9 +1,8 @@
 package data.db
 
-import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.v1.core.Transaction
 import org.jetbrains.exposed.v1.jdbc.Database
-import org.jetbrains.exposed.v1.jdbc.transactions.experimental.newSuspendedTransaction
+import org.jetbrains.exposed.v1.jdbc.transactions.suspendTransaction
 import org.jetbrains.exposed.v1.jdbc.transactions.transactionManager
 import java.sql.Connection
 
@@ -15,7 +14,7 @@ class DatabaseConnector {
     }
 
     suspend fun <T> transaction(block: suspend Transaction.() -> T): T =
-        newSuspendedTransaction(Dispatchers.IO, db = connection) { block() }
+        suspendTransaction(connection) { block() }
 
     suspend fun <T> transactionCatching(block: suspend Transaction.() -> T): Result<T> =
         runCatching { transaction { block() } }
