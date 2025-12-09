@@ -89,9 +89,14 @@ class UpdateService(
     }
 
     suspend fun checkForUpdates() {
-        val users = repository.getFullUsers()
+        var users = repository.getFullUsers()
         val securities = getSecurities(users)
-        handleUsers(users, securities)
+        val indicatorsCache = IndicatorsCache(cacheServerApi)
+        val uids = securities.values.map { it.uid }
+        val lastPrices = cacheServerApi.lastPrices(GetLastPricesRequest.default(uids))
+            .getOrElse { return }.associateBy { it.uid }
+        users = repository.getFullUsers()
+        handleUsers(users, lastPrices, indicatorsCache)
     }
 
     private suspend fun getSecurities(users: List<FullUser>): Map<String, Security> = coroutineScope {
@@ -114,18 +119,31 @@ class UpdateService(
     }
 
     @OptIn(ExperimentalTime::class)
-    private suspend fun handleUsers(users: List<FullUser>, securities: Map<String, Security>) {
-        val indicatorsCache = IndicatorsCache(cacheServerApi)
-        val uids = securities.values.map { it.uid }
-        val lastPrices = cacheServerApi.lastPrices(GetLastPricesRequest.default(uids))
-            .getOrElse { return }.associateBy { it.uid }
+    private suspend fun handleUsers(
+        users: List<FullUser>,
+        lastPrices: Map<String, LastPrice>,
+        indicatorsCache: IndicatorsCache,
+    ) {
         val toUpdate = mutableListOf<TrackingSecurity>()
         for (user in users) {
             handleUser(user, lastPrices, indicatorsCache, toUpdate)
         }
 
         if (toUpdate.isNotEmpty()) {
-            repository.updateTrackingSecurities(toUpdate)
+            val actualSecurities = repository.getFullUsers().flatMap { it.securities }.associateBy { it.id }
+            val iLoveRaceConditions: MutableList<TrackingSecurity> = ArrayList(toUpdate.size)
+            for (security in toUpdate) {
+                val actualSecurity = actualSecurities[security.id] ?: continue
+                if (actualSecurity.targetPrice != security.targetPrice ||
+                    actualSecurity.lowTargetPrice != security.lowTargetPrice
+                ) {
+                    continue
+                }
+
+                iLoveRaceConditions.add(security)
+            }
+
+            repository.updateTrackingSecurities(iLoveRaceConditions)
         }
     }
 

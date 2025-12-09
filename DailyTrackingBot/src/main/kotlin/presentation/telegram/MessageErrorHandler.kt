@@ -29,12 +29,10 @@ class MessageErrorHandler {
         error: TelegramBotResult.Error.HttpError
     ) = logger.error("HTTP error: $error for screen: $screen")
 
-
     private fun handleInvalidResponse(
         screen: BotScreen,
         error: TelegramBotResult.Error.InvalidResponse
     ) = logger.error("Invalid response error: $error for screen: $screen")
-
 
     private suspend fun handleTelegramApiError(
         screen: BotScreen,
@@ -72,6 +70,10 @@ class MessageErrorHandler {
         screen: BotScreen,
         error: TelegramBotResult.Error.Unknown
     ) = logger.error("Unknown error: $error for screen: $screen")
+
+    fun handleException(screen: BotScreen, exception: Exception) {
+        logger.error("Exception occurred for screen: $screen", exception)
+    }
 
     companion object {
         private const val CANT_PARSE_ENTITIES = "Bad Request: can't parse entities"

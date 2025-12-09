@@ -112,4 +112,7 @@ class BotModel(
 
     suspend fun handleMessageError(screen: BotScreen, error: TelegramBotResult.Error) =
         errorHandler.handleError(screen, error)
+
+    suspend fun handleMessageException(screen: BotScreen, exception: Exception) =
+        errorHandler.handleException(screen, exception)
 }
