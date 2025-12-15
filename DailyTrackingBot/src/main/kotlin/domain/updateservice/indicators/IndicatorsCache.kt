@@ -56,10 +56,10 @@ class IndicatorsCache(
             hourlyMfi = MoneyFlowIndexIndicator(seriesResult.hourly, DEFAULT_BAR_COUNT).lastDouble(),
             hour4Mfi = MoneyFlowIndexIndicator(seriesResult.hour4, DEFAULT_BAR_COUNT).lastDouble(),
             dailyMfi = MoneyFlowIndexIndicator(seriesResult.daily, DEFAULT_BAR_COUNT).lastDouble(),
-            min15Srsi = StochasticRSIIndicator(min15RsiInd, DEFAULT_BAR_COUNT).lastDouble(),
-            hourlySrsi = StochasticRSIIndicator(hourlyRsiInd, DEFAULT_BAR_COUNT).lastDouble(),
-            hour4Srsi = StochasticRSIIndicator(hour4RsiInd, DEFAULT_BAR_COUNT).lastDouble(),
-            dailySrsi = StochasticRSIIndicator(dailyRsiInd, DEFAULT_BAR_COUNT).lastDouble(),
+            min15Srsi = StochasticRSIIndicator(min15RsiInd, DEFAULT_BAR_COUNT).lastDouble() * 100.0,
+            hourlySrsi = StochasticRSIIndicator(hourlyRsiInd, DEFAULT_BAR_COUNT).lastDouble() * 100.0,
+            hour4Srsi = StochasticRSIIndicator(hour4RsiInd, DEFAULT_BAR_COUNT).lastDouble() * 100.0,
+            dailySrsi = StochasticRSIIndicator(dailyRsiInd, DEFAULT_BAR_COUNT).lastDouble() * 100.0,
         )
     }
 
