@@ -11,10 +11,22 @@ import domain.util.MathUtil
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
+import org.jfree.chart.ChartUtils
+import org.jfree.chart.JFreeChart
+import org.jfree.chart.axis.DateAxis
+import org.jfree.chart.axis.NumberAxis
+import org.jfree.chart.plot.XYPlot
+import org.jfree.chart.renderer.xy.CandlestickRenderer
+import org.jfree.data.xy.DefaultHighLowDataset
 import presentation.telegram.security.list.callbackbutton.EditSecurityCallbackButton
 import presentation.util.PresentationUtil
 import presentation.util.TelegramUtil
 import presentation.util.TinInvestUtil
+import java.io.ByteArrayOutputStream
+import java.io.FileOutputStream
+import java.util.*
+import kotlin.math.min
+import kotlin.random.Random
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -135,3 +147,51 @@ fun defaultSecurityAlertReplayMarkup(security: TrackingSecurity) = InlineKeyboar
         listOf(EditSecurityCallbackButton.getCallbackData(security.ticker))
     )
 )
+
+fun plotGraphs(indicators: CacheEntry?): ByteArray? {
+    if (indicators == null) return null
+    val size = min(100, indicators.min15.barCount)
+    val highs = DoubleArray(size)
+    val lows = DoubleArray(size)
+    val opens = DoubleArray(size)
+    val closes = DoubleArray(size)
+    val volumes = DoubleArray(size)
+    val dates = Array<Date>(size) {
+        val i = indicators.min15.barCount - size + it
+        val bar = indicators.min15.getBar(i)
+        highs[it] = bar.highPrice.doubleValue()
+        lows[it] = bar.lowPrice.doubleValue()
+        opens[it] = bar.openPrice.doubleValue()
+        closes[it] = bar.closePrice.doubleValue()
+        volumes[it] = bar.volume.doubleValue()
+        Date(bar.endTime.toEpochMilli())
+    }
+
+    val dataset = DefaultHighLowDataset(
+        "series",
+        dates,
+        highs,
+        lows,
+        opens,
+        closes,
+        volumes
+    )
+
+    val renderer = CandlestickRenderer()
+    val dateAxis = DateAxis()
+    val valueAxis = NumberAxis()
+    val plot = XYPlot(dataset, dateAxis, valueAxis, renderer)
+    val chart = JFreeChart(null as String?, JFreeChart.DEFAULT_TITLE_FONT, plot, false)
+
+
+    val ba = ByteArrayOutputStream().use { baos ->
+        ChartUtils.writeChartAsPNG(baos, chart, 1920, 1080)
+        baos.toByteArray()
+    }
+
+    FileOutputStream("chart${Random.nextInt()}.png").use { fos ->
+        fos.write(ba)
+    }
+
+    return ba
+}

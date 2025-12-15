@@ -44,6 +44,10 @@ class IndicatorsCache(
         val dailyRsiInd = RSIIndicator(dailyClose, DEFAULT_BAR_COUNT)
 
         return CacheEntry(
+            min15 = seriesResult.min15,
+            hourly = seriesResult.hourly,
+            hour4 = seriesResult.hour4,
+            daily = seriesResult.daily,
             min15Rsi = min15RsiInd.lastDouble(),
             hourlyRsi = hourlyRsiInd.lastDouble(),
             hour4Rsi = hour4RsiInd.lastDouble(),

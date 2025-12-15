@@ -1,9 +1,11 @@
 package presentation.telegram.security.update
 
 import com.github.kotlintelegrambot.entities.ParseMode
+import com.github.kotlintelegrambot.entities.TelegramFile
 import domain.common.ROUBLE_SIGN
 import domain.common.formatToRu
 import domain.updateservice.TelegramUpdate
+import presentation.telegram.core.MediaType
 import presentation.util.PresentationUtil
 
 class PriceAlertScreen(
@@ -14,6 +16,14 @@ class PriceAlertScreen(
     override val parseMode = ParseMode.MARKDOWN
     override val disableWebPagePreview = true
     override val replyMarkup = defaultSecurityAlertReplayMarkup(update.security)
+    override val mediaType: MediaType?
+        get() = when (val g = plotGraphs(update.indicators)) {
+            null -> null
+            else -> MediaType.Photo(
+                photo = TelegramFile.ByByteArray(g),
+                protectContent = false
+            )
+        }
 
     private fun renderText() = buildString(UPDATE_BUILDER_CAPACITY) {
         appendLine("*Сработал ценовой сигнал!*")

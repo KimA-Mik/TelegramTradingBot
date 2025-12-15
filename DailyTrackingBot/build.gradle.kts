@@ -33,6 +33,12 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.clikt)
 
+//    implementation("org.jetbrains.kotlinx:kandy-lets-plot:0.8.0")
+
+    implementation("org.jfree:jfreechart:1.5.3")
+//    implementation("org.jetbrains.kotlinx:kandy-api:0.8.0")
+//    implementation("org.jetbrains.kotlinx:kandy-echarts:0.8.0")
+
     implementation(project(":SharesServer:CacheServerApi"))
     testImplementation(kotlin("test"))
 }

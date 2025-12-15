@@ -8,10 +8,13 @@ import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.telegramError
 import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
+import com.github.kotlintelegrambot.entities.TelegramFile.ByByteArray
 import com.github.kotlintelegrambot.types.TelegramBotResult
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
+import presentation.telegram.core.MediaType
 import presentation.telegram.core.UiError
+import presentation.telegram.core.screen.BotScreen
 
 
 class TelegramBot(
@@ -71,34 +74,56 @@ class TelegramBot(
         }
         telegramBot.startPolling()
         botJob = scope.launch {
-            model.outMessages.collect { screen ->
-                screen.messageId?.let {
-                    val chatId = ChatId.fromId(screen.id)
-                    telegramBot.editMessageText(
-                        chatId = chatId,
-                        messageId = it,
-                        text = screen.text,
+            model.outMessages.collect { collectScreen(it) }
+        }
+    }
+
+    private suspend fun collectScreen(screen: BotScreen) {
+        screen.messageId?.let {
+            val chatId = ChatId.fromId(screen.id)
+            telegramBot.editMessageText(
+                chatId = chatId,
+                messageId = it,
+                text = screen.text,
+                parseMode = screen.parseMode,
+                disableWebPagePreview = screen.disableWebPagePreview,
+                replyMarkup = screen.replyMarkup
+            ).second?.let { exception ->
+                model.handleMessageException(screen, exception)
+            }
+
+            return
+        }
+
+        if (screen.mediaType == null) {
+            val result = telegramBot.sendMessage(
+                chatId = ChatId.fromId(screen.id),
+                text = screen.text,
+                parseMode = screen.parseMode,
+                disableWebPagePreview = screen.disableWebPagePreview,
+                replyMarkup = screen.replyMarkup
+            )
+            // Can't run suspend function in onError callback, noice
+            if (result is TelegramBotResult.Error) {
+                model.handleMessageError(screen, result)
+            }
+        } else {
+            val res = when (screen.mediaType) {
+                is MediaType.Photo ->
+                    telegramBot.sendPhoto(
+                        chatId = ChatId.fromId(screen.id),
+                        photo = ByByteArray(ByteArray(2)),
+                        caption = screen.text,
                         parseMode = screen.parseMode,
-                        disableWebPagePreview = screen.disableWebPagePreview,
+                        protectContent = (screen.mediaType as MediaType.Photo).protectContent,
                         replyMarkup = screen.replyMarkup
-                    ).second?.let { error ->
-                        logger.error("Failed to edit message $it for user ${screen.id}: $error")
-                    }
+                    )
 
-                    return@collect
-                }
+                null -> null
+            }
 
-                val result = telegramBot.sendMessage(
-                    chatId = ChatId.fromId(screen.id),
-                    text = screen.text,
-                    parseMode = screen.parseMode,
-                    disableWebPagePreview = screen.disableWebPagePreview,
-                    replyMarkup = screen.replyMarkup
-                )
-                // Can't run suspend function in onError callback, noice
-                if (result is TelegramBotResult.Error) {
-                    model.handleMessageError(screen, result)
-                }
+            res?.second?.let { exception ->
+                model.handleMessageException(screen, exception)
             }
         }
     }
