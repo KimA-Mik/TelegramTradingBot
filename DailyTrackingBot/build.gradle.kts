@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
+    alias(libs.plugins.serialization)
 }
 
 group = "ru.kima.dailytrackingbot"
@@ -32,6 +33,8 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.logging.interceptor)
     implementation(libs.clikt)
+
+    implementation(libs.ktor.serialization.kotlinx.json)
 
     implementation(project(":SharesServer:CacheServerApi"))
     testImplementation(kotlin("test"))
