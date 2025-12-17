@@ -7,8 +7,8 @@ object MathUtil {
     const val PRICE_ZERO = 0.0
     const val EPSILON = 1e-5
 
-    const val RSI_LOW = 22.0
-    const val RSI_HIGH = 78.0
+    const val RSI_LOW = 29.0
+    const val RSI_HIGH = 71.0
     const val BB_FOR_RSI_HIGH = 80.0
     const val BB_FOR_RSI_LOW = 20.0
     fun isRsiCritical(rsi: Double, low: Double = RSI_LOW, high: Double = RSI_HIGH) =
