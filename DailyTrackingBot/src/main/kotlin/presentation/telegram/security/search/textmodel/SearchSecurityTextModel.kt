@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory
 import presentation.telegram.core.NavigationRoot
 import presentation.telegram.core.TextModel
 import presentation.telegram.core.screen.BotScreen
+import presentation.telegram.security.search.screen.AddDefaultSecuritiesScreen
 import presentation.telegram.security.search.screen.SearchSecurityScreen
 import presentation.telegram.security.search.screen.TickerSearchResultScreen
 
@@ -31,9 +32,12 @@ class SearchSecurityTextModel(
         }
 
         when (command) {
-            Commands.UseDefaultSecurities.text -> {
-
-            }
+            Commands.UseDefaultSecurities.text -> emit(
+                AddDefaultSecuritiesScreen(
+                    user.id,
+                    state = AddDefaultSecuritiesScreen.State.AddSecurities(localConfig.getLocalConfig().securities.size)
+                )
+            )
 
             else -> {
                 val searchResult = runCatching { findSecurity(user.id, command) }

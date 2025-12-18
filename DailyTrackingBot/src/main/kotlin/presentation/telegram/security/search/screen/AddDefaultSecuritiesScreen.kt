@@ -11,8 +11,9 @@ class AddDefaultSecuritiesScreen(
 ) : BotScreen(userId, messageId) {
     override val text = when (state) {
         is State.AddSecurities -> "Будет добавлено ${state.count} бумаг"
-        State.Success -> "Бумаги по умолчанию успешно добавлены в ваш список отслеживания."
+        is State.Success -> "Успешно добавлено ${state.count} бумаг по умолчанию."
         State.Failure -> "Не удалось добавить бумаги по умолчанию. Попробуйте позже."
+        State.NoDefaultSecurities -> "Дла данного бота нет бумаг по умолчанию для добавления."
     }
 
     override val replyMarkup = when (state) {
@@ -28,7 +29,8 @@ class AddDefaultSecuritiesScreen(
 
     sealed interface State {
         data class AddSecurities(val count: Int) : State
-        data object Success : State
+        data class Success(val count: Int) : State
         data object Failure : State
+        data object NoDefaultSecurities : State
     }
 }

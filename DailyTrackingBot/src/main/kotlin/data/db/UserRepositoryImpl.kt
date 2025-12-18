@@ -136,6 +136,23 @@ class UserRepositoryImpl(
         }.toTrackingSecurity()
     }
 
+    override suspend fun createTrackingSecurities(
+        user: User,
+        securities: List<TrackingSecurity>
+    ): Result<List<TrackingSecurity>> = databaseConnector.transactionCatching {
+        val results = mutableListOf<TrackingSecurity>()
+        val u = UserEntity[user.id]
+        for (security in securities) {
+            val new = SecurityEntity.new {
+                this.user = u
+                updateSecurity(this, security)
+            }
+            results.add(new.toTrackingSecurity())
+        }
+
+        return@transactionCatching results
+    }
+
     override suspend fun updateTrackingSecurity(security: TrackingSecurity) = databaseConnector.transactionCatching {
         SecurityEntity.findByIdAndUpdate(security.id) {
             updateSecurity(it, security)
