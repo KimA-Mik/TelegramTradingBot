@@ -16,6 +16,7 @@ import presentation.telegram.settings.root.callbackbutton.ToggleSrsiAlertCallbac
 
 class CallbackHandler(
     /* Ticker search screen */
+    acceptDefaultSecuritiesCallbackButtonHandler: AcceptDefaultSecuritiesCallbackButtonHandler,
     tickerSuggestionCallbackHandler: TickerSuggestionCallbackHandler,
     subscribeToSecurityCallbackHandler: SubscribeToSecurityCallbackHandler,
     unsubscribeFromSecurityCallbackHandler: UnsubscribeFromSecurityCallbackHandler,
@@ -35,6 +36,7 @@ class CallbackHandler(
 ) {
     private val buttonHandlers = mapOf(
         /* Ticker search screen */
+        AcceptDefaultSecuritiesCallbackButton.callbackName to acceptDefaultSecuritiesCallbackButtonHandler,
         TickerSuggestionCallbackButton.callbackName to tickerSuggestionCallbackHandler,
         SubscribeToSecurityCallbackButton.callbackName to subscribeToSecurityCallbackHandler,
         UnsubscribeFromSecurityCallbackButton.callbackName to unsubscribeFromSecurityCallbackHandler,

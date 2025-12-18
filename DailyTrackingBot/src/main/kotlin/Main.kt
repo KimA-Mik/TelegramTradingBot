@@ -21,13 +21,14 @@ class Program : CliktCommand() {
     val telegramToken: String by option("-t", "--token").required().help("Telegram bot token")
     val apiUrl: String by option("-u", "--url").help("Cache server API URL")
         .default("127.0.0.1:6969")
+    val localConfig: String? by option("-c", "--config").help("Local config file path")
 
     override fun run() {
         val ruLocale = Locale.Builder().setLanguage("ru").setRegion("RU").build()
         Locale.setDefault(ruLocale)
         startKoin {
             modules(
-                dataModule(apiUrl),
+                dataModule(apiUrl, localConfig),
                 domainModule(),
                 presentationModule()
             )

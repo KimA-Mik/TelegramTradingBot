@@ -13,6 +13,7 @@ import presentation.telegram.security.list.callbackbutton.EditSecurityCallbackBu
 import presentation.telegram.security.list.callbackbutton.SecuritiesListBackwardCallbackButtonHandler
 import presentation.telegram.security.list.callbackbutton.SecuritiesListForwardCallbackButtonHandler
 import presentation.telegram.security.list.textmodel.SecurityListTextModel
+import presentation.telegram.security.search.callbackbutton.AcceptDefaultSecuritiesCallbackButtonHandler
 import presentation.telegram.security.search.callbackbutton.SubscribeToSecurityCallbackHandler
 import presentation.telegram.security.search.callbackbutton.TickerSuggestionCallbackHandler
 import presentation.telegram.security.search.callbackbutton.UnsubscribeFromSecurityCallbackHandler
@@ -30,6 +31,7 @@ fun presentationModule() = module {
 
     //Search
     singleOf(::TickerSuggestionCallbackHandler)
+    singleOf(::AcceptDefaultSecuritiesCallbackButtonHandler)
     singleOf(::SubscribeToSecurityCallbackHandler)
     singleOf(::UnsubscribeFromSecurityCallbackHandler)
     singleOf(::SearchSecurityTextModel)
