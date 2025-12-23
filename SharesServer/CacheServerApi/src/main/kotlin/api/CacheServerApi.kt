@@ -62,7 +62,7 @@ class CacheServerApi(
             from = to - interval.duration * (interval.limit - 1),
             to = to,
             interval = interval,
-            candleSource = GetCandlesRequest.CandleSource.EXCHANGE
+            candleSource = GetCandlesRequest.CandleSource.INCLUDE_WEEKEND
         )
     )
 
