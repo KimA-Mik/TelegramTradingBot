@@ -13,4 +13,5 @@ object Users : LongIdTable("users") {
     ).default(PriceProlongation.NONE)
 
     val enableSrsi = bool("enable_srsi").default(false)
+    val timeframesToFire = integer("timeframes_to_fire").default(3)
 }

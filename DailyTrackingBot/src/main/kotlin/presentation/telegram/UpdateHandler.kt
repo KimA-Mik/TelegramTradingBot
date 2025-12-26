@@ -22,6 +22,7 @@ class UpdateHandler(
             is TelegramUpdate.BbAlert -> BbAlertScreen(update)
             is TelegramUpdate.UnboundPriceAlert -> UnboundPriceAlertScreen(update)
             is TelegramUpdate.SrsiAlert -> SrsiAlertScreen(update)
+            is TelegramUpdate.RsiBbAlert -> RsiBbAlert(update)
         }
     }
 }

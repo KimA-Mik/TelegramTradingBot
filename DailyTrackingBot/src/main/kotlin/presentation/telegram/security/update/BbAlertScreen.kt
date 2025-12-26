@@ -32,10 +32,22 @@ class BbAlertScreen(
                     "15м"
                 )
 
+                TelegramUpdate.BbAlert.BbInterval.HOUR -> renderBb(
+                    update.indicators.hourlyBb,
+                    update.currentPrice,
+                    "1ч"
+                )
+
                 TelegramUpdate.BbAlert.BbInterval.HOUR4 -> renderBb(
                     update.indicators.hour4Bb,
                     update.currentPrice,
                     "4ч"
+                )
+
+                TelegramUpdate.BbAlert.BbInterval.DAY -> renderBb(
+                    update.indicators.dailyBb,
+                    update.currentPrice,
+                    "1д"
                 )
             }
         }
@@ -48,7 +60,9 @@ class BbAlertScreen(
     private fun alertColor(update: TelegramUpdate.BbAlert) = update.intervals.firstOrNull()?.let {
         val bb = when (it) {
             TelegramUpdate.BbAlert.BbInterval.MIN15 -> update.indicators.min15bb
+            TelegramUpdate.BbAlert.BbInterval.HOUR -> update.indicators.hourlyBb
             TelegramUpdate.BbAlert.BbInterval.HOUR4 -> update.indicators.hour4Bb
+            TelegramUpdate.BbAlert.BbInterval.DAY -> update.indicators.dailyBb
         }
         PresentationUtil.markupBbColor(update.currentPrice, bb.lower, bb.upper)
     }

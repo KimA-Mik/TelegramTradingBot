@@ -41,7 +41,7 @@ sealed class TelegramUpdate(val userId: Long) {
         val indicators: CacheEntry
     ) : TelegramUpdate(user.id) {
         enum class RsiInterval {
-            MIN15, HOUR4
+            MIN15, HOUR, HOUR4, DAY
         }
     }
 
@@ -53,9 +53,18 @@ sealed class TelegramUpdate(val userId: Long) {
         val indicators: CacheEntry
     ) : TelegramUpdate(user.id) {
         enum class BbInterval {
-            MIN15, HOUR4
+            MIN15, HOUR, HOUR4, DAY
         }
     }
+
+    data class RsiBbAlert(
+        val user: User,
+        val security: TrackingSecurity,
+        val currentPrice: Double,
+        val rsiIntervals: List<RsiAlert.RsiInterval>,
+        val bbIntervals: List<BbAlert.BbInterval>,
+        val indicators: CacheEntry
+    ) : TelegramUpdate(user.id)
 
     data class SrsiAlert(
         val user: User,
@@ -65,7 +74,7 @@ sealed class TelegramUpdate(val userId: Long) {
         val indicators: CacheEntry
     ) : TelegramUpdate(user.id) {
         enum class SrsiInterval {
-            MIN15, HOUR4
+            MIN15, HOUR, HOUR4, DAY
         }
     }
 }

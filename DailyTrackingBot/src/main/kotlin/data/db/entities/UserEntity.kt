@@ -13,6 +13,7 @@ class UserEntity(id: EntityID<Long>) : LongEntity(id) {
     var registered by Users.registered
     var defaultPriceProlongation by Users.defaultPriceProlongation
     var enableSrsi by Users.enableSrsi
+    var timeframesToFire by Users.timeframesToFire
 
     val securities by SecurityEntity referrersOn Securities.user
 

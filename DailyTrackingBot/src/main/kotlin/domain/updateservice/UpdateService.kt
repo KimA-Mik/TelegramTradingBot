@@ -158,8 +158,9 @@ class UpdateService(
             val indicators = indicatorsCache[security.uid]
 
             var currentSecurity = handlePrice(user, security, indicators, lastPrice)
-            currentSecurity = handleRsi(user, currentSecurity, indicators, lastPrice)
-            currentSecurity = handleBB(user, currentSecurity, indicators, lastPrice)
+            currentSecurity = handleRsiBb(user, currentSecurity, indicators, lastPrice)
+//            currentSecurity = handleRsi(user, currentSecurity, indicators, lastPrice)
+//            currentSecurity = handleBB(user, currentSecurity, indicators, lastPrice)
             currentSecurity = handleSrsi(user, currentSecurity, indicators, lastPrice)
 
             if (currentSecurity != security) {
@@ -266,7 +267,6 @@ class UpdateService(
         return security
     }
 
-
     private suspend fun handleRsi(
         user: FullUser,
         security: TrackingSecurity,
@@ -278,7 +278,9 @@ class UpdateService(
         val intervals = mutableListOf<TelegramUpdate.RsiAlert.RsiInterval>()
 
         if (MathUtil.isRsiCritical(indicators.min15Rsi)) intervals.add(TelegramUpdate.RsiAlert.RsiInterval.MIN15)
+        if (MathUtil.isRsiCritical(indicators.hourlyRsi)) intervals.add(TelegramUpdate.RsiAlert.RsiInterval.HOUR)
         if (MathUtil.isRsiCritical(indicators.hour4Rsi)) intervals.add(TelegramUpdate.RsiAlert.RsiInterval.HOUR4)
+        if (MathUtil.isRsiCritical(indicators.dailyRsi)) intervals.add(TelegramUpdate.RsiAlert.RsiInterval.DAY)
 
         val shouldNotifyRsi = intervals.isNotEmpty()
         if (shouldNotifyRsi && security.shouldNotifyRsi) {
@@ -319,7 +321,9 @@ class UpdateService(
 
         val intervals = mutableListOf<TelegramUpdate.BbAlert.BbInterval>()
         if (MathUtil.isBbCritical(lastPrice, indicators.min15bb)) intervals.add(TelegramUpdate.BbAlert.BbInterval.MIN15)
+        if (MathUtil.isBbCritical(lastPrice, indicators.hourlyBb)) intervals.add(TelegramUpdate.BbAlert.BbInterval.HOUR)
         if (MathUtil.isBbCritical(lastPrice, indicators.hour4Bb)) intervals.add(TelegramUpdate.BbAlert.BbInterval.HOUR4)
+        if (MathUtil.isBbCritical(lastPrice, indicators.dailyBb)) intervals.add(TelegramUpdate.BbAlert.BbInterval.DAY)
 
         val shouldNotifyBb = intervals.isNotEmpty()
         if (shouldNotifyBb && security.shouldNotifyBb) {
@@ -376,6 +380,48 @@ class UpdateService(
             return security.copy(shouldNotifySrsi = false)
         } else if (!shouldNotifySrsi && !security.shouldNotifySrsi) {
             return security.copy(shouldNotifySrsi = true)
+        }
+
+        return security
+    }
+
+    private suspend fun handleRsiBb(
+        user: FullUser,
+        security: TrackingSecurity,
+        indicators: CacheEntry?,
+        lastPrice: Double,
+    ): TrackingSecurity {
+        if (indicators == null) return security
+
+        val rsis = mutableListOf<TelegramUpdate.RsiAlert.RsiInterval>()
+        if (MathUtil.isRsiCritical(indicators.min15Rsi)) rsis.add(TelegramUpdate.RsiAlert.RsiInterval.MIN15)
+        if (MathUtil.isRsiCritical(indicators.hourlyRsi)) rsis.add(TelegramUpdate.RsiAlert.RsiInterval.HOUR)
+        if (MathUtil.isRsiCritical(indicators.hour4Rsi)) rsis.add(TelegramUpdate.RsiAlert.RsiInterval.HOUR4)
+        if (MathUtil.isRsiCritical(indicators.dailyRsi)) rsis.add(TelegramUpdate.RsiAlert.RsiInterval.DAY)
+
+        val bbs = mutableListOf<TelegramUpdate.BbAlert.BbInterval>()
+        if (MathUtil.isBbCritical(lastPrice, indicators.min15bb)) bbs.add(TelegramUpdate.BbAlert.BbInterval.MIN15)
+        if (MathUtil.isBbCritical(lastPrice, indicators.hourlyBb)) bbs.add(TelegramUpdate.BbAlert.BbInterval.HOUR)
+        if (MathUtil.isBbCritical(lastPrice, indicators.hour4Bb)) bbs.add(TelegramUpdate.BbAlert.BbInterval.HOUR4)
+        if (MathUtil.isBbCritical(lastPrice, indicators.dailyBb)) bbs.add(TelegramUpdate.BbAlert.BbInterval.DAY)
+
+        //TODO: add separate flag for rsi+bb notifications
+        val shouldNotifyRsiBb = rsis.size >= user.user.timeframesToFire && bbs.size >= user.user.timeframesToFire
+        if (shouldNotifyRsiBb && security.shouldNotifyRsi) {
+            _updates.emit(
+                TelegramUpdate.RsiBbAlert(
+                    user = user.user,
+                    security = security,
+                    currentPrice = lastPrice,
+                    rsiIntervals = rsis,
+                    bbIntervals = bbs,
+                    indicators = indicators
+                )
+            )
+
+            return security.copy(shouldNotifyRsi = false)
+        } else if (!shouldNotifyRsiBb && !security.shouldNotifyRsi) {
+            return security.copy(shouldNotifyRsi = true)
         }
 
         return security

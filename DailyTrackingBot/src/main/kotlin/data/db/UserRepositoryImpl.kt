@@ -94,6 +94,7 @@ class UserRepositoryImpl(
                 it.registered = user.registered.toLocalDateTime(TimeZone.currentSystemDefault())
                 it.defaultPriceProlongation = user.defaultPriceProlongation
                 it.enableSrsi = user.enableSrsi
+                it.timeframesToFire = user.timeframesToFire
             }?.toUser()
         }
 
