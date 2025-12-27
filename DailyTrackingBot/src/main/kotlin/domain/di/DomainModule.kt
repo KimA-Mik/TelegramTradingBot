@@ -15,6 +15,7 @@ fun domainModule() = module {
     singleOf(::GetSecurityUseCase)
 
     //User
+    singleOf(::ChangeTimeframesToFireUseCase)
     singleOf(::FindTickerForUserUseCase)
     singleOf(::FindUserUseCase)
     singleOf(::GetUserTrackingSecuritiesUseCase)

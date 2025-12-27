@@ -11,6 +11,8 @@ import presentation.telegram.core.screen.ErrorScreen
 import presentation.telegram.security.edit.callbackbutton.*
 import presentation.telegram.security.list.callbackbutton.*
 import presentation.telegram.security.search.callbackbutton.*
+import presentation.telegram.settings.root.callbackbutton.ChangeTimeframesToFireCallbackButton
+import presentation.telegram.settings.root.callbackbutton.ChangeTimeframesToFireCallbackButtonHandler
 import presentation.telegram.settings.root.callbackbutton.ToggleSrsiAlertCallbackButton
 import presentation.telegram.settings.root.callbackbutton.ToggleSrsiAlertCallbackButtonHandler
 
@@ -31,6 +33,7 @@ class CallbackHandler(
     securitiesListBackwardCallbackButtonHandler: SecuritiesListBackwardCallbackButtonHandler,
     securitiesListForwardCallbackButtonHandler: SecuritiesListForwardCallbackButtonHandler,
     /* Settings */
+    changeTimeframesToFireCallbackButtonHandler: ChangeTimeframesToFireCallbackButtonHandler,
     toggleSrsiAlertCallbackButtonHandler: ToggleSrsiAlertCallbackButtonHandler,
     private val findUser: FindUserUseCase
 ) {
@@ -51,6 +54,7 @@ class CallbackHandler(
         SecuritiesListBackwardCallbackButton.callbackName to securitiesListBackwardCallbackButtonHandler,
         SecuritiesListForwardCallbackButton.callbackName to securitiesListForwardCallbackButtonHandler,
         /* Settings */
+        ChangeTimeframesToFireCallbackButton.callbackName to changeTimeframesToFireCallbackButtonHandler,
         ToggleSrsiAlertCallbackButton.callbackName to toggleSrsiAlertCallbackButtonHandler
     )
 

@@ -18,6 +18,7 @@ import presentation.telegram.security.search.callbackbutton.SubscribeToSecurityC
 import presentation.telegram.security.search.callbackbutton.TickerSuggestionCallbackHandler
 import presentation.telegram.security.search.callbackbutton.UnsubscribeFromSecurityCallbackHandler
 import presentation.telegram.security.search.textmodel.SearchSecurityTextModel
+import presentation.telegram.settings.root.callbackbutton.ChangeTimeframesToFireCallbackButtonHandler
 import presentation.telegram.settings.root.callbackbutton.ToggleSrsiAlertCallbackButtonHandler
 
 fun presentationModule() = module {
@@ -57,5 +58,6 @@ fun presentationModule() = module {
     singleOf(::EditPriceTextModel)
 
     //Settings
+    singleOf(::ChangeTimeframesToFireCallbackButtonHandler)
     singleOf(::ToggleSrsiAlertCallbackButtonHandler)
 }
