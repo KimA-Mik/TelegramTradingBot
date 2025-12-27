@@ -18,7 +18,8 @@ data class TrackingSecurity(
     val shouldNotifyBb: Boolean,
     val shouldNotifySrsi: Boolean,
     val type: SecurityType,
-    val lastUnboundUpdateSec: Long
+    val lastUnboundUpdateSec: Long,
+    val lastUnboundUpdatePrice: Double?,
 ) {
 
     companion object {
@@ -40,7 +41,8 @@ data class TrackingSecurity(
             shouldNotifyRsi: Boolean = true,
             shouldNotifyBb: Boolean = true,
             shouldNotifySrsi: Boolean = true,
-            lastUnboundUpdateSec: Long = 0
+            lastUnboundUpdateSec: Long = 0,
+            lastUnboundUpdatePrice: Double? = null,
         ) = TrackingSecurity(
             id = id,
             ticker = ticker,
@@ -59,7 +61,8 @@ data class TrackingSecurity(
             shouldNotifyBb = shouldNotifyBb,
             shouldNotifySrsi = shouldNotifySrsi,
             type = type,
-            lastUnboundUpdateSec = lastUnboundUpdateSec
+            lastUnboundUpdateSec = lastUnboundUpdateSec,
+            lastUnboundUpdatePrice = lastUnboundUpdatePrice
         )
     }
 }

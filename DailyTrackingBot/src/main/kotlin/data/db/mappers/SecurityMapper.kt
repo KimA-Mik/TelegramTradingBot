@@ -25,5 +25,6 @@ fun SecurityEntity.toTrackingSecurity() = TrackingSecurity(
     shouldNotifyBb = shouldNotifyBb,
     shouldNotifySrsi = shouldNotifySrsi,
     type = type,
-    lastUnboundUpdateSec = lastUnboundUpdate
+    lastUnboundUpdateSec = lastUnboundUpdate,
+    lastUnboundUpdatePrice = lastUnboundUpdatePrice
 )

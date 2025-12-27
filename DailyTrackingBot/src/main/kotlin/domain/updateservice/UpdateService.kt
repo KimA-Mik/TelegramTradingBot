@@ -8,6 +8,7 @@ import domain.user.repository.UserRepository
 import domain.util.DateUtil
 import domain.util.MathUtil
 import domain.util.TimeUtil
+import domain.util.isEqual
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -195,6 +196,12 @@ class UpdateService(
         indicators: CacheEntry?,
         lastPrice: Double,
     ): TrackingSecurity {
+        security.lastUnboundUpdatePrice?.let {
+            if (it.isEqual(lastPrice, 1e-3)) {
+                return security
+            }
+        }
+
         val currentSec = Clock.System.now().epochSeconds
         if (currentSec - security.lastUnboundUpdateSec < unboundUpdateIntervalSec) {
             return security
@@ -224,7 +231,12 @@ class UpdateService(
                     type = priceType
                 )
             )
-            return security.copy(shouldNotify = true, lastUnboundUpdateSec = currentSec)
+
+            return security.copy(
+                shouldNotify = true,
+                lastUnboundUpdateSec = currentSec,
+                lastUnboundUpdatePrice = lastPrice
+            )
         }
 
         return security

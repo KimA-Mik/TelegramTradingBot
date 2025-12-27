@@ -26,6 +26,7 @@ class SecurityEntity(id: EntityID<Long>) : LongEntity(id) {
     var shouldNotifySrsi by Securities.shouldNotifySrsi
     var type by Securities.type
     var lastUnboundUpdate by Securities.lastUnboundUpdate
+    var lastUnboundUpdatePrice by Securities.lastUnboundUpdatePrice
 
     override fun toString(): String {
         return "Security(id=$id, ticker=$ticker, name=$name, uid=$uid, targetPrice=$targetPrice, " +

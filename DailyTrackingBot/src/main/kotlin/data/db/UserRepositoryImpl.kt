@@ -204,6 +204,8 @@ class UserRepositoryImpl(
         entity.shouldNotifyBb = security.shouldNotifyBb
         entity.shouldNotifySrsi = security.shouldNotifySrsi
         entity.type = security.type
+        entity.lastUnboundUpdate = security.lastUnboundUpdateSec
+        entity.lastUnboundUpdatePrice = security.lastUnboundUpdatePrice
     }
 
     override suspend fun deleteTrackingSecurity(id: Long) {
