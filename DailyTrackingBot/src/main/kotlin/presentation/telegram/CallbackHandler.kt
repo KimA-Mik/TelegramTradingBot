@@ -11,6 +11,8 @@ import presentation.telegram.core.screen.ErrorScreen
 import presentation.telegram.security.edit.callbackbutton.*
 import presentation.telegram.security.list.callbackbutton.*
 import presentation.telegram.security.search.callbackbutton.*
+import presentation.telegram.security.update.callbackbutton.RequestCsvCallbackButton
+import presentation.telegram.security.update.callbackbutton.RequestCsvCallbackButtonHandler
 import presentation.telegram.settings.root.callbackbutton.ToggleSrsiAlertCallbackButton
 import presentation.telegram.settings.root.callbackbutton.ToggleSrsiAlertCallbackButtonHandler
 
@@ -32,6 +34,9 @@ class CallbackHandler(
     securitiesListForwardCallbackButtonHandler: SecuritiesListForwardCallbackButtonHandler,
     /* Settings */
     toggleSrsiAlertCallbackButtonHandler: ToggleSrsiAlertCallbackButtonHandler,
+
+    /* Updates */
+    requestCsvCallbackButtonHandler: RequestCsvCallbackButtonHandler,
     private val findUser: FindUserUseCase
 ) {
     private val buttonHandlers = mapOf(
@@ -51,7 +56,9 @@ class CallbackHandler(
         SecuritiesListBackwardCallbackButton.callbackName to securitiesListBackwardCallbackButtonHandler,
         SecuritiesListForwardCallbackButton.callbackName to securitiesListForwardCallbackButtonHandler,
         /* Settings */
-        ToggleSrsiAlertCallbackButton.callbackName to toggleSrsiAlertCallbackButtonHandler
+        ToggleSrsiAlertCallbackButton.callbackName to toggleSrsiAlertCallbackButtonHandler,
+        /* Updates */
+        RequestCsvCallbackButton.callbackName to requestCsvCallbackButtonHandler,
     )
 
     private val _outFlow = MutableSharedFlow<BotScreen>()

@@ -12,6 +12,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
 import presentation.telegram.security.list.callbackbutton.EditSecurityCallbackButton
+import presentation.telegram.security.update.callbackbutton.RequestCsvCallbackButton
 import presentation.util.PresentationUtil
 import presentation.util.TelegramUtil
 import presentation.util.TinInvestUtil
@@ -132,6 +133,7 @@ fun defaultSecurityAlertReplayMarkup(security: TrackingSecurity) = InlineKeyboar
                 url = TinInvestUtil.securityUrl(security)
             )
         ),
-        listOf(EditSecurityCallbackButton.getCallbackData(security.ticker))
+        listOf(EditSecurityCallbackButton.getCallbackData(security.ticker)),
+        listOf(RequestCsvCallbackButton.getCallbackData(security.ticker))
     )
 )
